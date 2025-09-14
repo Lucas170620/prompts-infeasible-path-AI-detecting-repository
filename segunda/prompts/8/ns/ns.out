@@ -1,0 +1,93 @@
+**Resposta: NÃO**
+
+### Explicação:
+Com base na análise do Grafo de Fluxo de Controle (CFG) e do Grafo de Fluxo de Dados (DFG) construídos, **não existem infeasible paths** no código fornecido. 
+
+#### Motivos:
+1. **CFG Analysis**: 
+   - O CFG mostra que todos os caminhos são estruturalmente possíveis, pois os loops são aninhados de forma regular e a condição de quebra (`return` dentro do inner loop) depende apenas do valor de `x` e dos dados do array `keys`, que são acessíveis em todas as iterações.
+   - Não há condições contraditórias ou restrições lógicas que impossibilitem a execução de qualquer caminho. Por exemplo, o `return` dentro do loop pode ser acionado a qualquer momento, e o `return -1` no final é alcançável se o valor não for encontrado.
+
+2. **DFG Analysis**:
+   - O DFG revela que as dependências de dados são simples e diretas. Os valores de `i, j, k, l` são usados para acessar `keys` e `answer`, e não há dependências que criem conflitos ou impossibilitem fluxos.
+   - A condição `keys[i][j][k][l] == x` depende apenas de dados disponíveis em cada iteração, sem restrições que tornem algum caminho inviável.
+
+3. **Conclusão**:
+   - A ausência de condições complexas ou dependências críticas garante que todos os caminhos do CFG são executáveis para alguma entrada de `x`. Por exemplo, se `x = 400`, o inner loop é interrompido; caso contrário, todos os loops são percorridos até o final.
+
+---
+
+### CFG (Control Flow Graph) em Graphviz DOT:
+```dot
+digraph foo_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nodes
+    START [label="Início", shape=ellipse];
+    END [label="Fim", shape=ellipse];
+    N1 [label="i = 0"];
+    N2 [label="i < 5"];
+    N3 [label="j = 0"];
+    N4 [label="j < 5"];
+    N5 [label="k = 0"];
+    N6 [label="k < 5"];
+    N7 [label="l = 0"];
+    N8 [label="l < 5"];
+    N9 [label="if (keys[i][j][k][l] == x)"];
+    N10 [label="return answer[i][j][k][l] + keys[i][j][k][l];"];
+    N11 [label="l++"];
+    N12 [label="k++"];
+    N13 [label="j++"];
+    N14 [label="i++"];
+    N15 [label="return -1;"];
+
+    // Edges
+    START -> N1;
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N15 [label="false"];
+    N3 -> N4;
+    N4 -> N5 [label="true"];
+    N4 -> N14 [label="false"];
+    N5 -> N6;
+    N6 -> N7 [label="true"];
+    N6 -> N13 [label="false"];
+    N7 -> N8;
+    N8 -> N9 [label="true"];
+    N8 -> N12 [label="false"];
+    N9 -> N10 [label="true"];
+    N9 -> N11 [label="false"];
+    N10 -> END;
+    N11 -> N8;
+    N12 -> N6;
+    N13 -> N4;
+    N14 -> N2;
+    N15 -> END;
+}
+```
+
+### DFG (Data Flow Graph) em Graphviz DOT:
+```dot
+digraph foo_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    x [label="x (input)"];
+    keys [label="keys (array)"];
+    answer [label="answer (array)"];
+
+    node [shape=box, style=""];
+    add [label="+"];
+    eq [label="=="];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    result [label="result"];
+
+    // Fluxo de dados
+    x -> eq;
+    keys -> eq;
+    keys -> add;
+    answer -> add;
+    eq -> result [label="condição"];
+    add -> result [label="valor de retorno"];
+}
+```

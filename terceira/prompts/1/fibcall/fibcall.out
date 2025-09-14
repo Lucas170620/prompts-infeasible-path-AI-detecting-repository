@@ -1,0 +1,105 @@
+**Análise de Caminhos Inviáveis no Código fibcall.c**
+
+### 1. CFG (Control Flow Graph) para a Função `fib`
+```dot
+digraph CFG_fib {
+    node [shape=box, fontname="Courier", fontsize=10];
+    edge [fontname="Courier", fontsize=10];
+
+    entry [label="ENTRY", shape=ellipse];
+    exit [label="EXIT", shape=ellipse];
+
+    B1 [label="Fnew = 1\nFold = 0\ni = 2"];
+    B2 [label="i <= 30 && i <= n"];
+    B3 [label="temp = Fnew\nFnew = Fnew + Fold\nFold = temp\ni++"];
+    B4 [label="ans = Fnew\nreturn ans"];
+
+    entry -> B1;
+    B1 -> B2;
+    B2 -> B3 [label="true"];
+    B2 -> B4 [label="false"];
+    B3 -> B2;
+    B4 -> exit;
+}
+```
+
+### 2. DFG (Data Flow Graph) para a Função `fib`
+```dot
+digraph DFG_fib {
+    node [shape=box, fontname="Courier", fontsize=10];
+    edge [fontname="Courier", fontsize=10];
+
+    // Nós de operação
+    op1 [label="Fnew = 1"];
+    op2 [label="Fold = 0"];
+    op3 [label="i = 2"];
+    op4 [label="temp = Fnew"];
+    op5 [label="Fnew = Fnew + Fold"];
+    op6 [label="Fold = temp"];
+    op7 [label="i++"];
+    op8 [label="ans = Fnew"];
+    op9 [label="return ans"];
+
+    // Dependências de dados
+    op1 -> op4;
+    op1 -> op5;
+    op2 -> op5;
+    op4 -> op6;
+    op5 -> op4 [label="loop"];
+    op5 -> op5 [label="loop"];
+    op6 -> op5 [label="loop"];
+    op3 -> op7;
+    op7 -> op4 [label="loop (via condition)"];
+    op5 -> op8;
+    op8 -> op9;
+}
+```
+
+### 3. CFG (Control Flow Graph) para a Função `main`
+```dot
+digraph CFG_main {
+    node [shape=box, fontname="Courier", fontsize=10];
+    edge [fontname="Courier", fontsize=10];
+
+    entry [label="ENTRY", shape=ellipse];
+    exit [label="EXIT", shape=ellipse];
+
+    M1 [label="a = 30"];
+    M2 [label="fib(a)"];
+    M3 [label="return a"];
+
+    entry -> M1;
+    M1 -> M2;
+    M2 -> M3;
+    M3 -> exit;
+}
+```
+
+### 4. DFG (Data Flow Graph) para a Função `main`
+```dot
+digraph DFG_main {
+    node [shape=box, fontname="Courier", fontsize=10];
+    edge [fontname="Courier", fontsize=10];
+
+    op1 [label="a = 30"];
+    op2 [label="fib(a)"];
+    op3 [label="return a"];
+
+    op1 -> op2;
+    op1 -> op3;
+}
+```
+
+### 5. Análise de Caminhos Inviáveis
+**NÃO** existem *infeasible paths* neste código.
+
+#### Justificativa:
+- **Função `fib`:**
+  - O loop `for` é controlado pela condição `i <= 30 && i <= n`, que depende do parâmetro `n` e da variável `i`. No contexto da execução (com `n = 30`), a condição é sempre verdadeira para `2 ≤ i ≤ 30`, e falsa para `i > 30`. Não há contradições lógicas ou dependências de dados que impossibilitem qualquer caminho.
+  - As variáveis `Fnew`, `Fold`, e `temp` são inicializadas e atualizadas de forma consistente dentro do loop, sem dependências inviáveis.
+
+- **Função `main`:**
+  - O fluxo é linear (`a = 30 → fib(a) → return a`), sem branches ou condições. Portanto, não há múltiplos caminhos para analisar.
+
+- **Contexto Global:**
+  - A chamada `fib(30)` no `main` garante que o loop em `fib` execute exatamente 29 iterações (de `i = 2` a `i = 30`), o que é viável e não gera conflitos.

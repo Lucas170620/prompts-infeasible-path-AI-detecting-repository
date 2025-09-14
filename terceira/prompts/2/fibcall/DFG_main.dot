@@ -1,0 +1,9 @@
+digraph DFG_main {
+    node [shape=box];
+    a_assign [label="a = 30"];
+    fib_call [label="fib(a)"];
+    return [label="return a"];
+
+    a_assign -> fib_call;
+    a_assign -> return;
+}

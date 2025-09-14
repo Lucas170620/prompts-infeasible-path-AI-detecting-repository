@@ -1,0 +1,34 @@
+digraph DFG_foo {
+  node [shape=box];
+  x [label="x (parameter)"];
+  keys [label="keys (global)"];
+  answer [label="answer (global)"];
+  i0 [label="i = 0"];
+  j0 [label="j = 0"];
+  k0 [label="k = 0"];
+  l0 [label="l = 0"];
+  i_inc [label="i++"];
+  j_inc [label="j++"];
+  k_inc [label="k++"];
+  l_inc [label="l++"];
+  access_keys [label="keys[i][j][k][l]"];
+  access_answer [label="answer[i][j][k][l]"];
+  cond [label="keys[i][j][k][l] == x"];
+  return_val [label="answer[i][j][k][l] + keys[i][j][k][l]"];
+
+  i0 -> i_inc;
+  i_inc -> i_inc [label="loop"];
+  i0 -> access_keys;
+  i0 -> access_answer;
+  j0 -> access_keys;
+  j0 -> access_answer;
+  k0 -> access_keys;
+  k0 -> access_answer;
+  l0 -> access_keys;
+  l0 -> access_answer;
+  access_keys -> cond;
+  x -> cond;
+  cond -> return_val [label="condition true"];
+  access_keys -> return_val;
+  access_answer -> return_val;
+}

@@ -1,0 +1,57 @@
+**Resposta: NÃO**
+
+### Análise Baseada no CFG e DFG Construídos
+
+#### 1. **CFG (Control Flow Graph)**
+O CFG do código `adpcm.c` foi construído considerando a estrutura do programa, que é majoritariamente sequencial e estruturada, conforme as restrições mencionadas no cabeçalho (sem saltos incondicionais, sem `switch`, etc.). Os nós representam blocos de código indivisíveis, e as arestas representam fluxos de controle. O CFG revela:
+
+- **Laços bem definidos**: Todos os loops (como em `my_sin`, `encode`, `decode`) têm condições de entrada e saída claras, baseadas em variáveis que são modificadas incrementalmente (ex: `i` em `for` loops) ou em convergência numérica (ex: `diff` em `my_sin`).
+- **Condições não excludentes**: As condições (ex: `if (dlt == 0)` em `upzero`, `if (eh >= 0)` em `encode`) dependem de valores de variáveis calculadas em tempo de execução, mas não há contradições lógicas evidentes entre condições sequenciais. Por exemplo, não há casos como `if (x > 10)` seguido imediatamente por `if (x < 5)` no mesmo caminho.
+- **Fluxo linear**: O programa segue um fluxo previsível, com chamadas de função aninhadas, mas sem caminhos que possam ser bloqueados por invariantes ou estados mutuamente exclusivos.
+
+#### 2. **DFG (Data Flow Graph)**
+O DFG foca no fluxo de dados e dependências entre operações. Observamos:
+
+- **Variáveis inicializadas**: Todas as variáveis são inicializadas antes do uso (ex: `reset()` inicializa arrays e variáveis globais).
+- **Dependências consistentes**: Operações dependem de valores calculados anteriormente, mas não há casos onde uma variável é usada antes de ser definida ou onde valores fixos contradizem condições subsequentes. Exemplo: `deth` e `detl` são atualizados com base em entradas e estados anteriores, mas não há restrições que impossibilitem caminhos.
+- **Ausência de conflitos de dados**: Não há dependências circulares ou conflitos que tornem um caminho inviável. Exemplo: Em `my_sin`, `diff` é atualizado iterativamente, mas a condição de parada (`my_fabs(diff) >= 1`) é atingível para qualquer entrada.
+
+### Conclusão
+Não foram identificados **infeasible paths** no código `adpcm.c`. Todos os caminhos no CFG são potencialmente executáveis para alguma entrada, e o DFG não revela dependências de dados que impossibilitem a execução. As condições e loops são consistentes com os valores das variáveis, e não há contradições lógicas ou restrições de sistema que bloqueiem caminhos.
+
+### CFG e DFG em Graphviz DOT
+```dot
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="reset()"];
+    N2 [label="j = 10; f = 2000;"];
+    N3 [label="for (i=0; i<SIZE; i++)\n test_data[i] = j * my_cos(f*PI*i);"];
+    N4 [label="for (i=0; i<IN_END; i+=2)\n compressed[i/2] = encode(test_data[i], test_data[i+1]);"];
+    N5 [label="for (i=0; i<IN_END; i+=2)\n decode(compressed[i/2]);\n result[i]=xout1; result[i+1]=xout2;"];
+    N6 [label="return result[i]+result[i+1];"];
+    N1 -> N2 -> N3 -> N4 -> N5 -> N6;
+}
+```
+
+```dot
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    j [label="j"]; f [label="f"]; PI [label="PI"]; i [label="i"];
+    node [shape=box, style=""];
+    mult [label="*"]; cos [label="my_cos"]; assign_test [label="="];
+    encode [label="encode"]; assign_compressed [label="="];
+    decode [label="decode"]; assign_result1 [label="="]; assign_result2 [label="="];
+    add [label="+"];
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    test_data [label="test_data"]; compressed [label="compressed"];
+    result [label="result"]; return_val [label="return"];
+
+    j -> mult; f -> mult; PI -> mult; i -> mult;
+    mult -> cos -> assign_test -> test_data;
+    test_data -> encode -> assign_compressed -> compressed;
+    compressed -> decode;
+    decode -> assign_result1; decode -> assign_result2;
+    assign_result1 -> result; assign_result2 -> result;
+    result -> add -> return_val;
+}
+```

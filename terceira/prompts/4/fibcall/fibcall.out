@@ -1,0 +1,110 @@
+**Função:** `fib`
+
+**Grafo de Fluxo de Controle (CFG) em formato Graphviz:**
+
+```dot
+digraph fib_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    N1 [label="1: int i, Fnew, Fold, temp, ans;"];
+    N2 [label="2: Fnew = 1; Fold = 0; i = 2;"];
+    N3 [label="3: i <= 30 && i <= n"];
+    N4 [label="4: temp = Fnew; Fnew = Fnew + Fold; Fold = temp; i++;"];
+    N5 [label="5: ans = Fnew; return ans;"];
+
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N5 [label="false"];
+    N4 -> N3;
+}
+```
+
+**Grafo de Fluxo de Dados (DFG) em formato Graphviz:**
+
+```dot
+digraph fib_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_in [label="n"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_init [label="Initialize i, Fnew, Fold"];
+    op_cond [label="i <= 30 && i <= n"];
+    op_loop [label="temp = Fnew; Fnew = Fnew + Fold; Fold = temp; i++"];
+    op_ret [label="ans = Fnew; return ans"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    ans_out [label="ans"];
+
+    n_in -> op_cond;
+    op_init -> op_cond;
+    op_init -> op_loop;
+    op_cond -> op_loop [label="true"];
+    op_loop -> op_cond;
+    op_cond -> op_ret [label="false"];
+    op_loop -> op_ret [xlabel="Fnew (carried)", constraint=false];
+    op_ret -> ans_out;
+}
+```
+
+**Análise de Caminhos Inviáveis:**
+**Pergunta:** Quantos infeasible paths existem nesta função?
+**Resposta:** `0`
+
+**Justificativa:**
+O CFG mostra um loop com uma condição composta (`i <= 30 && i <= n`). Não há branches adicionais ou condições aninhadas que possam criar contradições lógicas. O DFG confirma que as dependências de dados são consistentes: 
+- A variável `n` é apenas lida e não modificada.
+- As variáveis `i`, `Fnew`, e `Fold` são inicializadas antes do loop e atualizadas de forma circularmente dependente, mas válida.
+- Não há condições mutuamente excludentes (ex: `x > 10` e `x < 5` no mesmo caminho).
+- Todos os caminhos (entrar no loop 0, 1, ..., até 29 vezes) são viáveis para diferentes valores de `n`. Por exemplo:
+  - Se `n < 2`, o loop não é executado.
+  - Se `2 ≤ n ≤ 30`, o loop executa `n - 1` vezes.
+  - Se `n > 30`, o loop executa 29 vezes (de `i=2` a `i=30`).
+
+Não há restrições de dados ou lógicas que tornem qualquer caminho impossível.
+
+---
+
+**Função:** `main`
+
+**Grafo de Fluxo de Controle (CFG) em formato Graphviz:**
+
+```dot
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    N1 [label="1: int a;"];
+    N2 [label="2: a = 30;"];
+    N3 [label="3: fib(a);"];
+    N4 [label="4: return a;"];
+
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4;
+}
+```
+
+**Grafo de Fluxo de Dados (DFG) em formato Graphviz:**
+
+```dot
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    a_out [label="a"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_assign [label="a = 30"];
+    op_call [label="fib(a)"];
+
+    op_assign -> op_call;
+    op_assign -> a_out;
+}
+```
+
+**Análise de Caminhos Inviáveis:**
+**Pergunta:** Quantos infeasible paths existem nesta função?
+**Resposta:** `0`
+
+**Justificativa:**
+O CFG é uma sequência linear sem branches. O DFG mostra que `a` é inicializado com 30 e usado na chamada de `fib(a)`, mas não há modificações ou condições que introduzam contradições. O único caminho é trivialmente viável.

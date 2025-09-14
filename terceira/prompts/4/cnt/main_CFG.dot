@@ -1,0 +1,7 @@
+digraph main_CFG {
+    node [shape=box];
+    N1 [label="InitSeed();"];
+    N2 [label="Test(Array);"];
+    N3 [label="return 1;"];
+    N1 -> N2 -> N3;
+}

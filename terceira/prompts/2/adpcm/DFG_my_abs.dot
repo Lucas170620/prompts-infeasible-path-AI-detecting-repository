@@ -1,0 +1,16 @@
+digraph DFG_my_abs {
+    node [shape=oval];
+    n [label="n (input)"];
+    m [label="m (output)"];
+    cond [label="n >= 0", shape=diamond];
+    true_op [label="m = n"];
+    false_op [label="m = -n"];
+
+    n -> cond;
+    n -> true_op;
+    n -> false_op;
+    cond -> true_op [label="True"];
+    cond -> false_op [label="False"];
+    true_op -> m;
+    false_op -> m;
+}

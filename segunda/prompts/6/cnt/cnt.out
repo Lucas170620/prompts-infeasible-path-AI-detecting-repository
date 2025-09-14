@@ -1,0 +1,77 @@
+**Resposta:**  
+Não existem infeasible paths no código fornecido.  
+
+### Análise com Base no CFG e DFG:
+#### 1. Grafo de Fluxo de Controle (CFG):
+O CFG do código (principalmente focado na função `Sum`) é composto por loops aninhados e uma condição única que verifica se um elemento da matriz é negativo. Não há condições sequenciais ou decisões que se contradigam (como `if (x > 10)` seguido por `if (x < 5)`). Todos os caminhos são alcançáveis dependendo dos valores gerados para a matriz. O CFG é linear nas funções `main`, `Test` e `Initialize`, sem ramificações complexas.
+
+```dot
+digraph CFG {
+    node [shape=box, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nós principais
+    Main [label="main: InitSeed(); Test(Array); return 1;"];
+    Test [label="Test: Initialize(Array); Sum(Array); return 0;"];
+    Initialize [label="Initialize: Loops para preencher a matriz com RandomInteger();"];
+    Sum [label="Sum: Loops aninhados com condição if (Array[Outer][Inner] < 0)"];
+    InitSeed [label="InitSeed: Seed = 0; return 0;"];
+    RandomInteger [label="RandomInteger: Seed = ((Seed * 133) + 81) % 8095; return Seed;"];
+
+    // Arestas
+    Main -> InitSeed;
+    Main -> Test;
+    Test -> Initialize;
+    Test -> Sum;
+    Initialize -> RandomInteger [label="Para cada elemento"];
+    Sum -> Sum [label="Loop interno"];
+    Sum -> Sum [label="Loop externo"];
+}
+```
+
+#### 2. Grafo de Fluxo de Dados (DFG):
+O DFG mostra dependências diretas entre inicializações, operações aritméticas e atribuições. Não há dependências que forcem contradições (como usar uma variável não inicializada ou valores fixos que conflitem com condições). Por exemplo:
+- `Ptotal` e `Ntotal` dependem dos valores da matriz e são acumulados independentemente.
+- `Seed` é inicializado em `InitSeed` e atualizado em `RandomInteger`, mas não interfere nas condições de `Sum`.
+
+```dot
+digraph DFG {
+    node [shape=ellipse, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Entradas
+    Seed_init [label="Seed (inicializado em InitSeed)"];
+    Array_val [label="Valores da matriz (gerados por RandomInteger)"];
+
+    // Operações
+    RandomInteger_op [label="RandomInteger: Atualiza Seed"];
+    Sum_cond [label="Sum: Condição (Array[Outer][Inner] < 0)"];
+    Ptotal_add [label="Ptotal += Array[Outer][Inner]"];
+    Ntotal_add [label="Ntotal += Array[Outer][Inner]"];
+    Pcnt_inc [label="Pcnt++"];
+    Ncnt_inc [label="Ncnt++"];
+
+    // Saídas
+    Postotal_out [label="Postotal = Ptotal"];
+    Negtotal_out [label="Negtotal = Ntotal"];
+
+    // Dependências
+    Seed_init -> RandomInteger_op;
+    RandomInteger_op -> Array_val;
+    Array_val -> Sum_cond;
+    Sum_cond -> Ptotal_add [label="Condição falsa"];
+    Sum_cond -> Ntotal_add [label="Condição verdadeira"];
+    Ptotal_add -> Pcnt_inc;
+    Ntotal_add -> Ncnt_inc;
+    Ptotal_add -> Postotal_out;
+    Ntotal_add -> Negtotal_out;
+}
+```
+
+### Justificativa para Nenhum Infeasible Path:
+- **Contradições Lógicas:** Não há condições sequenciais mutuamente exclusivas (como `x > 10` e `x < 5` no mesmo caminho).
+- **Dependências de Dados:** Todas as variáveis são inicializadas antes do uso (e.g., `Seed` em `InitSeed`, `Ptotal` em `Sum`). Não há conflitos de valores.
+- **Loops e Condições:** Os loops (`for`) são controlados por variáveis inicializadas em 0 e incrementadas até `MAXSIZE`, tornando todos os caminhos possíveis.
+- **Regras de Negócio:** O código não tem invariantes ou restrições externas (como hardware) que bloqueiem caminhos.
+
+Como resultado, todos os caminhos no CFG são executáveis para alguma entrada válida (valores da matriz gerados por `RandomInteger`).

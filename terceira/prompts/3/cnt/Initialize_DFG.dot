@@ -1,0 +1,25 @@
+digraph Initialize_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    Seed_global [label="Seed (global)"];
+    Array_global [label="Array (global)"];
+    node [shape=box];
+    op_assign_OuterIndex [label="OuterIndex = 0"];
+    op_condition_outer [label="OuterIndex < MAXSIZE"];
+    op_assign_InnerIndex [label="InnerIndex = 0"];
+    op_condition_inner [label="InnerIndex < MAXSIZE"];
+    op_call_RandomInteger [label="RandomInteger()"];
+    op_assign_array [label="Array[OuterIndex][InnerIndex] = RandomInteger()"];
+    op_increment_InnerIndex [label="InnerIndex++"];
+    op_increment_OuterIndex [label="OuterIndex++"];
+    Seed_global -> op_call_RandomInteger;
+    op_call_RandomInteger -> op_assign_array;
+    op_assign_array -> Array_global;
+    op_assign_OuterIndex -> op_condition_outer;
+    op_condition_outer -> op_assign_InnerIndex [label="true"];
+    op_assign_InnerIndex -> op_condition_inner;
+    op_condition_inner -> op_assign_array [label="true"];
+    op_assign_array -> op_increment_InnerIndex;
+    op_increment_InnerIndex -> op_condition_inner;
+    op_condition_inner -> op_increment_OuterIndex [label="false"];
+    op_increment_OuterIndex -> op_condition_outer;
+}

@@ -1,0 +1,41 @@
+digraph sort_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    arr_in [label="arr"];
+    n_in [label="n"];
+    M_in [label="M (7)"];
+    NSTACK_in [label="NSTACK (50)"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_assign_ir [label="ir = n"];
+    op_assign_l [label="l = 1"];
+    op_assign_jstack [label="jstack = 0"];
+    op_compare [label="ir - l < M"];
+    op_swap [label="SWAP"];
+    op_compare_arr [label="Comparacoes arr"];
+    op_index [label="Acesso arr[i]"];
+    op_assign_a [label="a = arr[j]"];
+    op_assign_stack [label="Atribuicao stack"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    arr_out [label="arr (ordenado)"];
+    jstack_out [label="jstack"];
+    ir_out [label="ir"];
+    l_out [label="l"];
+
+    arr_in -> op_assign_a;
+    arr_in -> op_swap;
+    arr_in -> op_compare_arr;
+    n_in -> op_assign_ir;
+    op_assign_ir -> op_compare;
+    op_assign_l -> op_compare;
+    M_in -> op_compare;
+    op_compare -> op_assign_a [label="true"];
+    op_compare -> op_swap [label="false"];
+    op_assign_a -> op_index;
+    op_swap -> arr_out;
+    op_index -> op_compare_arr;
+    op_compare_arr -> op_swap;
+    op_assign_stack -> jstack_out;
+    op_assign_stack -> ir_out;
+    op_assign_stack -> l_out;
+}

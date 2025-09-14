@@ -1,0 +1,96 @@
+**Resposta: Quantidade de Caminhos Inviáveis (Infeasible Paths)**
+
+Após uma análise detalhada do código fornecido, com base nos Grafos de Fluxo de Controle (CFG) e de Dados (DFG) construídos, **não foram identificados caminhos inviáveis (infeasible paths)**. 
+
+### Justificativa:
+- **Contradições Lógicas:** Não há condições mutuamente exclusivas (ex: `x > 10` e `x < 5` no mesmo caminho).
+- **Dependências de Dados:** Todas as variáveis são inicializadas antes do uso, e não há conflitos de valores que impossibilitem a execução.
+- **Restrições do Sistema:** O código é autônomo e não depende de recursos externos.
+- **Condições em Loops:** Os loops possuem condições de parada bem-definidas e variáveis de controle que garantem terminação.
+- **Conflitos Sequenciais:** Não há condições sequenciais que se anulem (ex: `if (x == 5)` seguido de `if (x != 5)` no mesmo fluxo).
+- **Invariantes de Programa:** O algoritmo de ordenação mantém invariantes consistentes durante a execução.
+- **Estados Mutuamente Exclusivos:** Não há requisitos para que variáveis estejam em estados contraditórios.
+
+Os grafos CFG e DFG (fornecidos abaixo) confirmam que todos os caminhos são viáveis, dado que o código é estruturado e as condições são coerentes com o fluxo de dados.
+
+---
+
+### Grafos para Cada Função:
+
+#### 1. Função `sort`:
+**CFG (Control Flow Graph):**
+```dot
+digraph sort_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="B1: i, ir = n, j, k, l = 1; jstack = 0; flag = 0;"];
+    N2 [label="B2: for (;;) {"];
+    N3 [label="B3: if (ir-l < M)"];
+    N4 [label="B4: for (j=l+1; j<=ir; j++) { a=arr[j]; for (i=j-1; i>=l; i--) { if (arr[i]<=a) break; arr[i+1]=arr[i]; } arr[i+1]=a; }"];
+    N5 [label="B5: if (jstack == 0) break; ir=istack[jstack--]; l=istack[jstack--];"];
+    N6 [label="B6: else: k=(l+ir)>>1; SWAP; if-else chains; partition code; jstack+=2; push to stack; update l/ir;"];
+    N7 [label="B7: }"];
+    N8 [label="B8: return;"];
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N6 [label="false"];
+    N4 -> N5;
+    N5 -> N7 [label="break"];
+    N5 -> N2 [label="continue"];
+    N6 -> N2;
+    N7 -> N8;
+}
+```
+
+**DFG (Data Flow Graph):**
+```dot
+digraph sort_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n [label="n"];
+    arr [label="arr"];
+    istack [label="istack"];
+    node [shape=box];
+    op_assign [label="l=1, ir=n, jstack=0"];
+    op_compare [label="ir-l < M"];
+    op_swap [label="SWAP macros"];
+    op_partition [label="Partition logic"];
+    op_stack [label="Stack push/pop"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    result [label="Sorted arr"];
+    n -> op_assign;
+    arr -> op_assign;
+    arr -> op_swap;
+    arr -> op_partition;
+    op_assign -> op_compare;
+    op_compare -> op_swap [label="false"];
+    op_compare -> op_stack [label="true"];
+    op_swap -> op_partition;
+    op_partition -> op_stack;
+    op_stack -> result;
+}
+```
+
+#### 2. Função `main`:
+**CFG:**
+```dot
+digraph main_CFG {
+    node [shape=box, style=rounded];
+    N1 [label="main: sort(20);"];
+    N2 [label="return;"];
+    N1 -> N2;
+}
+```
+
+**DFG:**
+```dot
+digraph main_DFG {
+    node [shape=ellipse, fillcolor=lightblue];
+    const_20 [label="20"];
+    node [shape=box];
+    call_sort [label="sort(20)"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    result [label="Exit"];
+    const_20 -> call_sort;
+    call_sort -> result;
+}
+```

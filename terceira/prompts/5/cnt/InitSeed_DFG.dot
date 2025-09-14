@@ -1,0 +1,6 @@
+digraph InitSeed_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="Seed = 0"];
+    N2 [label="return 0"];
+    N1 -> N2 [label="Seed (global)"];
+}

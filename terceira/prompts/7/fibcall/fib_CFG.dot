@@ -1,0 +1,18 @@
+digraph fib_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: int i, Fnew, Fold, temp, ans;"];
+    N2 [label="2: Fnew = 1; Fold = 0;"];
+    N3 [label="3: i = 2;"];
+    N4 [label="4: i <= 30 && i <= n"];
+    N5 [label="5: temp = Fnew; Fnew = Fnew + Fold; Fold = temp;"];
+    N6 [label="6: i++"];
+    N7 [label="7: ans = Fnew; return ans;"];
+
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4;
+    N4 -> N5 [label="true"];
+    N4 -> N7 [label="false"];
+    N5 -> N6;
+    N6 -> N4;
+}

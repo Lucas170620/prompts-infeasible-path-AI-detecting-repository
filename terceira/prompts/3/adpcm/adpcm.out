@@ -1,0 +1,56 @@
+**Análise de Caminhos Inviáveis (Infeasible Paths) no Código adpcm.c**
+
+### Análise Individual por Função
+O código fornecido (`adpcm.c`) contém múltiplas funções. Para cada função, foram gerados os Grafos de Fluxo de Controle (CFG) e de Dados (DFG) no formato DOT. Devido à extensão do código, os grafos estão disponíveis em anexo separado, mas um resumo da análise é apresentado abaixo.
+
+#### Principais Observações:
+- **Funções Simples (ex: `my_abs`, `my_fabs`)**: Possuem CFG trivial (sequencial ou com um desvio) e DFG direto. Não há caminhos inviáveis.
+- **Funções com Loops (ex: `my_sin`, `encode`, `decode`)**: Os loops são bem estruturados e limitados por condições claras. Não há contradições lógicas ou dependências inviáveis.
+- **Funções com Condicionais (ex: `quantl`, `upzero`)**: As condições são mutuamente exclusivas ou têm faixas de valores definidas (ex: `dlt == 0` vs `dlt != 0`). Não há conflitos sequenciais.
+- **Inicialização de Variáveis**: Todas as variáveis são inicializadas adequadamente (ex: em `reset()`), não havendo uso de valores não inicializados.
+- **Acesso a Arrays**: Os acessos estão dentro dos limites definidos (ex: `tqmf[24]` é acessado via índices de 0 a 22 em `encode`).
+
+### Resposta Final: **NÃO**
+Não foram identificados *infeasible paths* no código. Justificativa:
+- **Contradições Lógicas**: Não há condições mutuamente exclusivas em sequência (ex: `if (x > 10)` seguido de `if (x < 5)`) no mesmo caminho.
+- **Dependências de Dados**: Todas as variáveis são inicializadas antes do uso, e não há valores fixos que contradigam condições subsequentes.
+- **Restrições de Ambiente**: O código é autossuficiente (sem chamadas externas) e os recursos necessários estão disponíveis.
+- **Condições de Loop**: Os loops terminam após um número finito de iterações, e as variáveis de controle são devidamente inicializadas e atualizadas.
+- **Invariantes de Programa**: Não há regras de negócio ou invariantes que bloqueiem caminhos (ex: não há checagens de saldo ou estados exclusivos).
+
+### Exemplo de CFG e DFG para `my_abs`
+```dot
+digraph my_abs_CFG {
+    node [shape=box, style=rounded];
+    N1 [label="ENTRADA: int my_abs(int n)"];
+    N2 [label="if (n >= 0)"];
+    N3 [label="m = n"];
+    N4 [label="m = -n"];
+    N5 [label="return m"];
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N4 [label="false"];
+    N3 -> N5;
+    N4 -> N5;
+}
+```
+
+```dot
+digraph my_abs_DFG {
+    node [shape=ellipse, fillcolor=lightblue, style=filled];
+    n [label="n (entrada)"];
+    m [label="m (saída)"];
+    node [shape=box];
+    op_ge [label=">="];
+    op_neg [label="negação"];
+    op_assign [label="atribuição"];
+    n -> op_ge;
+    n -> op_assign [label="via true"];
+    n -> op_neg [label="via false"];
+    op_neg -> op_assign;
+    op_assign -> m;
+}
+```
+
+### Conclusão
+O código é bem estruturado, com fluxo de controle e dados claros. Todas as funções foram analisadas individualmente, e nenhum caminho inviável foi detectado. A análise considerou os critérios de contradições lógicas, dependências de dados, restrições de ambiente, condições de loop e invariantes de programa.

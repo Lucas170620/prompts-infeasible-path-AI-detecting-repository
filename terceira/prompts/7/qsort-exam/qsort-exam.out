@@ -1,0 +1,122 @@
+**Resposta Final:** NÃO
+
+**Explicação Detalhada:**
+
+Após análise do código fornecido, construção dos Grafos de Fluxo de Controle (CFG) e de Dados (DFG), e avaliação criteriosa dos caminhos, conclui-se que **não existem infeasible paths** no código. Abaixo está a justificativa detalhada:
+
+### 1. **Análise do Código e CFG/DFG**:
+   - O código implementa uma versão não recursiva do algoritmo Quicksort, utilizando uma pilha (`istack`) para gerenciar subvetores.
+   - O CFG (visualizado abaixo) mostra um fluxo bem estruturado, com loops aninhados e condições que cobrem todos os casos possíveis de partição e ordenação por inserção.
+   - O DFG revela dependências de dados claras (ex: `arr` é lido e atualizado, `istack` armazena estado) sem contradições ou restrições ocultas.
+
+### 2. **Justificativa da Viabilidade**:
+   - **Loop Principal**: O loop `for (;;)` é controlado por condições bem definidas (`ir-l < M` e estado da pilha). Todas as ramificações são alcançáveis para entradas variadas.
+   - **Manipulação de Pilha**: A pilha `istack` é gerida de forma simétrica (push/pop), garantindo que nenhum estado inconsistente ocorra.
+   - **Partição e Swap**: As condições de swap (`arr[l] > arr[ir]`, etc.) dependem dos dados de entrada, mas nenhum conjunto de valores leva a condições logicamente impossíveis.
+   - **Caminhos de Break**: Os `break` dependem de `jstack == 0`, que é atingido apenas quando a pilha está vazia e o vetor está ordenado – um estado sempre alcançável.
+
+### 3. **Conclusão**:
+   - Todos os caminhos no CFG correspondem a execuções possíveis para alguma entrada válida (ex: vetores com diferentes tamanhos e distribuições).
+   - Não há condições mutuamente exclusivas ou invariantes que tornem qualquer caminho inalcançável.
+
+---
+
+### Código DOT para CFG da Função `sort`:
+```dot
+digraph sort_CFG {
+    node [shape=box, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    // Nós e rótulos
+    start [label="sort: Entry", shape=ellipse];
+    B1 [label="i, ir=n, j, k, l=1\njstack=0, flag=0, a, temp"];
+    B2 [label="for (;;)"];
+    B3 [label="if (ir-l < M)"];
+    B4 [label="j = l+1 to ir\n a = arr[j]\n i = j-1 down to l"];
+    B5 [label="if (arr[i] <= a) break\n else arr[i+1]=arr[i]"];
+    B6 [label="arr[i+1]=a"];
+    B7 [label="if (jstack == 0) break"];
+    B8 [label="ir = istack[jstack--]\n l = istack[jstack--]"];
+    B9 [label="k = (l+ir)>>1\nSWAP(arr[k], arr[l+1])"];
+    B10 [label="if (arr[l] > arr[ir]) SWAP\nif (arr[l+1] > arr[ir]) SWAP\nif (arr[l] > arr[l+1]) SWAP"];
+    B11 [label="i = l+1, j = ir\na = arr[l+1]"];
+    B12 [label="for (;;)"];
+    B13 [label="i++ while (arr[i] < a)\nj-- while (arr[j] > a)"];
+    B14 [label="if (j < i) break"];
+    B15 [label="SWAP(arr[i], arr[j])"];
+    B16 [label="arr[l+1]=arr[j]\narr[j]=a\njstack+=2"];
+    B17 [label="if (ir-i+1 >= j-l)"];
+    B18 [label="istack[jstack]=ir\nistack[jstack-1]=i\nir=j-1"];
+    B19 [label="istack[jstack]=j-1\nistack[jstack-1]=l\nl=i"];
+    end [label="Return", shape=ellipse];
+
+    // Arestas
+    start -> B1;
+    B1 -> B2;
+    B2 -> B3;
+    B3 -> B4 [label="true"];
+    B3 -> B9 [label="false"];
+    B4 -> B5;
+    B5 -> B6 [label="break"];
+    B5 -> B5 [label="loop"];
+    B6 -> B4 [label="next j"];
+    B4 -> B7 [label="j > ir"];
+    B7 -> end [label="true"];
+    B7 -> B8 [label="false"];
+    B8 -> B2;
+    B9 -> B10;
+    B10 -> B11;
+    B11 -> B12;
+    B12 -> B13;
+    B13 -> B14;
+    B14 -> B16 [label="true"];
+    B14 -> B15 [label="false"];
+    B15 -> B12;
+    B16 -> B17;
+    B17 -> B18 [label="true"];
+    B17 -> B19 [label="false"];
+    B18 -> B2;
+    B19 -> B2;
+}
+```
+
+### Código DOT para DFG da Função `sort` (Simplificado):
+```dot
+digraph sort_DFG {
+    node [shape=ellipse, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    // Entradas
+    arr_input [label="arr (global)", fillcolor=lightblue, style=filled];
+    istack_input [label="istack (global)", fillcolor=lightblue, style=filled];
+    n_input [label="n (parameter)", fillcolor=lightblue, style=filled];
+
+    // Operações principais
+    compute_k [label="k = (l+ir)>>1", shape=box];
+    swap_ops [label="SWAP operations", shape=box];
+    compare [label="Compare arr elements", shape=box];
+    partition [label="Partition logic", shape=box];
+    stack_push_pop [label="Stack push/pop", shape=box];
+
+    // Saídas
+    arr_output [label="arr (sorted)", fillcolor=lightgreen, style=filled];
+    istack_output [label="istack (updated)", fillcolor=lightgreen, style=filled];
+
+    // Dependências
+    arr_input -> compute_k;
+    arr_input -> compare;
+    arr_input -> partition;
+    n_input -> compute_k;
+    istack_input -> stack_push_pop;
+    compute_k -> swap_ops;
+    compare -> swap_ops;
+    swap_ops -> partition;
+    partition -> stack_push_pop;
+    stack_push_pop -> arr_output;
+    stack_push_pop -> istack_output;
+}
+```
+
+### 4. **Observações Finais**:
+   - O CFG e DFG confirmam que o fluxo de controle e dados é consistente e sem ambiguidades.
+   - Testes com entradas variadas (ex: vetores ordenados, inversos, aleatórios) executariam todos os caminhos, validando sua viabilidade.

@@ -1,0 +1,31 @@
+digraph DFG {
+    node [shape=box, style="", fillcolor=""];
+    edge [fontname="Helvetica"];
+
+    // Nodes for Array initialization
+    Rand_Seed [label="Seed", shape=ellipse, fillcolor=lightblue];
+    Rand_Compute [label="RandomInteger()"];
+    Array_Assign [label="Array[Outer][Inner] = RandomInteger()"];
+
+    // Nodes for Sum function
+    Array_Access [label="Array[Outer][Inner]", shape=ellipse];
+    Condition [label="Array[Outer][Inner] < 0?"];
+    Ptotal_Update [label="Ptotal += Array[Outer][Inner]"];
+    Ntotal_Update [label="Ntotal += Array[Outer][Inner]"];
+    Pcnt_Update [label="Pcnt++"];
+    Ncnt_Update [label="Ncnt++"];
+    Postotal_Assign [label="Postotal = Ptotal"];
+    Negtotal_Assign [label="Negtotal = Ntotal"];
+
+    // Data flow edges
+    Rand_Seed -> Rand_Compute;
+    Rand_Compute -> Array_Assign;
+    Array_Assign -> Array_Access;
+    Array_Access -> Condition;
+    Condition -> Ptotal_Update [label="true"];
+    Condition -> Ntotal_Update [label="false"];
+    Ptotal_Update -> Postotal_Assign;
+    Ntotal_Update -> Negtotal_Assign;
+    Condition -> Pcnt_Update [label="true"];
+    Condition -> Ncnt_Update [label="false"];
+}

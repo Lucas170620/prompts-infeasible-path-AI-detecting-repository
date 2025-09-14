@@ -1,0 +1,42 @@
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    IN_COUNT [label="IN_COUNT"];
+    BITS [label="BITS"];
+    orig_text_buffer [label="orig_text_buffer"];
+    comp_text_buffer [label="comp_text_buffer"];
+
+    node [shape=box];
+    op_assign_count [label="="];
+    op_call_initbuffer [label="initbuffer()"];
+    op_assign_maxbits [label="="];
+    op_shift [label="<<"];
+    op_assign_maxmaxcode [label="="];
+    op_assign_InCnt [label="="];
+    op_add [label="+"];
+    op_assign_apsim_InCnt [label="="];
+    op_cast [label="(unsigned char *)"];
+    op_assign_InBuff [label="="];
+    op_assign_OutBuff [label="="];
+    op_call_compress [label="compress()"];
+    op_return [label="return"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    count [label="count"];
+    maxbits_var [label="maxbits"];
+    maxmaxcode_var [label="maxmaxcode"];
+    InCnt [label="InCnt"];
+    apsim_InCnt [label="apsim_InCnt"];
+    InBuff [label="InBuff"];
+    OutBuff [label="OutBuff"];
+
+    IN_COUNT -> op_assign_count -> count;
+    BITS -> op_assign_maxbits -> maxbits_var;
+    maxbits_var -> op_shift;
+    op_shift -> op_assign_maxmaxcode -> maxmaxcode_var;
+    count -> op_assign_InCnt -> InCnt;
+    IN_COUNT -> op_add;
+    op_add -> op_assign_apsim_InCnt -> apsim_InCnt;
+    orig_text_buffer -> op_cast -> op_assign_InBuff -> InBuff;
+    comp_text_buffer -> op_assign_OutBuff -> OutBuff;
+    op_call_compress -> op_return;
+}

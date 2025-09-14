@@ -1,0 +1,33 @@
+digraph sort_DFG {
+    node [shape=ellipse, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    // Entradas
+    arr_input [label="arr (global)", fillcolor=lightblue, style=filled];
+    istack_input [label="istack (global)", fillcolor=lightblue, style=filled];
+    n_input [label="n (parameter)", fillcolor=lightblue, style=filled];
+
+    // Operacoes principais
+    compute_k [label="k = (l+ir)>>1", shape=box];
+    swap_ops [label="SWAP operations", shape=box];
+    compare [label="Compare arr elements", shape=box];
+    partition [label="Partition logic", shape=box];
+    stack_push_pop [label="Stack push/pop", shape=box];
+
+    // Saidas
+    arr_output [label="arr (sorted)", fillcolor=lightgreen, style=filled];
+    istack_output [label="istack (updated)", fillcolor=lightgreen, style=filled];
+
+    // Dependencias
+    arr_input -> compute_k;
+    arr_input -> compare;
+    arr_input -> partition;
+    n_input -> compute_k;
+    istack_input -> stack_push_pop;
+    compute_k -> swap_ops;
+    compare -> swap_ops;
+    swap_ops -> partition;
+    partition -> stack_push_pop;
+    stack_push_pop -> arr_output;
+    stack_push_pop -> istack_output;
+}

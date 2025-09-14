@@ -1,0 +1,6 @@
+digraph DFG_Initialize {
+    node [shape=box];
+    n1 [label="RandomInteger()"];
+    n2 [label="Atribuicao a Array"];
+    n1 -> n2;
+}

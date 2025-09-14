@@ -1,0 +1,10 @@
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="reset()"];
+    N2 [label="j = 10; f = 2000;"];
+    N3 [label="for (i=0; i<SIZE; i++)\n test_data[i] = j * my_cos(f*PI*i);"];
+    N4 [label="for (i=0; i<IN_END; i+=2)\n compressed[i/2] = encode(test_data[i], test_data[i+1]);"];
+    N5 [label="for (i=0; i<IN_END; i+=2)\n decode(compressed[i/2]);\n result[i]=xout1; result[i+1]=xout2;"];
+    N6 [label="return result[i]+result[i+1];"];
+    N1 -> N2 -> N3 -> N4 -> N5 -> N6;
+}

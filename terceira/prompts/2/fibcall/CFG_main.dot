@@ -1,0 +1,13 @@
+digraph CFG_main {
+    node [shape=box];
+    entry [label="Entry", shape=ellipse];
+    exit [label="Exit", shape=ellipse];
+    node1 [label="int a;\na = 30;"];
+    node2 [label="fib(a);"];
+    node3 [label="return a;"];
+
+    entry -> node1;
+    node1 -> node2;
+    node2 -> node3;
+    node3 -> exit;
+}

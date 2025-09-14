@@ -1,0 +1,24 @@
+digraph Sum_DFG {
+    node [shape=ellipse, fillcolor=lightblue];
+    Array_elem [label="Array[Outer][Inner]"];
+    node [shape=box];
+    cond [label="< 0?"];
+    add_Ptotal [label="+="];
+    add_Ntotal [label="+="];
+    inc_Pcnt [label="++"];
+    inc_Ncnt [label="++"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    Ptotal [label="Ptotal"];
+    Ntotal [label="Ntotal"];
+    Pcnt [label="Pcnt"];
+    Ncnt [label="Ncnt"];
+    Array_elem -> cond;
+    cond -> add_Ptotal [label="true"];
+    cond -> add_Ntotal [label="false"];
+    Array_elem -> add_Ptotal;
+    Array_elem -> add_Ntotal;
+    add_Ptotal -> Ptotal;
+    add_Ntotal -> Ntotal;
+    inc_Pcnt -> Pcnt;
+    inc_Ncnt -> Ncnt;
+}

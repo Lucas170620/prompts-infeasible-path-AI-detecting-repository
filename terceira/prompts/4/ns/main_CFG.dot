@@ -1,0 +1,11 @@
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    START [label="Start main"];
+    B1 [label="foo(400);"];
+    END [label="End main", shape=doublecircle];
+
+    START -> B1;
+    B1 -> END;
+}

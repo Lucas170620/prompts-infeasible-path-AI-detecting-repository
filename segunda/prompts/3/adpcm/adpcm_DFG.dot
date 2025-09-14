@@ -1,0 +1,20 @@
+digraph adpcm_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    // Nos de dados e operacoes
+    test_data [label="test_data"];
+    compressed [label="compressed"];
+    result [label="result"];
+    encode [label="encode()", shape=box];
+    decode [label="decode()", shape=box];
+    xout1 [label="xout1"];
+    xout2 [label="xout2"];
+
+    // Arestas representando fluxo de dados
+    test_data -> encode;
+    encode -> compressed;
+    compressed -> decode;
+    decode -> xout1;
+    decode -> xout2;
+    xout1 -> result;
+    xout2 -> result;
+}

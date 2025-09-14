@@ -1,0 +1,221 @@
+**Análise do Código e Identificação de Infeasible Paths**
+
+### 1. Grafos de Fluxo de Controle (CFG) e Fluxo de Dados (DFG) por Função
+
+#### Função `main`
+**CFG:**
+```dot
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: InitSeed();"];
+    N2 [label="2: Test(Array);"];
+    N3 [label="3: return 1;"];
+    N1 -> N2;
+    N2 -> N3;
+}
+```
+**DFG:**
+```dot
+digraph main_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="InitSeed()"];
+    N2 [label="Test(Array)"];
+    N3 [label="return 1"];
+    N1 -> N2 [label="Seed (global)"];
+}
+```
+
+#### Função `Test`
+**CFG:**
+```dot
+digraph Test_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: Initialize(Array);"];
+    N2 [label="2: StartTime = 1000.0;"];
+    N3 [label="3: Sum(Array);"];
+    N4 [label="4: StopTime = 1500.0;"];
+    N5 [label="5: TotalTime = (StopTime - StartTime) / 1000.0;"];
+    N6 [label="6: return 0;"];
+    N1 -> N2 -> N3 -> N4 -> N5 -> N6;
+}
+```
+**DFG:**
+```dot
+digraph Test_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="Initialize(Array)"];
+    N2 [label="StartTime = 1000.0"];
+    N3 [label="Sum(Array)"];
+    N4 [label="StopTime = 1500.0"];
+    N5 [label="TotalTime = (StopTime - StartTime) / 1000.0"];
+    N6 [label="return 0"];
+    N1 -> N3 [label="Array"];
+    N2 -> N5 [label="StartTime"];
+    N4 -> N5 [label="StopTime"];
+}
+```
+
+#### Função `Initialize`
+**CFG:**
+```dot
+digraph Initialize_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: register int OuterIndex, InnerIndex;"];
+    N2 [label="2: OuterIndex = 0"];
+    N3 [label="3: OuterIndex < MAXSIZE?"];
+    N4 [label="4: InnerIndex = 0"];
+    N5 [label="5: InnerIndex < MAXSIZE?"];
+    N6 [label="6: Array[OuterIndex][InnerIndex] = RandomInteger();"];
+    N7 [label="7: InnerIndex++"];
+    N8 [label="8: OuterIndex++"];
+    N9 [label="9: return 0;"];
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N9 [label="false"];
+    N4 -> N5;
+    N5 -> N6 [label="true"];
+    N5 -> N8 [label="false"];
+    N6 -> N7;
+    N7 -> N5;
+    N8 -> N3;
+}
+```
+**DFG:**
+```dot
+digraph Initialize_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N2 [label="OuterIndex = 0"];
+    N3 [label="OuterIndex < MAXSIZE?"];
+    N4 [label="InnerIndex = 0"];
+    N5 [label="InnerIndex < MAXSIZE?"];
+    N6 [label="Array[OuterIndex][InnerIndex] = RandomInteger()"];
+    N7 [label="InnerIndex++"];
+    N8 [label="OuterIndex++"];
+    N2 -> N3 [label="OuterIndex"];
+    N3 -> N4 [label="OuterIndex"];
+    N4 -> N5 [label="InnerIndex"];
+    N5 -> N6 [label="OuterIndex, InnerIndex"];
+    N6 -> N7 [label="InnerIndex"];
+    N7 -> N5 [label="InnerIndex"];
+    N3 -> N8 [label="OuterIndex"];
+    N8 -> N3 [label="OuterIndex"];
+    N6 -> N6 [label="Seed (global)"];
+}
+```
+
+#### Função `InitSeed`
+**CFG:**
+```dot
+digraph InitSeed_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: Seed = 0;"];
+    N2 [label="2: return 0;"];
+    N1 -> N2;
+}
+```
+**DFG:**
+```dot
+digraph InitSeed_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="Seed = 0"];
+    N2 [label="return 0"];
+    N1 -> N2 [label="Seed (global)"];
+}
+```
+
+#### Função `Sum`
+**CFG:**
+```dot
+digraph Sum_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: register int Outer, Inner;"];
+    N2 [label="2: int Ptotal = 0; int Ntotal = 0; int Pcnt = 0; int Ncnt = 0;"];
+    N3 [label="3: Outer = 0"];
+    N4 [label="4: Outer < MAXSIZE?"];
+    N5 [label="5: Inner = 0"];
+    N6 [label="6: Inner < MAXSIZE?"];
+    N7 [label="7: if (Array[Outer][Inner] < 0)"];
+    N8 [label="8: Ptotal += Array[Outer][Inner]; Pcnt++;"];
+    N9 [label="9: Ntotal += Array[Outer][Inner]; Ncnt++;"];
+    N10 [label="10: Inner++"];
+    N11 [label="11: Outer++"];
+    N12 [label="12: Postotal = Ptotal; Poscnt = Pcnt; Negtotal = Ntotal; Negcnt = Ncnt;"];
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4;
+    N4 -> N5 [label="true"];
+    N4 -> N12 [label="false"];
+    N5 -> N6;
+    N6 -> N7 [label="true"];
+    N6 -> N11 [label="false"];
+    N7 -> N8 [label="true"];
+    N7 -> N9 [label="false"];
+    N8 -> N10;
+    N9 -> N10;
+    N10 -> N6;
+    N11 -> N4;
+}
+```
+**DFG:**
+```dot
+digraph Sum_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N2 [label="int Ptotal = 0; int Ntotal = 0; int Pcnt = 0; int Ncnt = 0;"];
+    N3 [label="Outer = 0"];
+    N4 [label="Outer < MAXSIZE?"];
+    N5 [label="Inner = 0"];
+    N6 [label="Inner < MAXSIZE?"];
+    N7 [label="if (Array[Outer][Inner] < 0)"];
+    N8 [label="Ptotal += Array[Outer][Inner]; Pcnt++;"];
+    N9 [label="Ntotal += Array[Outer][Inner]; Ncnt++;"];
+    N10 [label="Inner++"];
+    N11 [label="Outer++"];
+    N12 [label="Postotal = Ptotal; Poscnt = Pcnt; Negtotal = Ntotal; Negcnt = Ncnt;"];
+    N3 -> N4 [label="Outer"];
+    N4 -> N5 [label="Outer"];
+    N5 -> N6 [label="Inner"];
+    N6 -> N7 [label="Outer, Inner"];
+    N7 -> N8 [label="Array[Outer][Inner]"];
+    N7 -> N9 [label="Array[Outer][Inner]"];
+    N8 -> N10 [label="Ptotal, Pcnt"];
+    N9 -> N10 [label="Ntotal, Ncnt"];
+    N10 -> N6 [label="Inner"];
+    N4 -> N11 [label="Outer"];
+    N11 -> N4 [label="Outer"];
+    N8 -> N12 [label="Ptotal, Pcnt"];
+    N9 -> N12 [label="Ntotal, Ncnt"];
+}
+```
+
+#### Função `RandomInteger`
+**CFG:**
+```dot
+digraph RandomInteger_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: Seed = ((Seed * 133) + 81) % 8095;"];
+    N2 [label="2: return Seed;"];
+    N1 -> N2;
+}
+```
+**DFG:**
+```dot
+digraph RandomInteger_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="Seed = ((Seed * 133) + 81) % 8095"];
+    N2 [label="return Seed"];
+    N1 -> N2 [label="Seed"];
+}
+```
+
+### 2. Análise de Infeasible Paths
+**Resposta:** SIM, existe um infeasible path neste código.
+
+**Justificativa:**  
+No código fornecido, a função `Sum` contém um branch condicional que depende do valor de `Array[Outer][Inner]` ser negativo (`Array[Outer][Inner] < 0`). No entanto, a função `Initialize` preenche a matriz `Array` com valores gerados por `RandomInteger`, que retorna apenas valores não negativos (entre 0 e 8094), conforme a lógica:
+```c
+Seed = ((Seed * 133) + 81) % 8095;
+```
+O módulo 8095 garante valores entre 0 e 8094. Assim, a condição `Array[Outer][Inner] < 0` nunca será verdadeira, tornando o branch correspondente (bloco N8 no CFG do `Sum`) **inviável**. Isso caracteriza um **infeasible path** devido a uma contradição lógica entre a condição do branch e os dados gerados em tempo de execução.
+
+**Conclusão:** O caminho que inclui o bloco N8 (atualização de `Ptotal` e `Pcnt`) é inviável, pois nunca será executado.

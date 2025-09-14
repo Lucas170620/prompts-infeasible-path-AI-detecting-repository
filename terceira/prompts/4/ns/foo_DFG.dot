@@ -1,0 +1,37 @@
+digraph foo_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    x [label="x (parameter)"];
+    keys [label="keys (array)"];
+    answer [label="answer (array)"];
+
+    node [shape=box, style="", fillcolor=""];
+    add [label="+"];
+    eq [label="=="];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    result [label="result"];
+
+    // Data flow edges
+    keys -> eq;
+    x -> eq;
+    eq -> B9_cond [style=dashed]; // Conditional branch in CFG
+
+    keys -> add;
+    answer -> add;
+    add -> result;
+
+    // Loop indices (simplified)
+    i [label="i", fillcolor=lightblue];
+    j [label="j", fillcolor=lightblue];
+    k [label="k", fillcolor=lightblue];
+    l [label="l", fillcolor=lightblue];
+
+    i -> keys [label="index"];
+    j -> keys [label="index"];
+    k -> keys [label="index"];
+    l -> keys [label="index"];
+    i -> answer [label="index"];
+    j -> answer [label="index"];
+    k -> answer [label="index"];
+    l -> answer [label="index"];
+}

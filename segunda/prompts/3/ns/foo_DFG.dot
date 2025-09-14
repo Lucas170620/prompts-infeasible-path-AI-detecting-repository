@@ -1,0 +1,36 @@
+digraph foo_DFG {
+    node [shape=box, style="", fillcolor=""];
+    x [label="x", shape=ellipse, style=filled, fillcolor=lightblue];
+    keys_array [label="keys", shape=ellipse, style=filled, fillcolor=lightblue];
+    answer_array [label="answer", shape=ellipse, style=filled, fillcolor=lightblue];
+    i [label="i", shape=ellipse, style=filled, fillcolor=lightblue];
+    j [label="j", shape=ellipse, style=filled, fillcolor=lightblue];
+    k [label="k", shape=ellipse, style=filled, fillcolor=lightblue];
+    l [label="l", shape=ellipse, style=filled, fillcolor=lightblue];
+
+    access_keys [label="keys[i][j][k][l]"];
+    access_answer [label="answer[i][j][k][l]"];
+    compare [label="=="];
+    add [label="+"];
+
+    condition [label="Condition", shape=diamond];
+    return_val [label="Return value", shape=ellipse, style=filled, fillcolor=lightgreen];
+
+    x -> compare;
+    keys_array -> access_keys;
+    i -> access_keys;
+    j -> access_keys;
+    k -> access_keys;
+    l -> access_keys;
+    access_keys -> compare;
+    compare -> condition;
+
+    access_keys -> add;
+    answer_array -> access_answer;
+    i -> access_answer;
+    j -> access_answer;
+    k -> access_answer;
+    l -> access_answer;
+    access_answer -> add;
+    add -> return_val;
+}

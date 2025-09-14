@@ -1,0 +1,11 @@
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    const_30 [label="30"];
+    node [shape=box, style="", fillcolor=""];
+    assign_a [label="a = 30"];
+    call_fib [label="fib(a)"];
+    return_a [label="return a"];
+    const_30 -> assign_a;
+    assign_a -> call_fib;
+    assign_a -> return_a;
+}

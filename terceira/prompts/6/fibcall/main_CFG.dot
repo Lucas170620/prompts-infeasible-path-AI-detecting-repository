@@ -1,0 +1,4 @@
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    M0 [label="0: a = 30;\nfib(a);\nreturn a;"];
+}

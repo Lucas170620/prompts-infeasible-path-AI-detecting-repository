@@ -1,0 +1,6 @@
+digraph main_CFG {
+    node [shape=box, style=rounded];
+    N1 [label="main: sort(20);"];
+    N2 [label="return;"];
+    N1 -> N2;
+}

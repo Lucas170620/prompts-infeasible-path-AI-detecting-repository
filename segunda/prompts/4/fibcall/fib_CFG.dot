@@ -1,0 +1,11 @@
+digraph fib_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="Fnew = 1;\nFold = 0;\ni = 2;"];
+    N2 [label="if (i <= 30 && i <= n)"];
+    N3 [label="temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;\ni++;"];
+    N4 [label="ans = Fnew;\nreturn ans;"];
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N4 [label="false"];
+    N3 -> N2;
+}

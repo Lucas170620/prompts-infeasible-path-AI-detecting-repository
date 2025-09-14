@@ -1,0 +1,28 @@
+digraph CFG_Sum {
+    node [shape=box, style=rounded];
+    entry [label="Entry (Sum)"];
+    loop_outer_init [label="Outer = 0"];
+    loop_outer_cond [label="Outer < MAXSIZE?"];
+    loop_inner_init [label="Inner = 0"];
+    loop_inner_cond [label="Inner < MAXSIZE?"];
+    condition [label="Array[Outer][Inner] < 0?"];
+    then_branch [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+    else_branch [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+    inner_inc [label="Inner++"];
+    outer_inc [label="Outer++"];
+    exit [label="Exit (Update globals)"];
+
+    entry -> loop_outer_init;
+    loop_outer_init -> loop_outer_cond;
+    loop_outer_cond -> loop_inner_init [label="Sim"];
+    loop_outer_cond -> exit [label="Nao"];
+    loop_inner_init -> loop_inner_cond;
+    loop_inner_cond -> condition [label="Sim"];
+    loop_inner_cond -> outer_inc [label="Nao"];
+    condition -> then_branch [label="Sim"];
+    condition -> else_branch [label="Nao"];
+    then_branch -> inner_inc;
+    else_branch -> inner_inc;
+    inner_inc -> loop_inner_cond;
+    outer_inc -> loop_outer_cond;
+}

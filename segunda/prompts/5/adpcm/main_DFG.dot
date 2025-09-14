@@ -1,0 +1,20 @@
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    j [label="j"]; f [label="f"]; PI [label="PI"]; i [label="i"];
+    node [shape=box, style=""];
+    mult [label="*"]; cos [label="my_cos"]; assign_test [label="="];
+    encode [label="encode"]; assign_compressed [label="="];
+    decode [label="decode"]; assign_result1 [label="="]; assign_result2 [label="="];
+    add [label="+"];
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    test_data [label="test_data"]; compressed [label="compressed"];
+    result [label="result"]; return_val [label="return"];
+
+    j -> mult; f -> mult; PI -> mult; i -> mult;
+    mult -> cos -> assign_test -> test_data;
+    test_data -> encode -> assign_compressed -> compressed;
+    compressed -> decode;
+    decode -> assign_result1; decode -> assign_result2;
+    assign_result1 -> result; assign_result2 -> result;
+    result -> add -> return_val;
+}

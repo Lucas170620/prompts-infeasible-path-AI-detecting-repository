@@ -1,0 +1,74 @@
+digraph compress_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    InCnt [label="InCnt"];
+    InBuff [label="InBuff"];
+    ent [label="ent"];
+    c [label="c"];
+    fcode [label="fcode"];
+    i [label="i"];
+    disp [label="disp"];
+    free_ent [label="free_ent"];
+    maxmaxcode [label="maxmaxcode"];
+    in_count [label="in_count"];
+    checkpoint [label="checkpoint"];
+    block_compress [label="block_compress"];
+    code [label="code"];
+    offset [label="offset"];
+    n_bits [label="n_bits"];
+    clear_flg [label="clear_flg"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_getbyte [label="getbyte()"];
+    op_htab [label="htab[i]"];
+    op_codetab [label="codetab[i]"];
+    op_compute_fcode [label="fcode = (c<<maxbits)+ent"];
+    op_compute_i [label="i = (c<<hshift)^ent"];
+    op_compare [label="htab[i] == fcode?"];
+    op_disp [label="disp = hsize_reg - i"];
+    op_adjust_i [label="i -= disp; if<0 adjust"];
+    op_output [label="output(code)"];
+    op_cl_block [label="cl_block()"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    OutBuff [label="OutBuff"];
+    bytes_out [label="bytes_out"];
+    exit_stat [label="exit_stat"];
+
+    // Data flow edges
+    InCnt -> op_getbyte;
+    InBuff -> op_getbyte;
+    op_getbyte -> c;
+    c -> op_compute_fcode;
+    ent -> op_compute_fcode;
+    op_compute_fcode -> fcode;
+    c -> op_compute_i;
+    op_compute_i -> i;
+    i -> op_htab;
+    op_htab -> op_compare;
+    fcode -> op_compare;
+    op_compare -> ent [label="true"];
+    op_compare -> op_disp [label="false"];
+    i -> op_disp;
+    op_disp -> disp;
+    disp -> op_adjust_i;
+    i -> op_adjust_i;
+    op_adjust_i -> i;
+    i -> op_htab;
+    free_ent -> op_output;
+    maxmaxcode -> op_output;
+    in_count -> op_cl_block;
+    checkpoint -> op_cl_block;
+    block_compress -> op_cl_block;
+    code -> op_output;
+    offset -> op_output;
+    n_bits -> op_output;
+    clear_flg -> op_output;
+    op_output -> OutBuff;
+    op_output -> bytes_out;
+    op_output -> offset;
+    op_output -> n_bits;
+    op_output -> clear_flg;
+    op_cl_block -> free_ent;
+    op_cl_block -> clear_flg;
+    op_cl_block -> ratio;
+}

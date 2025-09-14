@@ -1,0 +1,14 @@
+digraph main_CFG {
+    node [shape=box];
+    N1 [label="int count = IN_COUNT;"];
+    N2 [label="initbuffer();"];
+    N3 [label="maxbits = BITS;"];
+    N4 [label="maxmaxcode = 1 << maxbits;"];
+    N5 [label="InCnt = count;"];
+    N6 [label="apsim_InCnt = IN_COUNT + 3;"];
+    N7 [label="InBuff = (unsigned char *)orig_text_buffer;"];
+    N8 [label="OutBuff = (unsigned char *)comp_text_buffer;"];
+    N9 [label="compress();"];
+    N10 [label="return (0);"];
+    N1 -> N2 -> N3 -> N4 -> N5 -> N6 -> N7 -> N8 -> N9 -> N10;
+}

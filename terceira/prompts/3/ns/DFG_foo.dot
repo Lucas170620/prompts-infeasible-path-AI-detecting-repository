@@ -1,0 +1,57 @@
+digraph DFG_foo {
+    node [shape=box, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Variaveis de entrada
+    x [label="x (parametro)", shape=ellipse, fillcolor=lightblue, style=filled];
+    keys [label="keys (global)", shape=ellipse, fillcolor=lightblue, style=filled];
+    answer [label="answer (global)", shape=ellipse, fillcolor=lightblue, style=filled];
+
+    // Operacoes e dependencias
+    op_i_init [label="i = 0"];
+    op_j_init [label="j = 0"];
+    op_k_init [label="k = 0"];
+    op_l_init [label="l = 0"];
+
+    op_i_inc [label="i++"];
+    op_j_inc [label="j++"];
+    op_k_inc [label="k++"];
+    op_l_inc [label="l++"];
+
+    op_i_cmp [label="i < 5"];
+    op_j_cmp [label="j < 5"];
+    op_k_cmp [label="k < 5"];
+    op_l_cmp [label="l < 5"];
+
+    op_key_access [label="keys[i][j][k][l]"];
+    op_cond [label="keys[i][j][k][l] == x"];
+    op_return_val [label="answer[i][j][k][l] + keys[i][j][k][l]"];
+    op_return_neg [label="return -1"];
+
+    // Fluxo de dados
+    x -> op_cond;
+    keys -> op_key_access;
+    op_key_access -> op_cond;
+    op_cond -> op_return_val [label="True"];
+    answer -> op_return_val;
+
+    op_i_init -> op_i_cmp;
+    op_i_cmp -> op_j_init [label="True"];
+    op_i_cmp -> op_return_neg [label="False"];
+    op_i_inc -> op_i_cmp;
+
+    op_j_init -> op_j_cmp;
+    op_j_cmp -> op_k_init [label="True"];
+    op_j_cmp -> op_i_inc [label="False"];
+    op_j_inc -> op_j_cmp;
+
+    op_k_init -> op_k_cmp;
+    op_k_cmp -> op_l_init [label="True"];
+    op_k_cmp -> op_j_inc [label="False"];
+    op_k_inc -> op_k_cmp;
+
+    op_l_init -> op_l_cmp;
+    op_l_cmp -> op_key_access [label="True"];
+    op_l_cmp -> op_k_inc [label="False"];
+    op_l_inc -> op_l_cmp;
+}

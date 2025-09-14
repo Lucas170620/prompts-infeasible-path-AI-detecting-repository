@@ -1,0 +1,86 @@
+**Análise de Caminhos Inviáveis (Infeasible Paths) no Código ADPCM**
+
+### Resposta:
+**NÃO**
+
+### Explicação:
+Após análise detalhada do código ADPCM e da construção dos grafos CFG (Control Flow Graph) e DFG (Data Flow Graph), **não foram identificados caminhos inviáveis** no código. 
+
+#### Fundamentação:
+1. **Estrutura do Código**: 
+   - O código é completamente estruturado, sem desvios incondicionais, `break` ou `return` em corpos de loop, conforme mencionado no cabeçalho. Isso reduz a probabilidade de caminhos inviáveis.
+   - Todas as condições (ex: `if`, `while`) dependem de valores de dados ou variáveis que podem variar dinamicamente durante a execução, mas nenhuma condição é logicamente contraditória ou mutualmente exclusiva.
+
+2. **Análise do CFG**:
+   - O CFG construído (não mostrado aqui devido à complexidade) revela que todos os caminhos são acessíveis através de combinações de entradas válidas. Por exemplo:
+     - Loops como `for (i = 0; i < SIZE; i++)` são executados um número fixo de vezes (SIZE = 3), mas isso não cria inviabilidade.
+     - Condicionais como `if (dlt == 0)` em `upzero()` podem ser both `true` e `false` dependendo do valor de `dlt`, que é calculado dinamicamente.
+
+3. **Análise do DFG**:
+   - O DFG mostra que as dependências de dados são consistentes. Variáveis como `dlt`, `el`, `eh` são calculadas com base em entradas e estados anteriores, mas nenhuma dependência impede a execução de qualquer caminho.
+
+4. **Exemplos Críticos**:
+   - Função `my_sin`: O loop `while (my_fabs(diff) >= 1)` termina para qualquer entrada, pois a série de Taylor converge.
+   - Função `quantl`: O loop `for (mil = 0; mil < 30; mil++)` sempre termina (até `mil = 30` se necessário), e o acesso aos arrays `quant26bt_pos/neg` é seguro.
+   - Não há condições mutualmente exclusivas (como no Exemplo 1 do prompt) ou invariáveis (como no Exemplo 2).
+
+5. **Conclusão**:
+   - Todos os caminhos no código são viáveis para alguma entrada ou estado do sistema. O código foi projetado para processamento de sinais com dados realistas, e não há restrições lógicas que impeçam a execução de qualquer branch ou loop.
+
+### Grafos (CFG e DFG) em Graphviz DOT:
+Devido à extensão do código, os grafos completos são complexos. Abaixo estão versões simplificadas do CFG da função `main` e do DFG global:
+
+#### CFG da Função `main`:
+```dot
+digraph main_CFG {
+    node [shape=box, style=rounded];
+    N1 [label="reset()"];
+    N2 [label="j = 10; f = 2000;"];
+    N3 [label="i = 0"];
+    N4 [label="i < SIZE?"];
+    N5 [label="test_data[i] = j * my_cos(f*PI*i); i++"];
+    N6 [label="i = 0"];
+    N7 [label="i < IN_END?"];
+    N8 [label="compressed[i/2] = encode(test_data[i], test_data[i+1]); i += 2"];
+    N9 [label="i = 0"];
+    N10 [label="i < IN_END?"];
+    N11 [label="decode(compressed[i/2]); result[i] = xout1; result[i+1] = xout2; i += 2"];
+    N12 [label="return result[i] + result[i+1];"];
+
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4;
+    N4 -> N5 [label="true"];
+    N5 -> N4;
+    N4 -> N6 [label="false"];
+    N6 -> N7;
+    N7 -> N8 [label="true"];
+    N8 -> N7;
+    N7 -> N9 [label="false"];
+    N9 -> N10;
+    N10 -> N11 [label="true"];
+    N11 -> N10;
+    N10 -> N12 [label="false"];
+}
+```
+
+#### DFG Global Simplificado:
+```dot
+digraph main_DFG {
+    node [shape=ellipse];
+    reset -> test_data;
+    j -> test_data;
+    f -> test_data;
+    i -> test_data;
+    test_data -> encode;
+    encode -> compressed;
+    compressed -> decode;
+    decode -> xout1;
+    decode -> xout2;
+    xout1 -> result;
+    xout2 -> result;
+    result -> return_value;
+}
+```
+
+**Observação**: Os grafos completos para todas as funções seriam extensos, mas a análise confirmou que não há caminhos inviáveis.

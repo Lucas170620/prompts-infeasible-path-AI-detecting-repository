@@ -1,0 +1,25 @@
+digraph adpcm_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    // Nos principais representando blocos de codigo
+    N1 [label="1: Inicio do programa"];
+    N2 [label="2: Inicializacoes e reset()"];
+    N3 [label="3: Loop de geracao de test_data"];
+    N4 [label="4: Chamada encode()"];
+    N5 [label="5: Loop de encode"];
+    N6 [label="6: Chamada decode()"];
+    N7 [label="7: Loop de decode"];
+    N8 [label="8: Retorno do resultado"];
+    N9 [label="9: Fim do programa"];
+
+    // Arestas representando fluxo de controle
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="Condicao de loop"];
+    N4 -> N5;
+    N5 -> N3 [label="Proxima iteracao"];
+    N3 -> N6 [label="Fim do loop"];
+    N6 -> N7;
+    N7 -> N6 [label="Proxima iteracao"];
+    N6 -> N8 [label="Fim do loop"];
+    N8 -> N9;
+}

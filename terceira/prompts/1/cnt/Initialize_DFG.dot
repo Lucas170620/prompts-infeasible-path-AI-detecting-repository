@@ -1,0 +1,10 @@
+digraph Initialize_DFG {
+    node [shape=ellipse, fillcolor=lightblue];
+    Seed [label="Seed (global)"];
+    node [shape=box];
+    op_random [label="RandomInteger()"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    Array [label="Array[OuterIndex][InnerIndex]"];
+    Seed -> op_random;
+    op_random -> Array;
+}

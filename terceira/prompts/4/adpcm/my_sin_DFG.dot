@@ -1,0 +1,23 @@
+digraph my_sin_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    rad_in [label="rad"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_sub [label="-="];
+    op_add [label="+="];
+    op_mult [label="*"];
+    op_div [label="/"];
+    op_assign [label="="];
+    op_inc [label="++"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    app_out [label="app"];
+
+    rad_in -> op_sub;
+    rad_in -> op_add;
+    rad_in -> op_mult;
+    op_mult -> op_div;
+    op_div -> op_assign;
+    op_assign -> app_out;
+    op_inc -> op_mult;
+}

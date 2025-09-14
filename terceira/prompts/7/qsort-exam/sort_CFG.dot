@@ -1,0 +1,55 @@
+digraph sort_CFG {
+    node [shape=box, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    // Nos e rotulos
+    start [label="sort: Entry", shape=ellipse];
+    B1 [label="i, ir=n, j, k, l=1\njstack=0, flag=0, a, temp"];
+    B2 [label="for (;;)"];
+    B3 [label="if (ir-l < M)"];
+    B4 [label="j = l+1 to ir\n a = arr[j]\n i = j-1 down to l"];
+    B5 [label="if (arr[i] <= a) break\n else arr[i+1]=arr[i]"];
+    B6 [label="arr[i+1]=a"];
+    B7 [label="if (jstack == 0) break"];
+    B8 [label="ir = istack[jstack--]\n l = istack[jstack--]"];
+    B9 [label="k = (l+ir)>>1\nSWAP(arr[k], arr[l+1])"];
+    B10 [label="if (arr[l] > arr[ir]) SWAP\nif (arr[l+1] > arr[ir]) SWAP\nif (arr[l] > arr[l+1]) SWAP"];
+    B11 [label="i = l+1, j = ir\na = arr[l+1]"];
+    B12 [label="for (;;)"];
+    B13 [label="i++ while (arr[i] < a)\nj-- while (arr[j] > a)"];
+    B14 [label="if (j < i) break"];
+    B15 [label="SWAP(arr[i], arr[j])"];
+    B16 [label="arr[l+1]=arr[j]\narr[j]=a\njstack+=2"];
+    B17 [label="if (ir-i+1 >= j-l)"];
+    B18 [label="istack[jstack]=ir\nistack[jstack-1]=i\nir=j-1"];
+    B19 [label="istack[jstack]=j-1\nistack[jstack-1]=l\nl=i"];
+    end [label="Return", shape=ellipse];
+
+    // Arestas
+    start -> B1;
+    B1 -> B2;
+    B2 -> B3;
+    B3 -> B4 [label="true"];
+    B3 -> B9 [label="false"];
+    B4 -> B5;
+    B5 -> B6 [label="break"];
+    B5 -> B5 [label="loop"];
+    B6 -> B4 [label="next j"];
+    B4 -> B7 [label="j > ir"];
+    B7 -> end [label="true"];
+    B7 -> B8 [label="false"];
+    B8 -> B2;
+    B9 -> B10;
+    B10 -> B11;
+    B11 -> B12;
+    B12 -> B13;
+    B13 -> B14;
+    B14 -> B16 [label="true"];
+    B14 -> B15 [label="false"];
+    B15 -> B12;
+    B16 -> B17;
+    B17 -> B18 [label="true"];
+    B17 -> B19 [label="false"];
+    B18 -> B2;
+    B19 -> B2;
+}

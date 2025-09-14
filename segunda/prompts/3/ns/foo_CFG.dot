@@ -1,0 +1,44 @@
+digraph foo_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    entry [label="Entry", shape=ellipse];
+    exit [label="Exit", shape=ellipse];
+    B1 [label="Declare i, j, k, l"];
+    B2 [label="i = 0"];
+    B3 [label="i < 5?"];
+    B4 [label="j = 0"];
+    B5 [label="j < 5?"];
+    B6 [label="k = 0"];
+    B7 [label="k < 5?"];
+    B8 [label="l = 0"];
+    B9 [label="l < 5?"];
+    B10 [label="if (keys[i][j][k][l] == x)"];
+    B11 [label="return answer[i][j][k][l] + keys[i][j][k][l];"];
+    B12 [label="l++"];
+    B13 [label="k++"];
+    B14 [label="j++"];
+    B15 [label="i++"];
+    B16 [label="return -1;"];
+
+    entry -> B1;
+    B1 -> B2;
+    B2 -> B3;
+    B3 -> B4 [label="true"];
+    B3 -> B16 [label="false"];
+    B4 -> B5;
+    B5 -> B6 [label="true"];
+    B5 -> B15 [label="false"];
+    B6 -> B7;
+    B7 -> B8 [label="true"];
+    B7 -> B14 [label="false"];
+    B8 -> B9;
+    B9 -> B10 [label="true"];
+    B9 -> B13 [label="false"];
+    B10 -> B11 [label="true"];
+    B10 -> B12 [label="false"];
+    B12 -> B9;
+    B13 -> B7;
+    B14 -> B5;
+    B15 -> B3;
+    B11 -> exit;
+    B16 -> exit;
+}

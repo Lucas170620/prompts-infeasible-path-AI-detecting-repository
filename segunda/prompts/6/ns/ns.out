@@ -1,0 +1,96 @@
+**Control Flow Graph (CFG) for `foo` function:**
+```dot
+digraph foo_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    entry [label="Entry", shape=ellipse];
+    exit [label="Exit", shape=ellipse];
+
+    N0 [label="i=0"];
+    N1 [label="i<5"];
+    N2 [label="j=0"];
+    N3 [label="j<5"];
+    N4 [label="k=0"];
+    N5 [label="k<5"];
+    N6 [label="l=0"];
+    N7 [label="l<5"];
+    N8 [label="if (keys[i][j][k][l] == x)"];
+    N9 [label="return answer[i][j][k][l] + keys[i][j][k][l];"];
+    N10 [label="l++"];
+    N11 [label="k++"];
+    N12 [label="j++"];
+    N13 [label="i++"];
+    N14 [label="return -1;"];
+
+    entry -> N0;
+    N0 -> N1;
+    N1 -> N2 [label="true"];
+    N1 -> N14 [label="false"];
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N13 [label="false"];
+    N4 -> N5;
+    N5 -> N6 [label="true"];
+    N5 -> N12 [label="false"];
+    N6 -> N7;
+    N7 -> N8 [label="true"];
+    N7 -> N11 [label="false"];
+    N8 -> N9 [label="true"];
+    N8 -> N10 [label="false"];
+    N9 -> exit;
+    N10 -> N7;
+    N11 -> N5;
+    N12 -> N3;
+    N13 -> N1;
+    N14 -> exit;
+}
+```
+
+**Data Flow Graph (DFG) for `foo` function:**
+```dot
+digraph foo_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    i [label="i"];
+    j [label="j"];
+    k [label="k"];
+    l [label="l"];
+    x [label="x (400)"];
+    keys [label="keys array"];
+    answer [label="answer array"];
+
+    node [shape=box, style="", fillcolor=""];
+    access_keys [label="[]"];
+    access_answer [label="[]"];
+    eq [label="=="];
+    add [label="+"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    result [label="result"];
+
+    i -> access_keys;
+    j -> access_keys;
+    k -> access_keys;
+    l -> access_keys;
+    keys -> access_keys;
+    access_keys -> eq;
+    x -> eq;
+
+    access_keys -> add;
+    access_answer -> add;
+    add -> result;
+
+    i -> access_answer;
+    j -> access_answer;
+    k -> access_answer;
+    l -> access_answer;
+    answer -> access_answer;
+}
+```
+
+**Análise de Caminhos Inviáveis:**
+Existem **625** caminhos inviáveis no código. 
+
+**Explicação:**
+- O array `keys` contém valores predefinidos (0, 1, 2, 3, 4 ou 401), mas nenhum elemento possui o valor 400, que é o argumento passado para `foo(400)`.
+- A condição `keys[i][j][k][l] == x` (onde `x = 400`) é sempre falsa, tornando o ramo `true` do CFG (que leva ao retorno antecipado) inatingível.
+- Os loops aninhados executam 5 × 5 × 5 × 5 = 625 iterações, cada uma representando um caminho potencial para o ramo `true`, mas todos são inviáveis devido à contradição lógica entre o valor buscado (400) e os valores existentes no array.
+- O único caminho viável é aquele que percorre todas as iterações dos loops e retorna -1.

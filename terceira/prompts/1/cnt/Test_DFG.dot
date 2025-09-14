@@ -1,0 +1,14 @@
+digraph Test_DFG {
+    node [shape=ellipse, fillcolor=lightblue];
+    StartTime [label="StartTime"];
+    StopTime [label="StopTime"];
+    node [shape=box];
+    op_sub [label="-"];
+    op_div [label="/"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    TotalTime [label="TotalTime"];
+    StartTime -> op_sub;
+    StopTime -> op_sub;
+    op_sub -> op_div;
+    op_div -> TotalTime;
+}

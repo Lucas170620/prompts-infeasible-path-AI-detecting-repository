@@ -1,0 +1,43 @@
+digraph DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    x [label="x (input)"];
+    keys_array [label="keys[5][5][5][5]"];
+    answer_array [label="answer[5][5][5][5]"];
+
+    node [shape=box, style=""];
+    op_keys_access [label="Array Access\nkeys[i][j][k][l]"];
+    op_compare [label="== (Compare)"];
+    op_answer_access [label="Array Access\nanswer[i][j][k][l]"];
+    op_add [label="+ (Add)"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    result_found [label="result (found)"];
+    result_not_found [label="result (-1)"];
+
+    // Fluxo de dados
+    keys_array -> op_keys_access;
+    x -> op_compare;
+    op_keys_access -> op_compare;
+    op_compare -> result_found [style="invis"]; // Para alinhamento
+
+    op_keys_access -> op_add;
+    answer_array -> op_answer_access;
+    op_answer_access -> op_add;
+    op_add -> result_found;
+
+    result_not_found [label="-1 (const)"];
+
+    // Indices (simplificado)
+    i [label="i", fillcolor=lightblue];
+    j [label="j", fillcolor=lightblue];
+    k [label="k", fillcolor=lightblue];
+    l [label="l", fillcolor=lightblue];
+    i -> op_keys_access;
+    j -> op_keys_access;
+    k -> op_keys_access;
+    l -> op_keys_access;
+    i -> op_answer_access;
+    j -> op_answer_access;
+    k -> op_answer_access;
+    l -> op_answer_access;
+}

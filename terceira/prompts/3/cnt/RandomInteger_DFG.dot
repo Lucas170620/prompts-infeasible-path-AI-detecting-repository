@@ -1,0 +1,9 @@
+digraph RandomInteger_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    Seed_in [label="Seed (input)"];
+    node [shape=box];
+    op_calc [label="Seed = ((Seed * 133) + 81) % 8095"];
+    op_return [label="return Seed"];
+    Seed_in -> op_calc;
+    op_calc -> op_return;
+}

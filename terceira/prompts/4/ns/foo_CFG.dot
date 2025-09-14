@@ -1,0 +1,46 @@
+digraph foo_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Basic blocks
+    START [label="Start foo"];
+    B1 [label="i = 0"];
+    B2 [label="i < 5"];
+    B3 [label="j = 0"];
+    B4 [label="j < 5"];
+    B5 [label="k = 0"];
+    B6 [label="k < 5"];
+    B7 [label="l = 0"];
+    B8 [label="l < 5"];
+    B9 [label="keys[i][j][k][l] == x"];
+    B10 [label="return answer[i][j][k][l] + keys[i][j][k][l];"];
+    B11 [label="l++"];
+    B12 [label="k++"];
+    B13 [label="j++"];
+    B14 [label="i++"];
+    B15 [label="return -1;"];
+    END [label="End foo", shape=doublecircle];
+
+    // Edges
+    START -> B1;
+    B1 -> B2;
+    B2 -> B3 [label="true"];
+    B2 -> B15 [label="false"];
+    B3 -> B4;
+    B4 -> B5 [label="true"];
+    B4 -> B14 [label="false"];
+    B5 -> B6;
+    B6 -> B7 [label="true"];
+    B6 -> B13 [label="false"];
+    B7 -> B8;
+    B8 -> B9 [label="true"];
+    B8 -> B12 [label="false"];
+    B9 -> B10 [label="true"];
+    B9 -> B11 [label="false"];
+    B10 -> END;
+    B11 -> B8;
+    B12 -> B6;
+    B13 -> B4;
+    B14 -> B2;
+    B15 -> END;
+}

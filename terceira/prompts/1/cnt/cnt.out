@@ -1,0 +1,198 @@
+**Análise de Caminhos Inviáveis no Código cnt.c**
+
+### 1. CFG e DFG para Cada Função
+
+#### Função `main`
+**CFG:**
+```dot
+digraph main_CFG {
+    node [shape=box];
+    N1 [label="InitSeed()"];
+    N2 [label="Test(Array)"];
+    N3 [label="return 1;"];
+    N1 -> N2 -> N3;
+}
+```
+**DFG:** Não há dependências de dados significativas entre as chamadas de função.
+
+---
+
+#### Função `Test`
+**CFG:**
+```dot
+digraph Test_CFG {
+    node [shape=box];
+    N1 [label="Initialize(Array)"];
+    N2 [label="StartTime = 1000.0"];
+    N3 [label="Sum(Array)"];
+    N4 [label="StopTime = 1500.0"];
+    N5 [label="TotalTime = (StopTime - StartTime) / 1000.0"];
+    N6 [label="return 0;"];
+    N1 -> N2 -> N3 -> N4 -> N5 -> N6;
+}
+```
+**DFG:**
+```dot
+digraph Test_DFG {
+    node [shape=ellipse, fillcolor=lightblue];
+    StartTime [label="StartTime"];
+    StopTime [label="StopTime"];
+    node [shape=box];
+    op_sub [label="-"];
+    op_div [label="/"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    TotalTime [label="TotalTime"];
+    StartTime -> op_sub;
+    StopTime -> op_sub;
+    op_sub -> op_div;
+    op_div -> TotalTime;
+}
+```
+
+---
+
+#### Função `Initialize`
+**CFG:**
+```dot
+digraph Initialize_CFG {
+    node [shape=box];
+    N1 [label="OuterIndex = 0"];
+    N2 [label="OuterIndex < MAXSIZE?"];
+    N3 [label="InnerIndex = 0"];
+    N4 [label="InnerIndex < MAXSIZE?"];
+    N5 [label="Array[OuterIndex][InnerIndex] = RandomInteger()"];
+    N6 [label="InnerIndex++"];
+    N7 [label="OuterIndex++"];
+    N8 [label="return 0;"];
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N8 [label="false"];
+    N3 -> N4;
+    N4 -> N5 [label="true"];
+    N4 -> N7 [label="false"];
+    N5 -> N6 -> N4;
+    N7 -> N2;
+}
+```
+**DFG:**
+```dot
+digraph Initialize_DFG {
+    node [shape=ellipse, fillcolor=lightblue];
+    Seed [label="Seed (global)"];
+    node [shape=box];
+    op_random [label="RandomInteger()"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    Array [label="Array[OuterIndex][InnerIndex]"];
+    Seed -> op_random;
+    op_random -> Array;
+}
+```
+
+---
+
+#### Função `Sum`
+**CFG:**
+```dot
+digraph Sum_CFG {
+    node [shape=box];
+    N1 [label="Ptotal = 0; Ntotal = 0; Pcnt = 0; Ncnt = 0"];
+    N2 [label="Outer = 0"];
+    N3 [label="Outer < MAXSIZE?"];
+    N4 [label="Inner = 0"];
+    N5 [label="Inner < MAXSIZE?"];
+    N6 [label="Array[Outer][Inner] < 0?"];
+    N7 [label="Ptotal += Array[Outer][Inner]; Pcnt++"];
+    N8 [label="Ntotal += Array[Outer][Inner]; Ncnt++"];
+    N9 [label="Inner++"];
+    N10 [label="Outer++"];
+    N11 [label="Postotal = Ptotal; Negtotal = Ntotal; Poscnt = Pcnt; Negcnt = Ncnt"];
+    N1 -> N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N11 [label="false"];
+    N4 -> N5;
+    N5 -> N6 [label="true"];
+    N5 -> N10 [label="false"];
+    N6 -> N7 [label="true"];
+    N6 -> N8 [label="false"];
+    N7 -> N9;
+    N8 -> N9;
+    N9 -> N5;
+    N10 -> N3;
+}
+```
+**DFG:**
+```dot
+digraph Sum_DFG {
+    node [shape=ellipse, fillcolor=lightblue];
+    Array_elem [label="Array[Outer][Inner]"];
+    node [shape=box];
+    cond [label="< 0?"];
+    add_Ptotal [label="+="];
+    add_Ntotal [label="+="];
+    inc_Pcnt [label="++"];
+    inc_Ncnt [label="++"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    Ptotal [label="Ptotal"];
+    Ntotal [label="Ntotal"];
+    Pcnt [label="Pcnt"];
+    Ncnt [label="Ncnt"];
+    Array_elem -> cond;
+    cond -> add_Ptotal [label="true"];
+    cond -> add_Ntotal [label="false"];
+    Array_elem -> add_Ptotal;
+    Array_elem -> add_Ntotal;
+    add_Ptotal -> Ptotal;
+    add_Ntotal -> Ntotal;
+    inc_Pcnt -> Pcnt;
+    inc_Ncnt -> Ncnt;
+}
+```
+
+---
+
+#### Função `RandomInteger`
+**CFG:**
+```dot
+digraph RandomInteger_CFG {
+    node [shape=box];
+    N1 [label="Seed = ((Seed * 133) + 81) % 8095"];
+    N2 [label="return Seed;"];
+    N1 -> N2;
+}
+```
+**DFG:**
+```dot
+digraph RandomInteger_DFG {
+    node [shape=ellipse, fillcolor=lightblue];
+    OldSeed [label="Seed (input)"];
+    node [shape=box];
+    op_mul [label="* 133"];
+    op_add [label="+ 81"];
+    op_mod [label="% 8095"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    NewSeed [label="Seed (output)"];
+    OldSeed -> op_mul -> op_add -> op_mod -> NewSeed;
+}
+```
+
+---
+
+### 2. Existência de *Infeasible Paths*
+**SIM**, existe pelo menos um caminho inviável no código.
+
+### 3. Explicação Detalhada
+O caminho inviável ocorre na função `Sum`, especificamente no bloco condicional que verifica se `Array[Outer][Inner] < 0`. 
+
+**Motivo:**
+- A função `RandomInteger` gera valores **não negativos** (entre 0 e 8094), pois:
+  - A seed inicial é 0.
+  - A operação `((Seed * 133) + 81) % 8095` sempre produz valores não negativos em C (o operador `%` retorna restos não negativos quando o divisor é positivo).
+- O array `Array` é preenchido exclusivamente com valores não negativos pela função `Initialize`.
+- Portanto, a condição `Array[Outer][Inner] < 0` é **sempre falsa**, tornando o bloco `if` (que incrementa `Ptotal` e `Pcnt`) **inviável**.
+
+**Consequência:**
+- O caminho que executa `Ptotal += Array[Outer][Inner]; Pcnt++;` nunca é alcançado.
+- Apenas o bloco `else` (que atualiza `Ntotal` e `Ncnt`) é executado.
+
+**Contexto:**
+- Esse comportamento é específico da configuração atual (sem a diretiva `WORSTCASE`). Se `WORSTCASE` estivesse definido, a condição seria invertida (`>= 0`), tornando o bloco `else` inviável.

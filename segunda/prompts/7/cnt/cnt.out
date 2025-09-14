@@ -1,0 +1,87 @@
+**Resposta: SIM**
+
+**Explicação Baseada no CFG e DFG:**
+
+Após analisar o código e construir o Grafo de Fluxo de Controle (CFG) e o Grafo de Fluxo de Dados (DFG), identificamos um **caminho infeasible** no código. A razão principal é que a função `RandomInteger` sempre gera valores **não negativos** (o menor valor possível é 81, devido à inicialização `Seed = 0` e à expressão `((Seed * 133) + 81) % 8095`), mas a condição `if (Array[Outer][Inner] < 0)` na função `Sum` espera valores negativos. Isso torna o bloco condicional `Ptotal += Array[Outer][Inner]; Pcnt++;` **inacessível**, pois nenhum elemento da matriz será negativo.
+
+---
+
+### CFG (Control Flow Graph) da Função `Sum`:
+```dot
+digraph Sum_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    N1 [label="Início: int Ptotal=0, Ntotal=0, Pcnt=0, Ncnt=0"];
+    N2 [label="Outer = 0"];
+    N3 [label="Outer < MAXSIZE?"];
+    N4 [label="Inner = 0"];
+    N5 [label="Inner < MAXSIZE?"];
+    N6 [label="Array[Outer][Inner] < 0?"];
+    N7 [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+    N8 [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+    N9 [label="Inner++"];
+    N10 [label="Outer++"];
+    N11 [label="Postotal = Ptotal\nPoscnt = Pcnt\nNegtotal = Ntotal\nNegcnt = Ncnt"];
+    N12 [label="Retorno"];
+
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="Sim"];
+    N3 -> N11 [label="Não"];
+    N4 -> N5;
+    N5 -> N6 [label="Sim"];
+    N5 -> N10 [label="Não"];
+    N6 -> N7 [label="Sim (Infeasible)"];
+    N6 -> N8 [label="Não"];
+    N7 -> N9;
+    N8 -> N9;
+    N9 -> N5;
+    N10 -> N3;
+    N11 -> N12;
+}
+```
+
+---
+
+### DFG (Data Flow Graph) para a Atualização de Variáveis:
+```dot
+digraph Sum_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    Array [label="Array[Outer][Inner]"];
+    Ptotal_in [label="Ptotal (entrada)"];
+    Ntotal_in [label="Ntotal (entrada)"];
+    Pcnt_in [label="Pcnt (entrada)"];
+    Ncnt_in [label="Ncnt (entrada)"];
+
+    node [shape=box, style=""];
+    CheckNeg [label="< 0?"];
+    AddPtotal [label="Ptotal += valor"];
+    AddNtotal [label="Ntotal += valor"];
+    IncPcnt [label="Pcnt++"];
+    IncNcnt [label="Ncnt++"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    Ptotal_out [label="Ptotal (saída)"];
+    Ntotal_out [label="Ntotal (saída)"];
+    Pcnt_out [label="Pcnt (saída)"];
+    Ncnt_out [label="Ncnt (saída)"];
+
+    Array -> CheckNeg;
+    CheckNeg -> AddPtotal [label="Sim (Infeasible)"];
+    CheckNeg -> AddNtotal [label="Não"];
+    Ptotal_in -> AddPtotal;
+    Ntotal_in -> AddNtotal;
+    Pcnt_in -> IncPcnt;
+    Ncnt_in -> IncNcnt;
+    AddPtotal -> Ptotal_out;
+    AddNtotal -> Ntotal_out;
+    AddPtotal -> IncPcnt [style=dotted];
+    AddNtotal -> IncNcnt [style=dotted];
+}
+```
+
+---
+
+### Conclusão:
+O caminho que atualiza `Ptotal` e `Pcnt` é **infeasible** porque a condição `Array[Outer][Inner] < 0` nunca será verdadeira. O DFG mostra que o fluxo de dados para `AddPtotal` e `IncPcnt` depende dessa condição, que não pode ser satisfeita devido à geração exclusiva de valores não negativos por `RandomInteger`. Thus, esse bloco de código é inalcançável.

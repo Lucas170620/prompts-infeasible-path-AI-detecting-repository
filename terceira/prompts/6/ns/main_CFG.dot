@@ -1,0 +1,9 @@
+digraph main_CFG {
+  node [shape=box];
+  entry -> node0;
+  node0 [label="foo(400)"];
+  node0 -> node1;
+  node1 [label="printf (if TEST defined)"];
+  node1 -> exit;
+  exit [shape=doublecircle];
+}

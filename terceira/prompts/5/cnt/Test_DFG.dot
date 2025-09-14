@@ -1,0 +1,12 @@
+digraph Test_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="Initialize(Array)"];
+    N2 [label="StartTime = 1000.0"];
+    N3 [label="Sum(Array)"];
+    N4 [label="StopTime = 1500.0"];
+    N5 [label="TotalTime = (StopTime - StartTime) / 1000.0"];
+    N6 [label="return 0"];
+    N1 -> N3 [label="Array"];
+    N2 -> N5 [label="StartTime"];
+    N4 -> N5 [label="StopTime"];
+}

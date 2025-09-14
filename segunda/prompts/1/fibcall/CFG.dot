@@ -1,0 +1,37 @@
+digraph CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nos para a funcao main
+    main_start [label="main: START"];
+    main_decl [label="int a;"];
+    main_assign [label="a = 30;"];
+    main_call [label="fib(a);"];
+    main_return [label="return a;"];
+    main_end [label="main: END", shape=doublecircle];
+
+    // Nos para a funcao fib
+    fib_start [label="fib: START"];
+    fib_decl [label="int i, Fnew, Fold, temp, ans;"];
+    fib_init [label="Fnew = 1; Fold = 0; i = 2;"];
+    fib_cond [label="i <= 30 && i <= n?", shape=diamond];
+    fib_loop [label="temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;"];
+    fib_inc [label="i++"];
+    fib_after_loop [label="ans = Fnew;"];
+    fib_return [label="return ans;"];
+    fib_end [label="fib: END", shape=doublecircle];
+
+    // Fluxo em main
+    main_start -> main_decl -> main_assign -> main_call -> main_return -> main_end;
+
+    // Fluxo em fib
+    fib_start -> fib_decl -> fib_init -> fib_cond;
+    fib_cond -> fib_loop [label="true"];
+    fib_cond -> fib_after_loop [label="false"];
+    fib_loop -> fib_inc -> fib_cond;
+    fib_after_loop -> fib_return -> fib_end;
+
+    // Chamada de funcao entre main e fib
+    main_call -> fib_start [label="call", style=dashed];
+    fib_return -> main_return [label="return", style=dashed];
+}

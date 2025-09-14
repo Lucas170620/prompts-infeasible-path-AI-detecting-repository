@@ -1,0 +1,95 @@
+**Control Flow Graph (CFG) in DOT:**
+```dot
+digraph CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Main function nodes
+    main_ENTRY [label="main: int a;"];
+    main_ASSIGN [label="a = 30;"];
+    main_CALL [label="fib(a);"];
+    main_RETURN [label="return a;"];
+    main_EXIT [label="main exit", shape=doublecircle];
+
+    // Fib function nodes
+    fib_ENTRY [label="fib: int i, Fnew, Fold, temp, ans;"];
+    fib_INIT [label="Fnew = 1; Fold = 0;"];
+    fib_LOOP_INIT [label="i = 2;"];
+    fib_COND [label="i <= 30 && i <= n"];
+    fib_BODY [label="temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;"];
+    fib_INCREMENT [label="i++"];
+    fib_AFTER_LOOP [label="ans = Fnew;\nreturn ans;"];
+    fib_EXIT [label="fib exit", shape=doublecircle];
+
+    // Main edges
+    main_ENTRY -> main_ASSIGN;
+    main_ASSIGN -> main_CALL;
+    main_CALL -> fib_ENTRY [label="call"];
+    fib_EXIT -> main_RETURN [label="return"];
+    main_RETURN -> main_EXIT;
+
+    // Fib edges
+    fib_ENTRY -> fib_INIT;
+    fib_INIT -> fib_LOOP_INIT;
+    fib_LOOP_INIT -> fib_COND;
+    fib_COND -> fib_BODY [label="true"];
+    fib_COND -> fib_AFTER_LOOP [label="false"];
+    fib_BODY -> fib_INCREMENT;
+    fib_INCREMENT -> fib_COND;
+    fib_AFTER_LOOP -> fib_EXIT;
+}
+```
+
+**Data Flow Graph (DFG) in DOT:**
+```dot
+digraph DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_input [label="n (from main)"];
+    constant_1 [label="1"];
+    constant_0 [label="0"];
+    constant_2 [label="2"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_assign_fnew [label="="];
+    op_assign_fold [label="="];
+    op_assign_i [label="="];
+    op_cond [label="&&"];
+    op_assign_temp [label="="];
+    op_add [label="+"];
+    op_assign_fold_next [label="="];
+    op_assign_ans [label="="];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    fnew_out [label="Fnew"];
+    fold_out [label="Fold"];
+    i_out [label="i"];
+    ans_out [label="ans"];
+
+    // Data flow edges
+    n_input -> op_cond;
+    constant_1 -> op_assign_fnew;
+    constant_0 -> op_assign_fold;
+    constant_2 -> op_assign_i;
+    op_assign_i -> i_out;
+    i_out -> op_cond;
+    op_cond -> op_assign_temp [label="condition true"];
+    op_assign_fnew -> fnew_out;
+    fnew_out -> op_assign_temp;
+    op_assign_temp -> op_add;
+    fold_out -> op_add;
+    op_add -> op_assign_fnew;
+    op_assign_temp -> op_assign_fold_next;
+    op_assign_fold_next -> fold_out;
+    fnew_out -> op_assign_ans;
+    op_assign_ans -> ans_out;
+}
+```
+
+**Análise de Caminhos Inviáveis:**
+Existem **29 caminhos infeasible** no código. 
+
+**Explicação:**
+- O loop em `fib(int n)` é executado exatamente 29 vezes para `n = 30` (de `i = 2` a `i = 30`), conforme determinado pelo CFG e DFG.
+- Qualquer caminho que tente executar o loop fora desse intervalo (e.g., 0 iterações, 1 iteração, ou mais de 29 iterações) é infeasible devido à condição fixa `i <= 30 && i <= n` e ao valor `n = 30` passado por `main()`.
+- O DFG mostra que `n` é um input fixo de `main()`, tornando impossível condições alternativas (e.g., `n < 2` ou `n > 30`) que permitiriam outros números de iterações.
+- Thus, há 29 caminhos infeasible correspondentes a todas as contagens de iteração possíveis exceto 29.

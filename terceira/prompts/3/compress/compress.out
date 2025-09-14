@@ -1,0 +1,142 @@
+**Análise de Caminhos Inviáveis no Código compress.c**
+
+### 1. Grafos de Fluxo de Controle (CFG) e de Dados (DFG) por Função
+
+#### Função `main`
+**CFG:**
+```dot
+digraph main_CFG {
+    node [shape=box];
+    N1 [label="1: int count = IN_COUNT;"];
+    N2 [label="2: initbuffer();"];
+    N3 [label="3: maxbits = BITS;"];
+    N4 [label="4: maxmaxcode = 1 << maxbits;"];
+    N5 [label="5: InCnt = count;"];
+    N6 [label="6: apsim_InCnt = IN_COUNT + 3;"];
+    N7 [label="7: InBuff = (unsigned char *)orig_text_buffer;"];
+    N8 [label="8: OutBuff = (unsigned char *)comp_text_buffer;"];
+    N9 [label="9: compress();"];
+    N10 [label="10: return 0;"];
+    N1 -> N2 -> N3 -> N4 -> N5 -> N6 -> N7 -> N8 -> N9 -> N10;
+}
+```
+**DFG:**
+```dot
+digraph main_DFG {
+    node [shape=ellipse, fillcolor=lightblue, style=filled];
+    IN_COUNT [label="IN_COUNT"];
+    BITS [label="BITS"];
+    orig_text_buffer [label="orig_text_buffer"];
+    comp_text_buffer [label="comp_text_buffer"];
+    node [shape=box];
+    assign_count [label="="];
+    assign_maxbits [label="="];
+    assign_maxmaxcode [label="<<"];
+    assign_InCnt [label="="];
+    assign_apsim_InCnt [label="+"];
+    assign_InBuff [label="="];
+    assign_OutBuff [label="="];
+    call_compress [label="compress()"];
+    IN_COUNT -> assign_count;
+    assign_count -> count;
+    BITS -> assign_maxbits;
+    assign_maxbits -> maxbits;
+    maxbits -> assign_maxmaxcode;
+    assign_maxmaxcode -> maxmaxcode;
+    count -> assign_InCnt;
+    assign_InCnt -> InCnt;
+    IN_COUNT -> assign_apsim_InCnt;
+    assign_apsim_InCnt -> apsim_InCnt;
+    orig_text_buffer -> assign_InBuff;
+    assign_InBuff -> InBuff;
+    comp_text_buffer -> assign_OutBuff;
+    assign_OutBuff -> OutBuff;
+    InCnt -> call_compress;
+    apsim_InCnt -> call_compress;
+    InBuff -> call_compress;
+    OutBuff -> call_compress;
+}
+```
+
+#### Função `initbuffer`
+**CFG:**
+```dot
+digraph initbuffer_CFG {
+    node [shape=box];
+    N1 [label="1: int seed = 1;"];
+    N2 [label="2: int i;"];
+    N3 [label="3: int tabort;"];
+    N4 [label="4: i = 0"];
+    N5 [label="5: i < BUFFERSIZE?"];
+    N6 [label="6: tabort = i;"];
+    N7 [label="7: seed = ((seed * 133) + 81) % 8095;"];
+    N8 [label="8: orig_text_buffer[i] = seed % 256;"];
+    N9 [label="9: i++"];
+    N10 [label="10: End"];
+    N1 -> N2 -> N3 -> N4 -> N5;
+    N5 -> N6 [label="true"];
+    N6 -> N7 -> N8 -> N9 -> N5;
+    N5 -> N10 [label="false"];
+}
+```
+**DFG:**
+```dot
+digraph initbuffer_DFG {
+    node [shape=ellipse, fillcolor=lightblue, style=filled];
+    seed_init [label="1"];
+    i_init [label="0"];
+    node [shape=box];
+    op_seed [label="*133 +81 %8095"];
+    op_seed_mod [label="%256"];
+    assign_tabort [label="="];
+    assign_seed [label="="];
+    assign_orig [label="="];
+    increment_i [label="++"];
+    seed_init -> op_seed;
+    op_seed -> assign_seed;
+    assign_seed -> seed;
+    seed -> op_seed_mod;
+    op_seed_mod -> assign_orig;
+    i -> assign_tabort;
+    i -> assign_orig;
+    i -> increment_i;
+    increment_i -> i;
+    i_init -> i;
+}
+```
+
+#### Função `compress`
+*Devido à complexidade, o CFG e DFG completos são extensos. Aqui está um resumo do fluxo crítico:*
+- Loop principal `while (InCnt > 0)` com ramificações para hashing e colisões.
+- Condicionais como `if (htabof(i) == fcode)` e `if (free_ent < maxmaxcode)`.
+- Chamadas para `cl_block` e `cl_hash`.
+
+#### Função `output`
+**CFG (Simplificado):**
+```dot
+digraph output_CFG {
+    node [shape=box];
+    N1 [label="1: if (code >= 0)"];
+    N2 [label="2: Processamento para code >= 0"];
+    N3 [label="3: if (offset == (n_bits << 3))"];
+    N4 [label="4: if (free_ent > maxcode || clear_flg)"];
+    N5 [label="5: else (code < 0)"];
+    N6 [label="6: End"];
+    N1 -> N2 [label="true"];
+    N1 -> N5 [label="false"];
+    N2 -> N3 -> N4 -> N6;
+    N5 -> N6;
+}
+```
+**DFG:** Envolve variáveis como `code`, `offset`, `n_bits`, `free_ent`, `maxcode`, e `clear_flg`.
+
+### 2. Resposta Final: Existe algum infeasible path?
+**SIM**
+
+### 3. Explicação Detalhada
+- **Infeasible Path em `getbyte`:** A condição `if (InCnt > 0 && (apsim_InCnt-- > 0))` sempre será verdadeira durante a execução normal, pois `InCnt` é inicializado como `BUFFERSIZE` (50) e `apsim_InCnt` como `IN_COUNT + 3` (53). O else branch `return -1;` é inatingível, pois o loop em `compress` termina quando `InCnt == 0`, e `apsim_InCnt` é sempre maior que `InCnt`.
+- **Infeasible Path em `output`:** A condição `if (code >= 0)` sempre será verdadeira, pois `code` é do tipo `code_int` (não negativo) e só é chamado com valores não negativos (ex: `CLEAR = 256`). O branch `else` (para `code < 0`) é inatingível.
+- **Dependências de Dados:** Variáveis como `InCnt` e `apsim_InCnt` são decrementadas de forma sincronizada, impossibilitando cenários onde `InCnt > 0` mas `apsim_InCnt <= 0`.
+- **Conflitos Lógicos:** Em `compress`, a condição `if (free_ent > maxcode || clear_flg)` pode ser falsa, mas o branch subsequente que aumenta `n_bits` nunca ultrapassa `maxbits` (fixo em 16), garantindo que `maxcode` sempre será atualizado corretamente sem overflow.
+
+Esses caminhos inviáveis são resultado de invariantes do programa e dependências de dados específicas do contexto de benchmark WCET, onde entradas são fixas e previsíveis.

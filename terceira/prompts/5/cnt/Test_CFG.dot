@@ -1,0 +1,10 @@
+digraph Test_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: Initialize(Array);"];
+    N2 [label="2: StartTime = 1000.0;"];
+    N3 [label="3: Sum(Array);"];
+    N4 [label="4: StopTime = 1500.0;"];
+    N5 [label="5: TotalTime = (StopTime - StartTime) / 1000.0;"];
+    N6 [label="6: return 0;"];
+    N1 -> N2 -> N3 -> N4 -> N5 -> N6;
+}

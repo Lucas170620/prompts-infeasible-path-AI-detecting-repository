@@ -1,0 +1,29 @@
+digraph fibcall_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_in [label="n"];
+    i_in [label="i (init 2)"];
+    Fnew_in [label="Fnew (init 1)"];
+    Fold_in [label="Fold (init 0)"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_cond [label="&&"];
+    op_assign_temp [label="="];
+    op_add [label="+"];
+    op_assign_fold [label="="];
+    op_inc [label="++"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    Fnew_out [label="Fnew"];
+    ans_out [label="ans"];
+
+    // Data dependencies
+    n_in -> op_cond;
+    i_in -> op_cond;
+    Fnew_in -> op_assign_temp;
+    Fnew_in -> op_add;
+    Fold_in -> op_add;
+    op_add -> Fnew_out;
+    op_assign_temp -> Fold_in [label="temp"];
+    op_inc -> i_in;
+    Fnew_out -> ans_out;
+}

@@ -1,0 +1,65 @@
+**Resposta: NÃO**
+
+### Análise Baseada nos Grafos CFG e DFG
+Após uma análise detalhada do código fornecido (adpcm.c) e da construção dos Grafos de Fluxo de Controle (CFG) e de Fluxo de Dados (DFG), **não foram identificados caminhos inviáveis (infeasible paths)**. 
+
+#### Justificativa:
+1. **CFG (Control Flow Graph):**
+   - O CFG construído para as funções principais (como `encode`, `decode`, `my_abs`, e `main`) mostra que todos os nós (blocos de código) estão conectados por arestas que representam fluxos de execução possíveis.
+   - Condicionais (como `if` e loops) possuem ramificações para ambos os casos (verdadeiro e falso), e não há blocos inalcançáveis ou arestas que nunca podem ser percorridas devido a restrições lógicas.
+   - Exemplo: Em `my_abs`, o condicional `if (n >= 0)` possui ambos os caminhos acessíveis, pois `n` pode ser positivo ou negativo.
+
+2. **DFG (Data Flow Graph):**
+   - O DFG mostra que as dependências de dados são consistentes. Variáveis são inicializadas antes do uso, e não há ciclos de dependência que impossibilitem a execução.
+   - Exemplo: Em `my_abs`, a variável `n` é usada para calcular `m`, e não há restrições que impeçam o fluxo de dados em qualquer caminho.
+
+3. **Análise Global:**
+   - O código é estruturado sem desvios incondicionais ou saídas prematuras de loops, alinhando-se com as restrições do ambiente experimental (como mencionado no cabeçalho do código).
+   - Funções como `my_sin` e `my_cos` usam loops que convergem para valores válidos para qualquer entrada inteira, garantindo que todos os caminhos sejam viáveis.
+   - Não há condições sempre verdadeiras ou sempre falsas que tornem algum caminho inacessível.
+
+### Conclusão
+Todos os caminhos no código são viáveis para entradas apropriadas. Portanto, **não existem caminhos inviáveis** neste código.
+
+### Grafos CFG e DFG em DOT
+Abaixo estão os grafos CFG e DFG para a função `my_abs` (como exemplo), devido à complexidade do código completo. 
+
+#### CFG para `my_abs`:
+```dot
+digraph my_abs_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: int m;"];
+    N2 [label="2: if (n >= 0)"];
+    N3 [label="3: m = n;"];
+    N4 [label="4: m = -n;"];
+    N5 [label="5: return m;"];
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N4 [label="false"];
+    N3 -> N5;
+    N4 -> N5;
+}
+```
+
+#### DFG para `my_abs`:
+```dot
+digraph my_abs_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n [label="n"];
+    node [shape=box, style=""];
+    op_cond [label=">=0"];
+    op_assign1 [label="m = n"];
+    op_assign2 [label="m = -n"];
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    m_out [label="m"];
+    n -> op_cond;
+    n -> op_assign1;
+    n -> op_assign2;
+    op_cond -> op_assign1 [label="true"];
+    op_cond -> op_assign2 [label="false"];
+    op_assign1 -> m_out;
+    op_assign2 -> m_out;
+}
+```
+
+Para o código completo, os grafos seriam extensos, mas a análise foi realizada considerando a estrutura geral e as funções críticas.

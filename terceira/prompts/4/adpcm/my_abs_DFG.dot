@@ -1,0 +1,16 @@
+digraph my_abs_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_in [label="n"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_assign [label="="];
+    op_neg [label="-"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    m_out [label="m"];
+
+    n_in -> op_assign;
+    n_in -> op_neg;
+    op_assign -> m_out;
+    op_neg -> m_out;
+}

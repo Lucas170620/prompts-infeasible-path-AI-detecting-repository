@@ -1,0 +1,21 @@
+digraph CFG {
+    node [shape=box, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nos principais
+    Main [label="main: InitSeed(); Test(Array); return 1;"];
+    Test [label="Test: Initialize(Array); Sum(Array); return 0;"];
+    Initialize [label="Initialize: Loops para preencher a matriz com RandomInteger();"];
+    Sum [label="Sum: Loops aninhados com condicao if (Array[Outer][Inner] < 0)"];
+    InitSeed [label="InitSeed: Seed = 0; return 0;"];
+    RandomInteger [label="RandomInteger: Seed = ((Seed * 133) + 81) % 8095; return Seed;"];
+
+    // Arestas
+    Main -> InitSeed;
+    Main -> Test;
+    Test -> Initialize;
+    Test -> Sum;
+    Initialize -> RandomInteger [label="Para cada elemento"];
+    Sum -> Sum [label="Loop interno"];
+    Sum -> Sum [label="Loop externo"];
+}

@@ -1,0 +1,11 @@
+digraph RandomInteger_DFG {
+    node [shape=ellipse, fillcolor=lightblue];
+    OldSeed [label="Seed (input)"];
+    node [shape=box];
+    op_mul [label="* 133"];
+    op_add [label="+ 81"];
+    op_mod [label="% 8095"];
+    node [shape=ellipse, fillcolor=lightgreen];
+    NewSeed [label="Seed (output)"];
+    OldSeed -> op_mul -> op_add -> op_mod -> NewSeed;
+}

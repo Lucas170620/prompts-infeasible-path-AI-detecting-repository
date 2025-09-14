@@ -1,0 +1,84 @@
+**Control Flow Graph (CFG) em DOT:**
+```dot
+digraph fibcall_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Main function
+    M1 [label="main: int a;"];
+    M2 [label="a = 30;"];
+    M3 [label="fib(a);"];
+    M4 [label="return a;"];
+
+    // Fib function
+    F1 [label="fib: int i, Fnew, Fold, temp, ans;"];
+    F2 [label="Fnew = 1; Fold = 0;"];
+    F3 [label="i = 2;"];
+    F4 [label="i <= 30 && i <= n"];
+    F5 [label="temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;"];
+    F6 [label="i++"];
+    F7 [label="ans = Fnew;"];
+    F8 [label="return ans;"];
+
+    // Main edges
+    M1 -> M2 -> M3 -> M4;
+
+    // Fib edges
+    F1 -> F2 -> F3 -> F4;
+    F4 -> F5 [label="true"];
+    F5 -> F6 -> F4;
+    F4 -> F7 [label="false"];
+    F7 -> F8;
+
+    // Function call edge
+    M3 -> F1 [label="call", style=dashed, color=blue];
+    F8 -> M4 [label="return", style=dashed, color=blue];
+}
+```
+
+**Data Flow Graph (DFG) em DOT:**
+```dot
+digraph fibcall_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_in [label="n"];
+    i_in [label="i (init 2)"];
+    Fnew_in [label="Fnew (init 1)"];
+    Fold_in [label="Fold (init 0)"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_cond [label="&&"];
+    op_assign_temp [label="="];
+    op_add [label="+"];
+    op_assign_fold [label="="];
+    op_inc [label="++"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    Fnew_out [label="Fnew"];
+    ans_out [label="ans"];
+
+    // Data dependencies
+    n_in -> op_cond;
+    i_in -> op_cond;
+    Fnew_in -> op_assign_temp;
+    Fnew_in -> op_add;
+    Fold_in -> op_add;
+    op_add -> Fnew_out;
+    op_assign_temp -> Fold_in [label="temp"];
+    op_inc -> i_in;
+    Fnew_out -> ans_out;
+}
+```
+
+**Análise de Infeasible Paths:**
+**NÃO**, não existem infeasible paths neste código. 
+
+**Explicação:**
+1. **CFG Analysis:** O fluxo de controle é linear e previsível. O loop em `fib` sempre executará exatamente 29 iterações (de i=2 até i=30), pois `n` é fixado em 30 via `main`. Não há condições conflitantes ou mutuamente exclusivas.
+2. **DFG Analysis:** As dependências de dados são consistentes:
+   - `Fnew` e `Fold` são inicializados e atualizados de forma circular dentro do loop, mas isso é viável.
+   - A condição `i <= 30 && i <= n` sempre será verdadeira dentro do loop, pois `n=30` e `i` incrementa de 2 a 30.
+3. **Contexto do Programa:** O código é deterministico. Para a entrada fixa (n=30), todos os caminhos são alcançáveis:
+   - O loop executa completamente (caminho verdadeiro da condição).
+   - Após o loop, a função retorna `Fnew` (caminho falso da condição).
+
+Não há contradições lógicas ou restrições de dados que impossibilitem qualquer caminho no CFG/DFG.

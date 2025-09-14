@@ -1,0 +1,20 @@
+digraph CFG_Initialize {
+    node [shape=box];
+    start [label="Inicio", shape=ellipse];
+    n1 [label="OuterIndex = 0"];
+    n2 [label="OuterIndex < MAXSIZE?"];
+    n3 [label="InnerIndex = 0"];
+    n4 [label="InnerIndex < MAXSIZE?"];
+    n5 [label="Array[OuterIndex][InnerIndex] = RandomInteger()"];
+    n6 [label="InnerIndex++"];
+    n7 [label="OuterIndex++"];
+    end [label="return 0;", shape=ellipse];
+    start -> n1 -> n2;
+    n2 -> n3 [label="Sim"];
+    n2 -> end [label="Nao"];
+    n3 -> n4;
+    n4 -> n5 [label="Sim"];
+    n4 -> n7 [label="Nao"];
+    n5 -> n6 -> n4;
+    n7 -> n2;
+}

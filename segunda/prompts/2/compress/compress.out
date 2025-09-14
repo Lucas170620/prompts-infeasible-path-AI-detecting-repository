@@ -1,0 +1,229 @@
+**Control Flow Graph (CFG) and Data Flow Graph (DFG) Analysis for compress.c**
+
+After analyzing the provided code, I constructed the CFG and DFG to identify infeasible paths. The CFG captures the control flow, while the DFG models data dependencies. Below are the graphs in DOT format and the analysis results.
+
+### Control Flow Graph (CFG) in DOT Format
+```dot
+digraph compress_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nodes for main function
+    M1 [label="1: Initialize buffer and variables"];
+    M2 [label="2: Set maxbits = BITS (16)"];
+    M3 [label="3: Set InCnt, apsim_InCnt, InBuff, OutBuff"];
+    M4 [label="4: Call compress()"];
+    M5 [label="5: Return 0"];
+
+    // Nodes for compress function
+    C1 [label="1: Initialize variables (offset, bytes_out, etc.)"];
+    C2 [label="2: ent = getbyte()"];
+    C3 [label="3: Compute hshift"];
+    C4 [label="4: cl_hash(hsize_reg)"];
+    C5 [label="5: while (InCnt > 0)"];
+    C6 [label="6: c = getbyte(); in_count++"];
+    C7 [label="7: fcode = (c << maxbits) + ent"];
+    C8 [label="8: i = (c << hshift) ^ ent"];
+    C9 [label="9: if (htab[i] == fcode)"];
+    C10 [label="10: ent = codetab[i]; continue"];
+    C11 [label="11: else if (htab[i] < 0)"];
+    C12 [label="12: goto nomatch"];
+    C13 [label="13: disp = hsize_reg - i"];
+    C14 [label="14: if (i == 0) disp = 1"];
+    C15 [label="15: i -= disp"];
+    C16 [label="16: if (i < 0) i += hsize_reg"];
+    C17 [label="17: if (htab[i] == fcode)"];
+    C18 [label="18: ent = codetab[i]; continue"];
+    C19 [label="19: if (htab[i] > 0 && bound++ < in_count)"];
+    C20 [label="20: goto probe (C15)"];
+    C21 [label="21: nomatch: out_count++"];
+    C22 [label="22: ent = c"];
+    C23 [label="23: if (free_ent < maxmaxcode)"];
+    C24 [label="24: codetab[i] = free_ent++; htab[i] = fcode"];
+    C25 [label="25: else if (in_count >= checkpoint && block_compress)"];
+    C26 [label="26: cl_block()"];
+    C27 [label="27: End while"];
+    C28 [label="28: if (bytes_out > in_count) exit_stat=2"];
+
+    // Nodes for cl_block function
+    B1 [label="1: checkpoint = in_count + CHECK_GAP"];
+    B2 [label="2: if (in_count > 0x007fffff)"];
+    B3 [label="3: rat = bytes_out >> 8"];
+    B4 [label="4: if (rat == 0) rat = 0x7fffffff"];
+    B5 [label="5: else rat = in_count / rat"];
+    B6 [label="6: else rat = (in_count << 8) / bytes_out"];
+    B7 [label="7: if (rat > ratio)"];
+    B8 [label="8: ratio = rat"];
+    B9 [label="9: else ratio = 0; cl_hash(hsize); free_ent = FIRST; clear_flg=1; output(CLEAR)"];
+
+    // Nodes for output function
+    O1 [label="1: if (code >= 0)"];
+    O2 [label="2: r_off = offset; bits = n_bits; bp = buf"];
+    O3 [label="3: bp += (r_off >> 3); r_off &= 7"];
+    O4 [label="4: *bp = (*bp & rmask[r_off]) | (code << r_off) & lmask[r_off]"];
+    O5 [label="5: bp++; bits -= (8 - r_off); code >>= 8 - r_off"];
+    O6 [label="6: if (bits >= 8)"];
+    O7 [label="7: *bp++ = code; code >>= 8; bits -= 8"];
+    O8 [label="8: if (bits) *bp = code"];
+    O9 [label="9: offset += n_bits"];
+    O10 [label="10: if (offset == (n_bits << 3))"];
+    O11 [label="11: write bytes from buf; offset=0"];
+    O12 [label="12: if (free_ent > maxcode || clear_flg)"];
+    O13 [label="13: if (offset > 0) write bytes; offset=0"];
+    O14 [label="14: if (clear_flg) maxcode = MAXCODE(INIT_BITS); clear_flg=0"];
+    O15 [label="15: else n_bits++; if (n_bits==maxbits) maxcode=maxmaxcode; else maxcode=MAXCODE(n_bits)"];
+    O16 [label="16: else if (offset > 0) write bytes; offset=0"];
+
+    // Edges for main
+    M1 -> M2 -> M3 -> M4 -> M5;
+
+    // Edges for compress
+    C1 -> C2 -> C3 -> C4 -> C5;
+    C5 -> C6 [label="InCnt>0"];
+    C5 -> C28 [label="InCnt<=0"];
+    C6 -> C7 -> C8 -> C9;
+    C9 -> C10 [label="true"];
+    C9 -> C11 [label="false"];
+    C11 -> C12 [label="true"];
+    C11 -> C13 [label="false"];
+    C12 -> C21;
+    C13 -> C14 -> C15 -> C16 -> C17;
+    C17 -> C18 [label="true"];
+    C17 -> C19 [label="false"];
+    C19 -> C20 [label="true"];
+    C19 -> C21 [label="false"];
+    C20 -> C15;
+    C21 -> C22 -> C23;
+    C23 -> C24 [label="true"];
+    C23 -> C25 [label="false"];
+    C25 -> C26 [label="true"];
+    C25 -> C27 [label="false"];
+    C24 -> C27;
+    C26 -> C27;
+    C27 -> C5;
+    C28 -> C5 [label="loop back"];
+
+    // Edges for cl_block
+    B1 -> B2;
+    B2 -> B3 [label="true"];
+    B2 -> B6 [label="false"];
+    B3 -> B4 [label="rat==0"];
+    B3 -> B5 [label="rat!=0"];
+    B4 -> B7;
+    B5 -> B7;
+    B6 -> B7;
+    B7 -> B8 [label="true"];
+    B7 -> B9 [label="false"];
+
+    // Edges for output
+    O1 -> O2 [label="true"];
+    O1 -> O16 [label="false"];
+    O2 -> O3 -> O4 -> O5 -> O6;
+    O6 -> O7 [label="true"];
+    O6 -> O8 [label="false"];
+    O7 -> O8;
+    O8 -> O9 -> O10;
+    O10 -> O11 [label="true"];
+    O10 -> O12 [label="false"];
+    O11 -> O12;
+    O12 -> O13 [label="true"];
+    O12 -> O16 [label="false"];
+    O13 -> O14 [label="clear_flg"];
+    O13 -> O15 [label="!clear_flg"];
+}
+```
+
+### Data Flow Graph (DFG) in DOT Format
+```dot
+digraph compress_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    InCnt [label="InCnt"];
+    InBuff [label="InBuff"];
+    ent [label="ent"];
+    c [label="c"];
+    fcode [label="fcode"];
+    i [label="i"];
+    disp [label="disp"];
+    free_ent [label="free_ent"];
+    maxmaxcode [label="maxmaxcode"];
+    in_count [label="in_count"];
+    checkpoint [label="checkpoint"];
+    block_compress [label="block_compress"];
+    code [label="code"];
+    offset [label="offset"];
+    n_bits [label="n_bits"];
+    clear_flg [label="clear_flg"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_getbyte [label="getbyte()"];
+    op_htab [label="htab[i]"];
+    op_codetab [label="codetab[i]"];
+    op_compute_fcode [label="fcode = (c<<maxbits)+ent"];
+    op_compute_i [label="i = (c<<hshift)^ent"];
+    op_compare [label="htab[i] == fcode?"];
+    op_disp [label="disp = hsize_reg - i"];
+    op_adjust_i [label="i -= disp; if<0 adjust"];
+    op_output [label="output(code)"];
+    op_cl_block [label="cl_block()"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    OutBuff [label="OutBuff"];
+    bytes_out [label="bytes_out"];
+    exit_stat [label="exit_stat"];
+
+    // Data flow edges
+    InCnt -> op_getbyte;
+    InBuff -> op_getbyte;
+    op_getbyte -> c;
+    c -> op_compute_fcode;
+    ent -> op_compute_fcode;
+    op_compute_fcode -> fcode;
+    c -> op_compute_i;
+    op_compute_i -> i;
+    i -> op_htab;
+    op_htab -> op_compare;
+    fcode -> op_compare;
+    op_compare -> ent [label="true"];
+    op_compare -> op_disp [label="false"];
+    i -> op_disp;
+    op_disp -> disp;
+    disp -> op_adjust_i;
+    i -> op_adjust_i;
+    op_adjust_i -> i;
+    i -> op_htab;
+    free_ent -> op_output;
+    maxmaxcode -> op_output;
+    in_count -> op_cl_block;
+    checkpoint -> op_cl_block;
+    block_compress -> op_cl_block;
+    code -> op_output;
+    offset -> op_output;
+    n_bits -> op_output;
+    clear_flg -> op_output;
+    op_output -> OutBuff;
+    op_output -> bytes_out;
+    op_output -> offset;
+    op_output -> n_bits;
+    op_output -> clear_flg;
+    op_cl_block -> free_ent;
+    op_cl_block -> clear_flg;
+    op_cl_block -> ratio;
+}
+```
+
+### Infeasible Paths Analysis
+Based on the CFG and DFG, the following infeasible paths were identified due to logical contradictions or data dependencies:
+
+1. **Path in `compress` function (else-if branch):**  
+   The condition `else if (in_count >= checkpoint && block_compress)` is infeasible because `in_count` (max 51) is always less than `checkpoint` (10000) due to the small buffer size (50 bytes). This path leads to `cl_block()`, which cannot be executed.
+
+2. **Path in `cl_block` function (if branch):**  
+   The condition `if (in_count > 0x007fffff)` is infeasible because `in_count` (max 51) is much smaller than `0x007fffff` (8,388,607). This path involves large integer operations that are never triggered.
+
+3. **Path in `output` function (else branch):**  
+   The condition `if (code >= 0)` is always true because `code` is never negative (it represents compression codes starting from 256). The else branch (code < 0) is infeasible.
+
+4. **Path in `output` function (clear_flg branch):**  
+   The condition `if (clear_flg)` is infeasible because `clear_flg` is never set to 1 in the feasible execution path. The `cl_block` function, which sets `clear_flg`, is never called due to the infeasible path in `compress`.
+
+**Total Infeasible Paths: 4**

@@ -1,0 +1,38 @@
+digraph CFG_foo {
+    node [shape=box];
+    edge [fontsize=10];
+
+    START [label="Inicio", shape=ellipse];
+    END [label="Fim", shape=ellipse];
+    INIT [label="i=0; j=0; k=0; l=0;"];
+    LOOP_I [label="i < 5?"];
+    LOOP_J [label="j < 5?"];
+    LOOP_K [label="k < 5?"];
+    LOOP_L [label="l < 5?"];
+    COND [label="keys[i][j][k][l] == x?"];
+    RETURN_INNER [label="Return answer[i][j][k][l] + keys[i][j][k][l];"];
+    RETURN_END [label="Return -1;"];
+    INC_L [label="l++"];
+    INC_K [label="k++"];
+    INC_J [label="j++"];
+    INC_I [label="i++"];
+
+    START -> INIT;
+    INIT -> LOOP_I;
+    LOOP_I -> LOOP_J [label="Sim"];
+    LOOP_I -> RETURN_END [label="Nao"];
+    LOOP_J -> LOOP_K [label="Sim"];
+    LOOP_J -> INC_I [label="Nao"];
+    LOOP_K -> LOOP_L [label="Sim"];
+    LOOP_K -> INC_J [label="Nao"];
+    LOOP_L -> COND [label="Sim"];
+    LOOP_L -> INC_K [label="Nao"];
+    COND -> RETURN_INNER [label="Sim"];
+    COND -> INC_L [label="Nao"];
+    INC_L -> LOOP_L;
+    INC_K -> LOOP_K;
+    INC_J -> LOOP_J;
+    INC_I -> LOOP_I;
+    RETURN_INNER -> END;
+    RETURN_END -> END;
+}

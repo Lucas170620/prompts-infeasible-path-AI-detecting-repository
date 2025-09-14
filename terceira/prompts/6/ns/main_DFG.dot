@@ -1,0 +1,9 @@
+digraph main_DFG {
+  node [shape=ellipse];
+  constant_400 [label="400"];
+  foo_call [label="foo(400)", shape=box];
+  printf_call [label="printf", shape=box];
+
+  constant_400 -> foo_call;
+  foo_call -> printf_call;
+}

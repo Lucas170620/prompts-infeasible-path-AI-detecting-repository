@@ -1,0 +1,4 @@
+digraph DFG_main {
+  node [shape=box];
+  // No data operations in main
+}

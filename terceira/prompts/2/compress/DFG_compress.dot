@@ -1,0 +1,9 @@
+digraph DFG_compress {
+    node [shape=ellipse];
+    getbyte -> ent;
+    ent -> fcode;
+    fcode -> htabof;
+    htabof -> cond;
+    cond -> nomatch [label="< 0"];
+    // ... outras dependencias
+}

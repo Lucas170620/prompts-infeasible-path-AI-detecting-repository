@@ -1,0 +1,25 @@
+digraph DFG_Sum {
+         node [shape=box];
+         // Nos de entrada (dados iniciais)
+         Array_input [label="Array", shape=ellipse, fillcolor=lightblue, style=filled];
+         Zero [label="0", shape=ellipse, fillcolor=lightblue, style=filled];
+
+         // Nos de operacao
+         Init [label="Ptotal=Ntotal=Pcnt=Ncnt=0"];
+         Outer_loop [label="Outer=0 to MAXSIZE-1"];
+         Inner_loop [label="Inner=0 to MAXSIZE-1"];
+         Check_Neg [label="Array[Outer][Inner] < 0?"];
+         Update_P [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+         Update_N [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+         Assign [label="Postotal=Ptotal\nPoscnt=Pcnt\nNegtotal=Ntotal\nNegcnt=Ncnt"];
+
+         // Arestas de dependencia de dados
+         Zero -> Init;
+         Init -> Update_P;
+         Init -> Update_N;
+         Array_input -> Check_Neg;
+         Check_Neg -> Update_P [label="Condicao verdadeira (inviavel)"];
+         Check_Neg -> Update_N [label="Condicao falsa (sempre executada)"];
+         Update_P -> Assign [label="Dados nunca produzidos"];
+         Update_N -> Assign;
+     }

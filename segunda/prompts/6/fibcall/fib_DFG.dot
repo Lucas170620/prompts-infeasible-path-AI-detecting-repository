@@ -1,0 +1,44 @@
+digraph fib_DFG {
+    // Input nodes
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_in [label="n"];
+    const_1 [label="1"];
+    const_0 [label="0"];
+    const_2 [label="2"];
+
+    // Operation nodes
+    node [shape=box, style=""];
+    op_init_Fnew [label="Fnew = 1"];
+    op_init_Fold [label="Fold = 0"];
+    op_init_i [label="i = 2"];
+    op_cond [label="i <= 30 && i <= n", shape=diamond];
+    op_temp [label="temp = Fnew"];
+    op_add [label="Fnew + Fold"];
+    op_assign_Fnew [label="Fnew = result"];
+    op_assign_Fold [label="Fold = temp"];
+    op_inc [label="i + 1"];
+    op_assign_i [label="i = result"];
+    op_ans [label="ans = Fnew"];
+    op_return [label="return ans"];
+
+    // Data flow edges
+    const_1 -> op_init_Fnew;
+    op_init_Fnew -> op_temp [label="Fnew"];
+    op_init_Fnew -> op_add [label="Fnew"];
+    const_0 -> op_init_Fold;
+    op_init_Fold -> op_add [label="Fold"];
+    const_2 -> op_init_i;
+    op_init_i -> op_cond [label="i"];
+    op_init_i -> op_inc [label="i"];
+    n_in -> op_cond [label="n"];
+    op_temp -> op_assign_Fold [label="temp"];
+    op_add -> op_assign_Fnew [label="sum"];
+    op_assign_Fnew -> op_temp [label="Fnew"];
+    op_assign_Fnew -> op_add [label="Fnew"];
+    op_assign_Fold -> op_add [label="Fold"];
+    op_inc -> op_assign_i [label="inc"];
+    op_assign_i -> op_cond [label="i"];
+    op_assign_i -> op_inc [label="i"];
+    op_assign_Fnew -> op_ans [label="Fnew"];
+    op_ans -> op_return [label="ans"];
+}

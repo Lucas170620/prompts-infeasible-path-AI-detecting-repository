@@ -1,0 +1,30 @@
+digraph CFG {
+    node [shape=box, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    Start [label="Sum: Inicio"];
+    Loop1 [label="Outer = 0"];
+    Cond1 [label="Outer < MAXSIZE?"];
+    Loop2 [label="Inner = 0"];
+    Cond2 [label="Inner < MAXSIZE?"];
+    Check [label="Array[Outer][Inner] < 0?"];
+    PosBlock [label="Ptotal += Array[Outer][Inner]\nPcnt++", color=red];
+    NegBlock [label="Ntotal += Array[Outer][Inner]\nNcnt++", color=green];
+    InnerInc [label="Inner++"];
+    OuterInc [label="Outer++"];
+    End [label="Atribui globais e retorna"];
+
+    Start -> Loop1;
+    Loop1 -> Cond1;
+    Cond1 -> Loop2 [label="Sim"];
+    Cond1 -> End [label="Nao"];
+    Loop2 -> Cond2;
+    Cond2 -> Check [label="Sim"];
+    Cond2 -> OuterInc [label="Nao"];
+    Check -> PosBlock [label="Verdadeiro (Infeasible)", color=red];
+    Check -> NegBlock [label="Falso (Sempre executado)", color=green];
+    PosBlock -> InnerInc [color=red];
+    NegBlock -> InnerInc;
+    InnerInc -> Cond2;
+    OuterInc -> Cond1;
+}

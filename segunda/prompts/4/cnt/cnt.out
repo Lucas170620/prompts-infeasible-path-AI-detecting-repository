@@ -1,0 +1,123 @@
+**CFG (Control Flow Graph) para a função `Sum`:**
+
+```dot
+digraph Sum_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    N1 [label="1: int Ptotal = 0;\nint Ntotal = 0;\nint Pcnt = 0;\nint Ncnt = 0;"];
+    N2 [label="2: Outer = 0"];
+    N3 [label="3: Outer < MAXSIZE?"];
+    N4 [label="4: Inner = 0"];
+    N5 [label="5: Inner < MAXSIZE?"];
+    N6 [label="6: if (Array[Outer][Inner] < 0)"];
+    N7 [label="7: Ptotal += Array[Outer][Inner];\nPcnt++;"];
+    N8 [label="8: Ntotal += Array[Outer][Inner];\nNcnt++;"];
+    N9 [label="9: Inner++"];
+    N10 [label="10: Outer++"];
+    N11 [label="11: Postotal = Ptotal;\nPoscnt = Pcnt;\nNegtotal = Ntotal;\nNegcnt = Ncnt;"];
+
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N11 [label="false"];
+    N4 -> N5;
+    N5 -> N6 [label="true"];
+    N5 -> N10 [label="false"];
+    N6 -> N7 [label="true"];
+    N6 -> N8 [label="false"];
+    N7 -> N9;
+    N8 -> N9;
+    N9 -> N5;
+    N10 -> N3;
+    N11 -> N12 [style=invis];
+}
+```
+
+**DFG (Data Flow Graph) para a função `Sum`:**
+
+```dot
+digraph Sum_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    Array_in [label="Array"];
+    MAXSIZE_in [label="MAXSIZE"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_outer_init [label="="];
+    op_outer_cond [label="<"];
+    op_outer_inc [label="++"];
+    op_inner_init [label="="];
+    op_inner_cond [label="<"];
+    op_inner_inc [label="++"];
+    op_cond [label="< 0?"];
+    op_ptotal_add [label="+="];
+    op_ntotal_add [label="+="];
+    op_pcnt_inc [label="++"];
+    op_ncnt_inc [label="++"];
+    op_assign_ptotal [label="="];
+    op_assign_ntotal [label="="];
+    op_assign_pcnt [label="="];
+    op_assign_ncnt [label="="];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    Ptotal_out [label="Ptotal"];
+    Ntotal_out [label="Ntotal"];
+    Pcnt_out [label="Pcnt"];
+    Ncnt_out [label="Ncnt"];
+    Postotal_out [label="Postotal"];
+    Negtotal_out [label="Negtotal"];
+    Poscnt_out [label="Poscnt"];
+    Negcnt_out [label="Negcnt"];
+
+    Array_in -> op_cond;
+    Array_in -> op_ptotal_add;
+    Array_in -> op_ntotal_add;
+
+    MAXSIZE_in -> op_outer_cond;
+    MAXSIZE_in -> op_inner_cond;
+
+    op_outer_init -> op_outer_cond;
+    op_outer_cond -> op_inner_init [label="true"];
+    op_outer_cond -> op_assign_ptotal [label="false"];
+    op_outer_inc -> op_outer_cond;
+
+    op_inner_init -> op_inner_cond;
+    op_inner_cond -> op_cond [label="true"];
+    op_inner_cond -> op_outer_inc [label="false"];
+    op_inner_inc -> op_inner_cond;
+
+    op_cond -> op_ptotal_add [label="true"];
+    op_cond -> op_ntotal_add [label="false"];
+
+    op_ptotal_add -> Ptotal_out;
+    op_ntotal_add -> Ntotal_out;
+    op_pcnt_inc -> Pcnt_out;
+    op_ncnt_inc -> Ncnt_out;
+
+    Ptotal_out -> op_ptotal_add [style=dashed, constraint=false];
+    Ntotal_out -> op_ntotal_add [style=dashed, constraint=false];
+    Pcnt_out -> op_pcnt_inc [style=dashed, constraint=false];
+    Ncnt_out -> op_ncnt_inc [style=dashed, constraint=false];
+
+    Ptotal_out -> op_assign_ptotal;
+    op_assign_ptotal -> Postotal_out;
+    Ntotal_out -> op_assign_ntotal;
+    op_assign_ntotal -> Negtotal_out;
+    Pcnt_out -> op_assign_pcnt;
+    op_assign_pcnt -> Poscnt_out;
+    Ncnt_out -> op_assign_ncnt;
+    op_assign_ncnt -> Negcnt_out;
+}
+```
+
+**Análise de Caminhos Infeasible:**
+
+Após analisar o CFG e o DFG, não há **caminhos infeasible** no código. Justificativa:
+
+1. **Ausência de condições contraditórias:** O código não possui condições lógicas mutuamente exclusivas (como `x > 10 && x < 5`).
+2. **Fluxo de dados consistente:** Todas as variáveis são inicializadas antes do uso (e.g., `Ptotal`, `Ntotal` são inicializadas com 0).
+3. **Loops previsíveis:** Os loops `for` iteram sobre intervalos fixos (`0` até `MAXSIZE-1`), sem condições de saída complexas ou invariantes que impossibilitem caminhos.
+4. **Dependências de dados válidas:** As operações de acumulação (`+=`) e incremento (`++`) seguem um fluxo linear sem restrições irreconciliáveis.
+
+**Resposta Final:**  
+**0** caminhos infeasible foram identificados.

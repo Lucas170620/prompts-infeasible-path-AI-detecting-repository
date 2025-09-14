@@ -1,0 +1,7 @@
+digraph DFG_RandomInteger {
+    node [shape=box];
+    n1 [label="Seed (entrada)"];
+    n2 [label="Calculo: (Seed * 133) + 81) % 8095"];
+    n3 [label="Seed (saida)"];
+    n1 -> n2 -> n3;
+}

@@ -1,0 +1,32 @@
+**Análise de Caminhos Inviáveis (Infeasible Paths) no Código ADPCM**
+
+### Conclusão
+**NÃO**, não foram identificados *infeasible paths* (caminhos inviáveis) no código fornecido (`adpcm.c`).
+
+### Justificativa Detalhada
+1. **Análise do CFG e DFG**:
+   - Foram gerados Grafos de Fluxo de Controle (CFG) e Grafos de Fluxo de Dados (DFG) para todas as funções relevantes (ex: `encode`, `decode`, `main`, `quantl`, `logscl`).
+   - Os CFGs mostram que o fluxo de controle é bem estruturado, sem desvios incondicionais ou loops com condições conflitantes.
+   - Os DFGs mostram que as dependências de dados são consistentes. Variáveis são inicializadas antes do uso, e não há conflitos entre valores que possam inviabilizar caminhos.
+
+2. **Condições e Loops**:
+   - Loops (ex: em `encode`, `my_sin`) possuem condições claras e variáveis de controle que são devidamente inicializadas e modificadas.
+   - Condicionais (ex: em `quantl`, `logscl`) usam expressões bem definidas, sem contradições lógicas sequenciais (ex: `if (x > 10)` seguido por `if (x < 5)` no mesmo caminho).
+
+3. **Dependências de Dados**:
+   - Variáveis globais (ex: `deth`, `detl`) são inicializadas em `reset()` antes de qualquer uso.
+   - Em funções como `upzero` e `logscl`, operações em arrays usam índices dentro dos limites (ex: `il >> 2` resulta em valores entre 0-15, compatível com `wl_code_table[16]`).
+
+4. **Invariantes e Restrições**:
+   - Não há invariantes de programa ou restrições de ambiente (ex: hardware) que bloqueiem caminhos.
+   - Valores são truncados/clamped quando necessário (ex: `nbl` é limitado a [0, 18432] em `logscl`), evitando estados inválidos.
+
+5. **Exemplo de Caminho Viável**:
+   - Em `encode`, o caminho onde `eh >= 0` e `my_abs(eh) > decis` leva a `ih = 2`, que é válido (acessa `qq2_code2_table[2]`). Não há contradição ou dependência que impeça essa execução.
+
+### Observações
+- O código é bem estruturado e segue as restrições mencionadas no cabeçalho (sem `switch`, `do-while`, etc.), facilitando a análise.
+- A inicialização de arrays em `reset()` garante que não há uso de lixo de memória.
+- Apesar de complexo, o fluxo de dados e controle é consistente em todas as funções.
+
+**Conclusão Final**: Todos os caminhos identificados são viáveis. Não há evidências de *infeasible paths* baseadas na análise dos CFGs, DFGs e definições fornecidas.

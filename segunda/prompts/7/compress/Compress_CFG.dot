@@ -1,0 +1,37 @@
+digraph Compress_CFG {
+    node [shape=box, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    // Nos principais
+    COMPRESS_START [label="compress():\nInicializa variaveis"];
+    COMPRESS_LOOP [label="while (InCnt > 0)"];
+    GETBYTE [label="c = getbyte()"];
+    HASH_MATCH [label="if (htab[i] == fcode)"];
+    HASH_EMPTY [label="else if (htab[i] < 0)"];
+    PROBE_LOOP [label="i -= disp (probe loop)"];
+    NOMATCH [label="nomatch:\nfree_ent++"];
+    CHECK_FREE_ENT [label="if (free_ent < maxmaxcode)"];
+    CHECK_CHECKPOINT [label="else if (in_count >= checkpoint)"];
+    CL_BLOCK_CALL [label="cl_block()"]; // Inatingivel
+    CL_BLOCK_START [label="cl_block():\ncheckpoint = in_count + CHECK_GAP"];
+    RATIO_CALC [label="if (in_count > 0x007fffff)"]; // Inatingivel
+    CL_HASH_CALL [label="cl_hash()"];
+
+    // Arestas
+    COMPRESS_START -> COMPRESS_LOOP;
+    COMPRESS_LOOP -> GETBYTE [label="InCnt > 0"];
+    GETBYTE -> HASH_MATCH;
+    HASH_MATCH -> COMPRESS_LOOP [label="true"];
+    HASH_MATCH -> HASH_EMPTY [label="false"];
+    HASH_EMPTY -> PROBE_LOOP [label="false"];
+    HASH_EMPTY -> NOMATCH [label="true"];
+    PROBE_LOOP -> HASH_MATCH;
+    NOMATCH -> CHECK_FREE_ENT;
+    CHECK_FREE_ENT -> COMPRESS_LOOP [label="true"];
+    CHECK_FREE_ENT -> CHECK_CHECKPOINT [label="false"]; // Inatingivel
+    CHECK_CHECKPOINT -> CL_BLOCK_CALL [label="true"]; // Inatingivel
+    CL_BLOCK_CALL -> CL_BLOCK_START;
+    CL_BLOCK_START -> RATIO_CALC;
+    RATIO_CALC -> CL_HASH_CALL [label="false"]; // Sempre executa
+    RATIO_CALC -> CL_HASH_CALL [label="true"]; // Inatingivel
+}

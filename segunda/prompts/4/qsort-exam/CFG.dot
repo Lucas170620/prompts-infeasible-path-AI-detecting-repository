@@ -1,0 +1,36 @@
+digraph CFG {
+    node [shape=box, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    // Nodes
+    start [label="Start", shape=ellipse];
+    B1 [label="B1: Initialize variables\n(i, ir=n, j, k, l=1, jstack=0, flag=0)"];
+    B2 [label="B2: Infinite loop start"];
+    B3 [label="B3: if (ir - l < M)"];
+    B4 [label="B4: Insertion sort loop\n(j = l+1 to ir)"];
+    B5 [label="B5: if (jstack == 0)"];
+    B6 [label="B6: Break out of loop"];
+    B7 [label="B7: Pop stack (ir, l)"];
+    B8 [label="B8: Partitioning setup\n(SWAP and median-of-three)"];
+    B9 [label="B9: Inner partitioning loop"];
+    B10 [label="B10: Update stack and bounds"];
+    B11 [label="B11: Update stack and bounds (else)"];
+    end [label="End", shape=ellipse];
+
+    // Edges
+    start -> B1;
+    B1 -> B2;
+    B2 -> B3;
+    B3 -> B4 [label="True"];
+    B3 -> B8 [label="False"];
+    B4 -> B5;
+    B5 -> B6 [label="True"];
+    B5 -> B7 [label="False"];
+    B6 -> end;
+    B7 -> B2;
+    B8 -> B9;
+    B9 -> B10 [label="Partition done"];
+    B10 -> B11 [label="False"];
+    B10 -> B2 [label="True"];
+    B11 -> B2;
+}

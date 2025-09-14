@@ -1,0 +1,29 @@
+digraph Sum_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: register int Outer, Inner;"];
+    N2 [label="2: int Ptotal = 0; int Ntotal = 0; int Pcnt = 0; int Ncnt = 0;"];
+    N3 [label="3: Outer = 0"];
+    N4 [label="4: Outer < MAXSIZE?"];
+    N5 [label="5: Inner = 0"];
+    N6 [label="6: Inner < MAXSIZE?"];
+    N7 [label="7: if (Array[Outer][Inner] < 0)"];
+    N8 [label="8: Ptotal += Array[Outer][Inner]; Pcnt++;"];
+    N9 [label="9: Ntotal += Array[Outer][Inner]; Ncnt++;"];
+    N10 [label="10: Inner++"];
+    N11 [label="11: Outer++"];
+    N12 [label="12: Postotal = Ptotal; Poscnt = Pcnt; Negtotal = Ntotal; Negcnt = Ncnt;"];
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4;
+    N4 -> N5 [label="true"];
+    N4 -> N12 [label="false"];
+    N5 -> N6;
+    N6 -> N7 [label="true"];
+    N6 -> N11 [label="false"];
+    N7 -> N8 [label="true"];
+    N7 -> N9 [label="false"];
+    N8 -> N10;
+    N9 -> N10;
+    N10 -> N6;
+    N11 -> N4;
+}

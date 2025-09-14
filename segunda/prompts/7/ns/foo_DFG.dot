@@ -1,0 +1,36 @@
+digraph foo_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    i [label="i"];
+    j [label="j"];
+    k [label="k"];
+    l [label="l"];
+    x [label="x"];
+    keys_array [label="keys", shape=box];
+    answer_array [label="answer", shape=box];
+
+    node [shape=box, style="", fillcolor=""];
+    keys_access [label="[i][j][k][l]"];
+    answer_access [label="[i][j][k][l]"];
+    compare [label="=="];
+    add [label="+"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    result [label="result"];
+
+    i -> keys_access;
+    j -> keys_access;
+    k -> keys_access;
+    l -> keys_access;
+    keys_array -> keys_access;
+    keys_access -> compare;
+    x -> compare;
+
+    i -> answer_access;
+    j -> answer_access;
+    k -> answer_access;
+    l -> answer_access;
+    answer_array -> answer_access;
+    keys_access -> add;
+    answer_access -> add;
+    add -> result;
+}

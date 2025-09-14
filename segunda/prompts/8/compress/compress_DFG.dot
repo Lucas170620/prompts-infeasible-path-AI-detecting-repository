@@ -1,0 +1,31 @@
+digraph compress_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    InCnt; ent; c; fcode; i; free_ent; maxmaxcode; in_count; checkpoint;
+
+    node [shape=box, style=""];
+    op_getbyte [label="getbyte()"];
+    op_shift [label="<<, ^"];
+    op_compare [label="==, <, >"];
+    op_assign [label="="];
+    op_math [label="+=, -=, <<"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    htab; codetab; out_count; bytes_out;
+
+    // Fluxo de dados
+    InCnt -> op_getbyte;
+    op_getbyte -> c;
+    c -> op_shift;
+    ent -> op_shift;
+    op_shift -> fcode;
+    op_shift -> i;
+    i -> op_compare;
+    fcode -> op_compare;
+    op_compare -> op_assign [label="condicoes"];
+    op_assign -> ent;
+    op_assign -> free_ent;
+    free_ent -> op_compare [label="free_ent < maxmaxcode"];
+    in_count -> op_math;
+    op_math -> checkpoint;
+    checkpoint -> op_compare [label="in_count>=checkpoint"];
+}

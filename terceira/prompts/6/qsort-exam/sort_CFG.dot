@@ -1,0 +1,20 @@
+digraph sort_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="B1: i, ir = n, j, k, l = 1; jstack = 0; flag = 0;"];
+    N2 [label="B2: for (;;) {"];
+    N3 [label="B3: if (ir-l < M)"];
+    N4 [label="B4: for (j=l+1; j<=ir; j++) { a=arr[j]; for (i=j-1; i>=l; i--) { if (arr[i]<=a) break; arr[i+1]=arr[i]; } arr[i+1]=a; }"];
+    N5 [label="B5: if (jstack == 0) break; ir=istack[jstack--]; l=istack[jstack--];"];
+    N6 [label="B6: else: k=(l+ir)>>1; SWAP; if-else chains; partition code; jstack+=2; push to stack; update l/ir;"];
+    N7 [label="B7: }"];
+    N8 [label="B8: return;"];
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N6 [label="false"];
+    N4 -> N5;
+    N5 -> N7 [label="break"];
+    N5 -> N2 [label="continue"];
+    N6 -> N2;
+    N7 -> N8;
+}

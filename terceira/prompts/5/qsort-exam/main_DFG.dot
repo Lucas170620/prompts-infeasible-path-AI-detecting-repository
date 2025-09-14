@@ -1,0 +1,11 @@
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    const_20 [label="20"];
+    node [shape=box, style="", fillcolor=""];
+    call_sort [label="call sort"];
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    result [label="result"];
+
+    const_20 -> call_sort;
+    call_sort -> result;
+}

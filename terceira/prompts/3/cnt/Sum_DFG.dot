@@ -1,0 +1,34 @@
+digraph Sum_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    Array_global [label="Array (global)"];
+    node [shape=box];
+    op_init_vars [label="Ptotal=0, Ntotal=0, Pcnt=0, Ncnt=0"];
+    op_assign_Outer [label="Outer = 0"];
+    op_condition_outer [label="Outer < MAXSIZE"];
+    op_assign_Inner [label="Inner = 0"];
+    op_condition_inner [label="Inner < MAXSIZE"];
+    op_check_value [label="Array[Outer][Inner] < 0"];
+    op_update_positive [label="Ptotal += Array[Outer][Inner]; Pcnt++"];
+    op_update_negative [label="Ntotal += Array[Outer][Inner]; Ncnt++"];
+    op_increment_Inner [label="Inner++"];
+    op_increment_Outer [label="Outer++"];
+    op_assign_globals [label="Postotal = Ptotal; Poscnt = Pcnt; Negtotal = Ntotal; Negcnt = Ncnt"];
+    Array_global -> op_check_value;
+    Array_global -> op_update_positive;
+    Array_global -> op_update_negative;
+    op_init_vars -> op_update_positive;
+    op_init_vars -> op_update_negative;
+    op_update_positive -> op_assign_globals;
+    op_update_negative -> op_assign_globals;
+    op_assign_Outer -> op_condition_outer;
+    op_condition_outer -> op_assign_Inner [label="true"];
+    op_assign_Inner -> op_condition_inner;
+    op_condition_inner -> op_check_value [label="true"];
+    op_check_value -> op_update_positive [label="true"];
+    op_check_value -> op_update_negative [label="false"];
+    op_update_positive -> op_increment_Inner;
+    op_update_negative -> op_increment_Inner;
+    op_increment_Inner -> op_condition_inner;
+    op_condition_inner -> op_increment_Outer [label="false"];
+    op_increment_Outer -> op_condition_outer;
+}

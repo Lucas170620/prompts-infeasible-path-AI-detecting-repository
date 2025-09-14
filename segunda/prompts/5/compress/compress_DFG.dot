@@ -1,0 +1,20 @@
+digraph compress_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    in_count_init [label="in_count=1"];
+    checkpoint_init [label="checkpoint=10000"];
+    BUFFERSIZE [label="BUFFERSIZE=50"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_inc [label="++"];
+    op_cmp [label=">="];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    condition [label="condition: in_count>=checkpoint"];
+
+    // Fluxo de dados
+    in_count_init -> op_inc;
+    op_inc -> op_cmp;
+    checkpoint_init -> op_cmp;
+    BUFFERSIZE -> op_inc [label="max iterations"];
+    op_cmp -> condition;
+}

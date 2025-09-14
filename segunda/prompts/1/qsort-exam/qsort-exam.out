@@ -1,0 +1,96 @@
+**Análise de Caminhos Inviáveis (Infeasible Paths) no Código `qsort-exam.c`**
+
+### 1. Grafo de Fluxo de Controle (CFG) em DOT
+```dot
+digraph CFG {
+    node [shape=box, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nós
+    N1 [label="1: Declarações e inicializações\n(ir = n, l = 1, jstack = 0, flag = 0)"];
+    N2 [label="2: Loop infinito\nCondição: ir - l < M"];
+    N3 [label="3: Insertion Sort\n(j = l+1 to ir)\n(i = j-1 to l)\nCondição: arr[i] <= a"];
+    N4 [label="4: Condição: jstack == 0"];
+    N5 [label="5: Atualiza ir e l\n(ir = istack[jstack], l = istack[jstack-1])"];
+    N6 [label="6: Partição\nCalcula k, SWAPs\nDefine i, j, a = arr[l+1]"];
+    N7 [label="7: Loop interno de partição\nIncrementa i e decrementa j\nCondições: arr[i] < a, arr[j] > a\nBreak se j < i"];
+    N8 [label="8: Atualiza arr[j] e a\njstack += 2"];
+    N9 [label="9: Condição: ir - i + 1 >= j - l"];
+    N10 [label="10: Atualiza pilha e ajusta ir"];
+    N11 [label="11: Atualiza pilha e ajusta l"];
+    N12 [label="12: Fim"];
+
+    // Arestas
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N6 [label="false"];
+    N3 -> N4;
+    N4 -> N12 [label="true"];
+    N4 -> N5 [label="false"];
+    N5 -> N2;
+    N6 -> N7;
+    N7 -> N8 [label="j < i"];
+    N8 -> N9;
+    N9 -> N10 [label="true"];
+    N9 -> N11 [label="false"];
+    N10 -> N2;
+    N11 -> N2;
+}
+```
+
+### 2. Grafo de Fluxo de Dados (DFG) em DOT
+```dot
+digraph DFG {
+    node [shape=ellipse, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Variáveis e operações
+    n [label="n (input)"];
+    ir [label="ir"];
+    l [label="l"];
+    jstack [label="jstack"];
+    arr [label="arr"];
+    istack [label="istack"];
+    temp [label="temp"];
+    a [label="a"];
+
+    // Operações
+    op_cond1 [label="ir - l < M", shape=diamond];
+    op_swap [label="SWAP", shape=box];
+    op_cond2 [label="arr[i] <= a", shape=diamond];
+    op_cond3 [label="jstack == 0", shape=diamond];
+    op_cond4 [label="arr[i] < a", shape=diamond];
+    op_cond5 [label="arr[j] > a", shape=diamond];
+    op_cond6 [label="j < i", shape=diamond];
+    op_cond7 [label="ir - i + 1 >= j - l", shape=diamond];
+
+    // Fluxo de dados
+    n -> ir;
+    ir -> op_cond1;
+    l -> op_cond1;
+    arr -> op_swap;
+    temp -> op_swap;
+    arr -> op_cond2;
+    a -> op_cond2;
+    jstack -> op_cond3;
+    arr -> op_cond4;
+    a -> op_cond4;
+    arr -> op_cond5;
+    a -> op_cond5;
+    ir -> op_cond7;
+    i -> op_cond7;
+    j -> op_cond7;
+    l -> op_cond7;
+}
+```
+
+### 3. Análise de Caminhos Inviáveis
+**Resposta: NÃO**
+
+**Explicação:**
+- O código implementa o algoritmo Quicksort não recursivo, que é bem estruturado e não contém condições contraditórias ou dependências de dados inviáveis.
+- **CFG Analysis:** O grafo de fluxo de controle mostra loops e condições bem definidas, sem ramificações que levem a estados mutuamente exclusivos. Todos os caminhos são alcançáveis através de valores válidos de `ir`, `l`, `jstack` e `arr`.
+- **DFG Analysis:** As dependências de dados são consistentes. Variáveis são inicializadas antes do uso (ex: `ir = n`, `l = 1`), e as operações de SWAP e comparações não criam cenários inviáveis. O array `arr` é modificado de forma controlada, sem invalidar condições subsequentes.
+- **Contexto do Algoritmo:** O Quicksort é deterministico e lida com partições de forma que todas as trajetórias são viáveis para entradas válidas. Não há regras de negócio ou invariantes que restringem caminhos.
+
+**Conclusão:** Não foram identificados caminhos inviáveis no código, pois todas as condições e dependências de dados permitem execução consistente para qualquer entrada válida.

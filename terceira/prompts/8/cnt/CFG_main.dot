@@ -1,0 +1,8 @@
+digraph CFG_main {
+    node [shape=box];
+    start [label="Inicio", shape=ellipse];
+    n1 [label="InitSeed()"];
+    n2 [label="Test(Array)"];
+    end [label="return 1;", shape=ellipse];
+    start -> n1 -> n2 -> end;
+}

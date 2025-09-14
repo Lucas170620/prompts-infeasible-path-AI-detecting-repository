@@ -1,0 +1,98 @@
+**Análise do Código Fornecido:**
+
+O código fornecido contém duas funções: `sort` e `main`. A função `main` simplesmente chama `sort(20)`, então a análise focará principalmente na função `sort`.
+
+### 1. Grafo de Fluxo de Controle (CFG) para `sort`
+
+```dot
+digraph sort_CFG {
+    node [shape=box, style=rounded, fontname="Courier"];
+
+    // Nós representando blocos de código
+    N1 [label="1: i, ir=n, j, k, l=1, jstack=0, flag=0"];
+    N2 [label="2: for (;;)"];
+    N3 [label="3: if (ir-l < M)"];
+    N4 [label="4: for (j=l+1; j<=ir; j++)\l    a=arr[j];\l    for (i=j-1; i>=l; i--)\l        if (arr[i] <= a) break;\l        arr[i+1]=arr[i];\l    arr[i+1]=a;"];
+    N5 [label="5: if (jstack == 0)"];
+    N6 [label="6: break;"];
+    N7 [label="7: ir=istack[jstack--];\l    l=istack[jstack--];"];
+    N8 [label="8: else\l    k=(l+ir)>>1;\l    SWAP(arr[k],arr[l+1]);\l    if (arr[l] > arr[ir]) SWAP(arr[l],arr[ir]);\l    if (arr[l+1] > arr[ir]) SWAP(arr[l+1],arr[ir]);\l    if (arr[l] > arr[l+1]) SWAP(arr[l],arr[l+1]);\l    i=l+1; j=ir; a=arr[l+1];"];
+    N9 [label="9: for (;;)"];
+    N10 [label="10: i++; while (arr[i] < a) i++;"];
+    N11 [label="11: j--; while (arr[j] > a) j--;"];
+    N12 [label="12: if (j < i) break;"];
+    N13 [label="13: SWAP(arr[i],arr[j]);"];
+    N14 [label="14: arr[l+1]=arr[j];\l     arr[j]=a;\l     jstack += 2;"];
+    N15 [label="15: if (ir-i+1 >= j-l)"];
+    N16 [label="16: istack[jstack]=ir;\l     istack[jstack-1]=i;\l     ir=j-1;"];
+    N17 [label="17: else\l     istack[jstack]=j-1;\l     istack[jstack-1]=l;\l     l=i;"];
+    N18 [label="18: End of function", shape=doublecircle];
+
+    // Arestas do CFG
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N8 [label="false"];
+    N4 -> N5;
+    N5 -> N6 [label="true"];
+    N5 -> N7 [label="false"];
+    N6 -> N18;
+    N7 -> N2;
+    N8 -> N9;
+    N9 -> N10;
+    N10 -> N11;
+    N11 -> N12;
+    N12 -> N13 [label="false"];
+    N12 -> N14 [label="true"];
+    N13 -> N9;
+    N14 -> N15;
+    N15 -> N16 [label="true"];
+    N15 -> N17 [label="false"];
+    N16 -> N2;
+    N17 -> N2;
+}
+```
+
+### 2. Grafo de Fluxo de Dados (DFG) para `sort`
+
+```dot
+digraph sort_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    arr_in [label="arr"];
+    istack_in [label="istack"];
+
+    node [shape=box, style=""];
+    op_swap [label="SWAP"];
+    op_compare [label="Compare"];
+    op_assign [label="Assign"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    arr_out [label="arr"];
+    istack_out [label="istack"];
+
+    // Arestas do DFG (simplificado devido à complexidade)
+    arr_in -> op_swap;
+    arr_in -> op_compare;
+    op_swap -> arr_out;
+    op_compare -> op_assign;
+    istack_in -> op_assign;
+    op_assign -> istack_out;
+}
+```
+
+### 3. Análise de *Infeasible Paths*
+
+**Resposta: NÃO**
+
+**Explicação Detalhada:**
+
+Após analisar o CFG e o DFG da função `sort`, não foram identificados *infeasible paths* claros. O algoritmo de ordenação é bem estruturado e não contém:
+
+- **Contradições Lógicas:** As condições no código (ex: `if (arr[l] > arr[ir])`) dependem dos valores do array `arr`, que são dinâmicos e não possuem restrições intrínsecas que impossibilitem qualquer caminho.
+- **Dependências de Dados Inválidas:** Todas as variáveis são inicializadas antes do uso (ex: `l=1`, `jstack=0`). O array global `arr` é totalmente acessível e modificado de forma consistente.
+- **Restrições de Sistema:** Não há chamadas externas ou recursos que possam falhar inevitavelmente.
+- **Condições de Loop Inválidas:** Os loops `for (;;)` são controlados por break conditions baseadas em valores calculados durante a execução, todos atingíveis.
+- **Conflitos Sequenciais:** As condições sequenciais não se excluem mutuamente (ex: `if (ir-l < M)` e seu else são complementares).
+- **Invariantes de Programa:** Não há regras de negócio ou invariantes que restrinjam os valores de `arr` ou `istack` de forma a tornar caminhos inacessíveis.
+
+A função `main` é trivial (apenas chama `sort(20)`), não introduzindo caminhos adicionais. Portanto, **todos os caminhos no CFG são viáveis** considerando entradas arbitrárias do array `arr`.

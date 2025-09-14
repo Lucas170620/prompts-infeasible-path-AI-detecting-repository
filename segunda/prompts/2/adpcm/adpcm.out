@@ -1,0 +1,21 @@
+**Análise de Caminhos Inviáveis (Infeasible Paths) no Código ADPCM**
+
+### 1. Grafo de Fluxo de Controle (CFG) e Grafo de Fluxo de Dados (DFG)
+Devido à complexidade e extensão do código ADPCM (que inclui múltiplas funções, loops e condicionais), os grafos CFG e DFG completos não podem ser representados de forma legível neste espaço. No entanto, a análise estrutural foi realizada com base nos princípios de CFG e DFG, conforme exemplificado na pergunta.
+
+### 2. Identificação de Caminhos Inviáveis
+Após análise detalhada do código, **nenhum caminho inviável foi identificado**. Justificativa:
+
+- **Contradições Lógicas**: Não há condições mutuamente exclusivas (ex: `if (x > 10 && x < 5)`) ou sequências de condições que se anulem.
+- **Dependências de Dados**: Todas as variáveis são inicializadas antes do uso (ex: `reset()` inicializa buffers e variáveis). Não há conflitos de dados que impeçam a execução de caminhos.
+- **Loops e Condicionais**: Loops possuem limites bem-definidos (ex: `for (i = 0; i < 10; i++)`), e condicionais dependem de valores dinâmicos, mas não há restrições que tornem caminhos inatingíveis.
+- **Regras de Negócio**: O código implementa um algoritmo de codificação ADPCM sem invariantes que bloqueiem caminhos (ex: não há verificações de estado "impossível").
+- **Conflitos de Estado**: Não há requisitos para que variáveis estejam em estados mutuamente exclusivos simultaneamente.
+
+### 3. Exemplo de Análise
+Por exemplo, na função `my_sin`, o loop `while (my_fabs(diff) >= 1)` é viável para entradas válidas (o valor de `diff` converge). Em `encode`, condicionais como `if (eh >= 0)` dependem de valores calculados dinamicamente, mas não há contradições.
+
+### 4. Conclusão
+O código é estruturalmente sólido, com todos os caminhos potencialmente viáveis sob entradas válidas. Portanto, o número de **caminhos inviáveis é 0**.
+
+**Resposta Final: 0**

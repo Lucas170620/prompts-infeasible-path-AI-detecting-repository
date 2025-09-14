@@ -1,0 +1,102 @@
+**Resposta Final:** NÃO
+
+### Análise Detalhada:
+
+#### 1. Análise do Grafo de Fluxo de Controle (CFG) e Grafo de Fluxo de Dados (DFG):
+**Função `fib`:**  
+- **CFG:** O fluxo é linear com um loop que itera de `i = 2` até `min(30, n)`. Não há branches condicionais adicionais ou caminhos complexos.  
+- **DFG:** As variáveis `Fnew`, `Fold`, `temp` e `i` têm dependências diretas dentro do loop, mas não há conflitos ou restrições que impeçam o fluxo de dados.  
+
+**Função `main`:**  
+- **CFG:** Sequência linear simples (`a = 30` → `fib(a)` → `return a`).  
+- **DFG:** A variável `a` é inicializada com 30 e usada como argumento para `fib`, mas não é modificada.  
+
+#### 2. Justificativa para a Ausência de Caminhos Inviáveis:
+- **Contradição Lógica:** Não há condições mutuamente exclusivas (ex: `if (x > 10)` e `if (x < 5)`).  
+- **Dependências de Dados:** Todas as variáveis são inicializadas antes do uso. O loop em `fib` é controlado por `i` e `n`, mas `n` é passado como argumento e não há restrições que impeçam a execução.  
+- **Condições de Loop:** O loop itera até `min(30, n)`, o que é sempre viável para qualquer `n` (ex: se `n < 2`, o loop não executa).  
+- **Conflitos Sequenciais:** Não há condições sequenciais conflitantes.  
+- **Invariantes de Programa:** Não há regras de negócio ou invariantes que restrinjam os valores (ex: `n` pode ser qualquer inteiro).  
+
+#### 3. Conclusão:
+Todos os caminhos no CFG são executáveis para entradas válidas (ex: `n = 30` no `main`). O código é estruturado e não contém condições ou dependências que gerem caminhos inviáveis.
+
+---
+
+### Grafos (Formato DOT):
+
+#### CFG da Função `fib`:
+```dot
+digraph fib_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    N1 [label="1: Fnew = 1; Fold = 0; i = 2;"];
+    N2 [label="2: Condition: i <= 30 && i <= n"];
+    N3 [label="3: temp = Fnew; Fnew = Fnew + Fold; Fold = temp; i++;"];
+    N4 [label="4: ans = Fnew; return ans;"];
+
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N4 [label="false"];
+    N3 -> N2;
+}
+```
+
+#### DFG da Função `fib`:
+```dot
+digraph fib_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_input [label="n (input)"];
+    node [shape=box, style=""];
+    op_init [label="Fnew=1, Fold=0, i=2"];
+    op_temp [label="temp = Fnew"];
+    op_fnew [label="Fnew = Fnew + Fold"];
+    op_fold [label="Fold = temp"];
+    op_inc [label="i++"];
+    op_ans [label="ans = Fnew"];
+    op_return [label="return ans"];
+
+    n_input -> op_init [style=dashed, color=grey];
+    op_init -> op_temp;
+    op_init -> op_fnew;
+    op_init -> op_inc;
+    op_temp -> op_fold;
+    op_fold -> op_fnew;
+    op_fnew -> op_temp [label="next iteration"];
+    op_fnew -> op_fnew [label="next iteration"];
+    op_inc -> op_inc [label="next iteration"];
+    op_fnew -> op_ans;
+    op_ans -> op_return;
+}
+```
+
+#### CFG da Função `main`:
+```dot
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    M1 [label="1: a = 30;"];
+    M2 [label="2: fib(a);"];
+    M3 [label="3: return a;"];
+
+    M1 -> M2 -> M3;
+}
+```
+
+#### DFG da Função `main`:
+```dot
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    const_30 [label="30"];
+    node [shape=box, style=""];
+    op_assign [label="a = 30"];
+    op_call [label="fib(a)"];
+    op_return [label="return a"];
+
+    const_30 -> op_assign;
+    op_assign -> op_call;
+    op_assign -> op_return;
+}
+```

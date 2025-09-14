@@ -1,0 +1,17 @@
+digraph my_abs_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n [label="n"];
+    node [shape=box, style=""];
+    op_cond [label=">=0"];
+    op_assign1 [label="m = n"];
+    op_assign2 [label="m = -n"];
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    m_out [label="m"];
+    n -> op_cond;
+    n -> op_assign1;
+    n -> op_assign2;
+    op_cond -> op_assign1 [label="true"];
+    op_cond -> op_assign2 [label="false"];
+    op_assign1 -> m_out;
+    op_assign2 -> m_out;
+}

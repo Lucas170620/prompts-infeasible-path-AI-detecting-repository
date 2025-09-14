@@ -1,0 +1,15 @@
+digraph main_DFG {
+    node [shape=ellipse];
+    reset -> test_data;
+    j -> test_data;
+    f -> test_data;
+    i -> test_data;
+    test_data -> encode;
+    encode -> compressed;
+    compressed -> decode;
+    decode -> xout1;
+    decode -> xout2;
+    xout1 -> result;
+    xout2 -> result;
+    result -> return_value;
+}

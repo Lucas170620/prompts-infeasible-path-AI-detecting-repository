@@ -1,0 +1,103 @@
+**Resposta Final:**  
+**SIM**, existe um infeasible path neste código.
+
+### Análise Detalhada:
+O código contém um caminho inviável na função `Sum`, especificamente no bloco condicional que verifica se `Array[Outer][Inner] < 0`. Para justificar essa conclusão, vamos analisar os Grafos de Fluxo de Controle (CFG) e de Fluxo de Dados (DFG) das funções relevantes, com foco na função `Sum`.
+
+---
+
+### 1. CFG e DFG da Função `Sum` (Função Crítica)
+#### CFG (Control Flow Graph) em DOT:
+```dot
+digraph Sum_CFG {
+    node [shape=box, style=rounded, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    // Nós do CFG
+    Start [label="Start Sum"];
+    InitVars [label="Ptotal=0, Ntotal=0, Pcnt=0, Ncnt=0"];
+    OuterLoopInit [label="Outer=0"];
+    OuterLoopCond [label="Outer < MAXSIZE?"];
+    InnerLoopInit [label="Inner=0"];
+    InnerLoopCond [label="Inner < MAXSIZE?"];
+    CheckValue [label="if (Array[Outer][Inner] < 0)"];
+    UpdatePos [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+    UpdateNeg [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+    InnerIncr [label="Inner++"];
+    OuterIncr [label="Outer++"];
+    AssignGlobals [label="Postotal=Ptotal, Poscnt=Pcnt\nNegtotal=Ntotal, Negcnt=Ncnt"];
+    End [label="End Sum"];
+
+    // Arestas do CFG
+    Start -> InitVars;
+    InitVars -> OuterLoopInit;
+    OuterLoopInit -> OuterLoopCond;
+    OuterLoopCond -> InnerLoopInit [label="true"];
+    OuterLoopCond -> AssignGlobals [label="false"];
+    InnerLoopInit -> InnerLoopCond;
+    InnerLoopCond -> CheckValue [label="true"];
+    InnerLoopCond -> OuterIncr [label="false"];
+    CheckValue -> UpdatePos [label="true"];
+    CheckValue -> UpdateNeg [label="false"];
+    UpdatePos -> InnerIncr;
+    UpdateNeg -> InnerIncr;
+    InnerIncr -> InnerLoopCond;
+    OuterIncr -> OuterLoopCond;
+    AssignGlobals -> End;
+}
+```
+
+#### DFG (Data Flow Graph) em DOT:
+```dot
+digraph Sum_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    Array_input [label="Array"];
+    node [shape=box, style=""];
+    Add_Ptotal [label="+="];
+    Add_Ntotal [label="+="];
+    Inc_Pcnt [label="++"];
+    Inc_Ncnt [label="++"];
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    Ptotal_out [label="Ptotal"];
+    Ntotal_out [label="Ntotal"];
+    Pcnt_out [label="Pcnt"];
+    Ncnt_out [label="Ncnt"];
+
+    // Fluxo de dados
+    Array_input -> CheckValue;
+    CheckValue -> UpdatePos [label="true path"];
+    CheckValue -> UpdateNeg [label="false path"];
+    UpdatePos -> Add_Ptotal;
+    UpdatePos -> Inc_Pcnt;
+    UpdateNeg -> Add_Ntotal;
+    UpdateNeg -> Inc_Ncnt;
+    Add_Ptotal -> Ptotal_out;
+    Add_Ntotal -> Ntotal_out;
+    Inc_Pcnt -> Pcnt_out;
+    Inc_Ncnt -> Ncnt_out;
+}
+```
+
+---
+
+### 2. Justificativa para o Infeasible Path
+- **Contexto:** A função `Sum` itera sobre a matriz `Array` (de tamanho 10x10) e verifica se cada elemento é negativo (`Array[Outer][Inner] < 0`). Se for negativo, atualiza variáveis de soma e contagem para valores negativos (`Ntotal` e `Ncnt`); caso contrário, atualiza as variáveis para positivos (`Ptotal` e `Pcnt`).
+- **Problema:** A matriz `Array` é inicializada pela função `Initialize`, que preenche todos os elementos com valores gerados por `RandomInteger`. A função `RandomInteger` utiliza a semente (`Seed`) iniciada em 0 por `InitSeed` e executa a transformação:
+  ```c
+  Seed = ((Seed * 133) + 81) % 8095;
+  ```
+  **Todos os valores gerados são não-negativos** (o módulo 8095 produz inteiros entre 0 e 8094). Portanto, `Array[Outer][Inner]` sempre será `>= 0`, e a condição `Array[Outer][Inner] < 0` será **sempre falsa**.
+
+- **Consequência:** O bloco condicional `if (Array[Outer][Inner] < 0)` (caminho `true`) nunca é executado. Isso torna:
+  - O caminho `UpdatePos` (atualização de `Ptotal` e `Pcnt`) **inviável**.
+  - Apenas o caminho `UpdateNeg` (atualização de `Ntotal` e `Ncnt`) é executado.
+
+### 3. Confirmação em Outras Funções
+- **Função `Initialize`:** Seu CFG/DFG mostra um loop duplo que preenche a matriz com valores não-negativos, corroborando a análise.
+- **Função `RandomInteger`:** Garante que nenhum valor negativo é gerado.
+- **Função `Test`:** Chama `Initialize` e `Sum`, mas não altera a inviabilidade do caminho.
+
+---
+
+### Conclusão
+O caminho inviável está no bloco `UpdatePos` da função `Sum`, que depende da condição `Array[Outer][Inner] < 0`. Como a matriz contém apenas valores não-negativos, esse caminho é inatingível. Os grafos CFG e DFG ilustram claramente a dependência de dados e o fluxo de controle que levam a essa inviabilidade.

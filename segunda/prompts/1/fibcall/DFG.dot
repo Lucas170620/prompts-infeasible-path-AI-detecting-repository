@@ -1,0 +1,40 @@
+digraph DFG {
+    node [shape=box, style="", fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nos de entrada (variaveis e constantes)
+    n_input [label="n", shape=ellipse, style=filled, fillcolor=lightblue];
+    const_1 [label="1", shape=ellipse, style=filled, fillcolor=lightblue];
+    const_0 [label="0", shape=ellipse, style=filled, fillcolor=lightblue];
+    const_2 [label="2", shape=ellipse, style=filled, fillcolor=lightblue];
+
+    // Nos de operacao em fib
+    op_init_fnew [label="Fnew = 1"];
+    op_init_fold [label="Fold = 0"];
+    op_init_i [label="i = 2"];
+    op_cond [label="i <= 30 && i <= n"];
+    op_temp [label="temp = Fnew"];
+    op_fnew [label="Fnew = Fnew + Fold"];
+    op_fold [label="Fold = temp"];
+    op_inc_i [label="i++"];
+    op_ans [label="ans = Fnew"];
+    op_return [label="return ans"];
+
+    // Arestas de dependencia de dados
+    n_input -> op_cond;
+    const_1 -> op_init_fnew;
+    const_0 -> op_init_fold;
+    const_2 -> op_init_i;
+    op_init_fnew -> op_temp;
+    op_init_fnew -> op_fnew;
+    op_init_fold -> op_fnew;
+    op_temp -> op_fold;
+    op_fnew -> op_temp [label="loop"];
+    op_fnew -> op_fnew [label="loop"];
+    op_fold -> op_fnew [label="loop"];
+    op_init_i -> op_cond;
+    op_init_i -> op_inc_i;
+    op_inc_i -> op_cond [label="loop"];
+    op_fnew -> op_ans;
+    op_ans -> op_return;
+}

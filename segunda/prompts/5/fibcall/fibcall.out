@@ -1,0 +1,89 @@
+**CFG (Control Flow Graph) em DOT:**
+
+```dot
+digraph CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nós da função main
+    main_start [label="main: int a;"];
+    main_assign [label="main: a = 30;"];
+    main_call [label="main: fib(a);"];
+    main_return [label="main: return a;"];
+
+    // Nós da função fib
+    fib_start [label="fib: int i, Fnew, Fold, temp, ans;"];
+    fib_init [label="fib: Fnew = 1;\nFold = 0;"];
+    fib_loop_cond [label="fib: for (i = 2;\ni <= 30 && i <= n;"];
+    fib_loop_body [label="fib: temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;\ni++"];
+    fib_after_loop [label="fib: ans = Fnew;"];
+    fib_return [label="fib: return ans;"];
+
+    // Arestas do main
+    main_start -> main_assign;
+    main_assign -> main_call;
+    main_call -> main_return [label="Chama fib"];
+    main_return -> end [label="Saída"];
+
+    // Arestas do fib
+    fib_start -> fib_init;
+    fib_init -> fib_loop_cond;
+    fib_loop_cond -> fib_loop_body [label="Verdadeiro"];
+    fib_loop_cond -> fib_after_loop [label="Falso"];
+    fib_loop_body -> fib_loop_cond;
+    fib_after_loop -> fib_return;
+    fib_return -> main_return [label="Retorno"];
+
+    // Nó de fim
+    end [label="Fim", shape=doublecircle];
+}
+```
+
+**DFG (Data Flow Graph) em DOT:**
+
+```dot
+digraph DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_input [label="n (entrada)"];
+    constant_1 [label="1"];
+    constant_0 [label="0"];
+    constant_2 [label="2"];
+
+    node [shape=box, style=""];
+    op_init_Fnew [label="Fnew = 1"];
+    op_init_Fold [label="Fold = 0"];
+    op_init_i [label="i = 2"];
+    op_cond [label="i <= 30 && i <= n"];
+    op_temp [label="temp = Fnew"];
+    op_Fnew [label="Fnew = Fnew + Fold"];
+    op_Fold [label="Fold = temp"];
+    op_i_inc [label="i++"];
+    op_ans [label="ans = Fnew"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    ans_output [label="ans (saída)"];
+
+    // Fluxo de dados
+    n_input -> op_cond;
+    constant_1 -> op_init_Fnew;
+    constant_0 -> op_init_Fold;
+    constant_2 -> op_init_i;
+    op_init_Fnew -> op_temp;
+    op_init_Fnew -> op_Fnew;
+    op_init_Fold -> op_Fnew;
+    op_temp -> op_Fold;
+    op_Fnew -> op_temp [label="Loop"];
+    op_Fnew -> op_Fnew [label="Loop"];
+    op_Fold -> op_Fnew [label="Loop"];
+    op_Fnew -> op_ans;
+    op_ans -> ans_output;
+}
+```
+
+**Análise de Infeasible Paths:**  
+**NÃO** existem infeasible paths neste código. 
+
+**Justificativa com base no CFG e DFG:**  
+- **CFG:** O fluxo de controle é linear e previsível. O loop `for` possui uma condição clara (`i <= 30 && i <= n`), e como `n = 30` (fixo em `main`), o loop executará exatamente 29 iterações (de `i = 2` a `i = 30`). Não há branches condicionais conflitantes ou contraditórios.  
+- **DFG:** As dependências de dados são consistentes. As variáveis são inicializadas antes do uso (ex: `Fnew`, `Fold`, `i`), e não há conflitos entre valores (ex: não há condicionais que exijam estados mutuamente exclusivos). O loop atualiza `Fnew` e `Fold` de forma sequencial, sem contradições.  
+- **Contexto:** O código é deterministico e não possui condições ou dependências que impossibilitem a execução de qualquer caminho. Todos os paths são feasible given the fixed input (`n = 30`).

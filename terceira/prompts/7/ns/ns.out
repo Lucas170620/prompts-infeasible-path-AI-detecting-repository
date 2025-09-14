@@ -1,0 +1,91 @@
+**Resposta:**
+
+**SIM**, existe um infeasible path no código fornecido.
+
+### Explicação Detalhada:
+
+#### Análise do Código:
+O código define uma função `foo` que realiza uma busca em um array 4D `keys` por um valor `x`. Se encontrado, retorna a soma do valor correspondente em `answer` com o próprio valor de `keys`. Caso contrário, retorna -1. A função `main` chama `foo(400)`.
+
+#### Infeasible Path Identificado:
+O path que corresponde ao retorno antecipado dentro do loop mais interno (quando `keys[i][j][k][l] == x`) é **inviável** para a entrada `x = 400`. Isso ocorre porque:
+
+- O array `keys` é inicializado estaticamente, e o valor `400` **não está presente** em nenhuma posição do array (o último elemento é `401`, devido à ausência da macro `FIND_TARGET`).
+- A função `main` chama `foo(400)` de forma fixa, sem dependência de input externo.
+- Portanto, a condição `keys[i][j][k][l] == 400` nunca será verdadeira, tornando o path do `return` interno inalcançável.
+
+#### Grafos de Suporte (CFG e DFG):
+**CFG para `foo` (em DOT):**
+```dot
+digraph CFG_foo {
+    node [shape=box];
+    edge [fontsize=10];
+
+    START [label="Início", shape=ellipse];
+    END [label="Fim", shape=ellipse];
+    INIT [label="i=0; j=0; k=0; l=0;"];
+    LOOP_I [label="i < 5?"];
+    LOOP_J [label="j < 5?"];
+    LOOP_K [label="k < 5?"];
+    LOOP_L [label="l < 5?"];
+    COND [label="keys[i][j][k][l] == x?"];
+    RETURN_INNER [label="Return answer[i][j][k][l] + keys[i][j][k][l];"];
+    RETURN_END [label="Return -1;"];
+    INC_L [label="l++"];
+    INC_K [label="k++"];
+    INC_J [label="j++"];
+    INC_I [label="i++"];
+
+    START -> INIT;
+    INIT -> LOOP_I;
+    LOOP_I -> LOOP_J [label="Sim"];
+    LOOP_I -> RETURN_END [label="Não"];
+    LOOP_J -> LOOP_K [label="Sim"];
+    LOOP_J -> INC_I [label="Não"];
+    LOOP_K -> LOOP_L [label="Sim"];
+    LOOP_K -> INC_J [label="Não"];
+    LOOP_L -> COND [label="Sim"];
+    LOOP_L -> INC_K [label="Não"];
+    COND -> RETURN_INNER [label="Sim"];
+    COND -> INC_L [label="Não"];
+    INC_L -> LOOP_L;
+    INC_K -> LOOP_K;
+    INC_J -> LOOP_J;
+    INC_I -> LOOP_I;
+    RETURN_INNER -> END;
+    RETURN_END -> END;
+}
+```
+
+**DFG para `foo` (em DOT):**
+```dot
+digraph DFG_foo {
+    node [shape=ellipse];
+    edge [fontsize=10];
+
+    x [label="x (parâmetro)"];
+    keys [label="keys (array global)"];
+    answer [label="answer (array global)"];
+    i [label="i (iterador)"];
+    j [label="j (iterador)"];
+    k [label="k (iterador)"];
+    l [label="l (iterador)"];
+    cond [label="Condição: keys[i][j][k][l] == x", shape=diamond];
+    return_inner [label="Soma: answer[i][j][k][l] + keys[i][j][k][l]"];
+    return_end [label="Valor fixo: -1"];
+
+    x -> cond;
+    keys -> cond;
+    keys -> return_inner;
+    answer -> return_inner;
+    i -> cond;
+    j -> cond;
+    k -> cond;
+    l -> cond;
+    cond -> return_inner [label="Verdadeiro"];
+    cond -> return_end [label="Falso (após loops)"];
+}
+```
+
+#### Conclusão:
+O path que executa o `return` interno é **inviável** porque a condição `keys[i][j][k][l] == 400` nunca é satisfeita devido à inicialização fixa do array `keys`. Os grafos CFG e DFG ilustram que esse path existe estruturalmente, mas a análise semântica do código (valores dos arrays e entrada fixa) mostra que ele não pode ser executado.

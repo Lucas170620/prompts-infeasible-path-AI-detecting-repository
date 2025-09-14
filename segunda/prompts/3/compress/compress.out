@@ -1,0 +1,86 @@
+**Resposta: SIM**
+
+### Explicação Baseada no CFG e DFG Construídos
+
+#### Análise do Código e Identificação de Caminhos Inviáveis
+O código implementa um algoritmo de compressão LZW adaptado para análise de WCET (Worst-Case Execution Time). Após a construção do **Grafo de Fluxo de Controle (CFG)** e do **Grafo de Fluxo de Dados (DFG)**, identificamos um caminho inviável devido a uma contradição lógica relacionada ao tamanho do buffer de entrada e à condição de ativação da função `cl_block`.
+
+#### CFG (Control Flow Graph)
+O CFG mostra que a função `compress` possui um loop principal que processa `BUFFERSIZE` (50) bytes. Dentro deste loop, há uma condição que pode levar à chamada de `cl_block`:
+```dot
+digraph Compress_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="Inicialização: n_bits=9, maxcode=511, free_ent=257"];
+    N2 [label="Loop: while (InCnt > 0)"];
+    N3 [label="c = getbyte()\nin_count++"];
+    N4 [label="Computa fcode e i"];
+    N5 [label="htab[i] == fcode?"];
+    N6 [label="ent = codetab[i]\nContinua"];
+    N7 [label="htab[i] < 0?"];
+    N8 [label="Linear probing"];
+    N9 [label="Encontrou entrada?"];
+    N10 [label="Atualiza ent"];
+    N11 [label="nomatch:\nout_count++\nent = c"];
+    N12 [label="free_ent < maxmaxcode?"];
+    N13 [label="Atualiza tabelas"];
+    N14 [label="(in_count >= checkpoint) && block_compress?"];
+    N15 [label="cl_block()" color="red" fontcolor="red"];
+    N16 [label="Fim do loop"];
+    N17 [label="Final: verifica bytes_out"];
+
+    N1 -> N2;
+    N2 -> N3 [label="InCnt>0"];
+    N2 -> N17 [label="InCnt<=0"];
+    N3 -> N4;
+    N4 -> N5;
+    N5 -> N6 [label="Sim"];
+    N5 -> N7 [label="Não"];
+    N6 -> N2;
+    N7 -> N11 [label="Sim (vazio)"];
+    N7 -> N8 [label="Não (ocupado)"];
+    N8 -> N9;
+    N9 -> N10 [label="Sim"];
+    N9 -> N8 [label="Não (continua probing)"];
+    N10 -> N2;
+    N11 -> N12;
+    N12 -> N13 [label="Sim"];
+    N12 -> N14 [label="Não"];
+    N13 -> N2;
+    N14 -> N15 [label="Sim"];
+    N14 -> N2 [label="Não"];
+    N15 -> N2 [color="red"];
+    N16 -> N2;
+}
+```
+
+#### DFG (Data Flow Graph)
+O DFG destaca as dependências de dados para a condição `(in_count >= checkpoint) && block_compress`:
+```dot
+digraph Compress_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    in_count [label="in_count"];
+    checkpoint [label="checkpoint=10000"];
+    block_compress [label="block_compress=0x80"];
+
+    node [shape=diamond, fillcolor=yellow];
+    cond [label="in_count >= checkpoint"];
+
+    node [shape=box, fillcolor=lightgreen];
+    and [label="AND"];
+    cl_block_call [label="Chama cl_block" color="red" fontcolor="red"];
+
+    in_count -> cond;
+    checkpoint -> cond;
+    cond -> and;
+    block_compress -> and;
+    and -> cl_block_call [color="red"];
+}
+```
+
+#### Justificativa do Caminho Inviável
+- **Contradição Lógica:** A condição `(in_count >= checkpoint) && block_compress` depende de `in_count` (que varia de 1 a 51) e `checkpoint` (fixo em 10000). Como `in_count` nunca atinge 10000 (devido ao buffer ser de apenas 50 bytes), a condição **nunca é satisfeita**, tornando a chamada de `cl_block` inviável.
+- **Dependência de Dados:** O DFG mostra que `in_count` é incrementado a cada byte processado, mas seu valor máximo (51) é insuficiente para superar `checkpoint` (10000). Thus, o fluxo de dados impossibilita a execução do caminho que leva a `cl_block`.
+- **Consequência:** O código de `cl_block` e `output` (que depende de `cl_block`) **nunca é executado**, caracterizando um **caminho inviável** no CFG.
+
+### Conclusão
+O caminho que inclui a função `cl_block` é **inviável** devido à impossibilidade lógica da condição `in_count >= checkpoint` ser verdadeira, dado o tamanho limitado do buffer de entrada (50 bytes). Isso é confirmado pelo CFG e DFG, que mostram a desconexão entre os dados e a condição necessária para ativar esse caminho.

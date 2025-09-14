@@ -1,0 +1,24 @@
+digraph fib_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_input [label="n (input)"];
+    node [shape=box, style=""];
+    op_init [label="Fnew=1, Fold=0, i=2"];
+    op_temp [label="temp = Fnew"];
+    op_fnew [label="Fnew = Fnew + Fold"];
+    op_fold [label="Fold = temp"];
+    op_inc [label="i++"];
+    op_ans [label="ans = Fnew"];
+    op_return [label="return ans"];
+
+    n_input -> op_init [style=dashed, color=grey];
+    op_init -> op_temp;
+    op_init -> op_fnew;
+    op_init -> op_inc;
+    op_temp -> op_fold;
+    op_fold -> op_fnew;
+    op_fnew -> op_temp [label="next iteration"];
+    op_fnew -> op_fnew [label="next iteration"];
+    op_inc -> op_inc [label="next iteration"];
+    op_fnew -> op_ans;
+    op_ans -> op_return;
+}

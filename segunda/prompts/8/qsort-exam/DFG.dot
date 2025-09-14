@@ -1,0 +1,28 @@
+digraph DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    arr_in [label="arr"];
+    ir_in [label="ir"];
+    l_in [label="l"];
+    jstack_in [label="jstack"];
+
+    node [shape=box, style=""];
+    op_swap1 [label="SWAP"];
+    op_swap2 [label="SWAP"];
+    op_compare [label="Compare (ir-l < M)"];
+    op_assign [label="a = arr[j]"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    arr_out [label="arr"];
+    jstack_out [label="jstack"];
+
+    // Fluxo de Dados
+    arr_in -> op_swap1;
+    arr_in -> op_assign;
+    ir_in -> op_compare;
+    l_in -> op_compare;
+    op_compare -> B3;
+    op_swap1 -> arr_out;
+    op_assign -> a_var;
+    jstack_in -> op_push_pop;
+    op_push_pop -> jstack_out;
+}

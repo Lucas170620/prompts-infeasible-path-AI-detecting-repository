@@ -1,0 +1,11 @@
+digraph DFG_main {
+    node [shape=box, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // A funcao main nao possui dependencias de dados significativas.
+    // A chamada foo(400) e independente.
+    foo_call [label="foo(400)"];
+    printf_call [label="printf (se TEST definido)"];
+
+    // Sem dependencias de dados explicitas.
+}

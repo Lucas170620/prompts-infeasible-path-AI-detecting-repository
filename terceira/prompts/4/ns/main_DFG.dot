@@ -1,0 +1,13 @@
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    x [label="400 (literal)"];
+
+    node [shape=box, style="", fillcolor=""];
+    call_foo [label="foo()"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    result [label="result (ignored)"];
+
+    x -> call_foo;
+    call_foo -> result [style=dashed];
+}

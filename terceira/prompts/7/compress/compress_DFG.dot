@@ -1,0 +1,18 @@
+digraph compress_DFG {
+    node [shape=ellipse];
+    InCnt [label="InCnt"];
+    free_ent [label="free_ent"];
+    maxmaxcode [label="maxmaxcode"];
+    in_count [label="in_count"];
+    checkpoint [label="checkpoint"];
+
+    node [shape=diamond];
+    cond3 [label="free_ent < maxmaxcode?"];
+    cond4 [label="in_count >= checkpoint?"];
+
+    InCnt -> cond3;
+    free_ent -> cond3;
+    maxmaxcode -> cond3;
+    in_count -> cond4;
+    checkpoint -> cond4;
+}

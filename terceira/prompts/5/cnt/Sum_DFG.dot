@@ -1,0 +1,27 @@
+digraph Sum_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N2 [label="int Ptotal = 0; int Ntotal = 0; int Pcnt = 0; int Ncnt = 0;"];
+    N3 [label="Outer = 0"];
+    N4 [label="Outer < MAXSIZE?"];
+    N5 [label="Inner = 0"];
+    N6 [label="Inner < MAXSIZE?"];
+    N7 [label="if (Array[Outer][Inner] < 0)"];
+    N8 [label="Ptotal += Array[Outer][Inner]; Pcnt++;"];
+    N9 [label="Ntotal += Array[Outer][Inner]; Ncnt++;"];
+    N10 [label="Inner++"];
+    N11 [label="Outer++"];
+    N12 [label="Postotal = Ptotal; Poscnt = Pcnt; Negtotal = Ntotal; Negcnt = Ncnt;"];
+    N3 -> N4 [label="Outer"];
+    N4 -> N5 [label="Outer"];
+    N5 -> N6 [label="Inner"];
+    N6 -> N7 [label="Outer, Inner"];
+    N7 -> N8 [label="Array[Outer][Inner]"];
+    N7 -> N9 [label="Array[Outer][Inner]"];
+    N8 -> N10 [label="Ptotal, Pcnt"];
+    N9 -> N10 [label="Ntotal, Ncnt"];
+    N10 -> N6 [label="Inner"];
+    N4 -> N11 [label="Outer"];
+    N11 -> N4 [label="Outer"];
+    N8 -> N12 [label="Ptotal, Pcnt"];
+    N9 -> N12 [label="Ntotal, Ncnt"];
+}

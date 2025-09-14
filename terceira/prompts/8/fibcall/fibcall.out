@@ -1,0 +1,113 @@
+**Análise do Código e Geração de Grafos**
+
+### 1. Grafo de Fluxo de Controle (CFG) para a função `fib`
+
+```dot
+digraph CFG_fib {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: Fnew = 1; Fold = 0;"];
+    N2 [label="2: i = 2;"];
+    N3 [label="3: if (i <= 30 && i <= n)"];
+    N4 [label="4: temp = Fnew; Fnew = Fnew + Fold; Fold = temp;"];
+    N5 [label="5: i++"];
+    N6 [label="6: ans = Fnew; return ans;"];
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N6 [label="false"];
+    N4 -> N5;
+    N5 -> N3;
+}
+```
+
+### 2. Grafo de Fluxo de Dados (DFG) para a função `fib`
+
+```dot
+digraph DFG_fib {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_input [label="n"];
+    const_1 [label="1"];
+    const_0 [label="0"];
+    const_2 [label="2"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_init_fnew [label="Fnew = 1"];
+    op_init_fold [label="Fold = 0"];
+    op_init_i [label="i = 2"];
+    op_temp [label="temp = Fnew"];
+    op_update_fnew [label="Fnew = Fnew + Fold"];
+    op_update_fold [label="Fold = temp"];
+    op_inc_i [label="i++"];
+    op_ans [label="ans = Fnew"];
+    op_return [label="return ans"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    Fnew_out [label="Fnew"];
+    Fold_out [label="Fold"];
+    i_out [label="i"];
+    ans_out [label="ans"];
+
+    const_1 -> op_init_fnew;
+    const_0 -> op_init_fold;
+    const_2 -> op_init_i;
+    op_init_fnew -> Fnew_out;
+    op_init_fold -> Fold_out;
+    op_init_i -> i_out;
+    Fnew_out -> op_temp;
+    op_temp -> op_update_fold;
+    Fnew_out -> op_update_fnew;
+    Fold_out -> op_update_fnew;
+    op_update_fnew -> Fnew_out;
+    op_update_fold -> Fold_out;
+    i_out -> op_inc_i;
+    op_inc_i -> i_out;
+    Fnew_out -> op_ans;
+    op_ans -> ans_out;
+    ans_out -> op_return;
+    n_input -> op_init_i [style=invis]; // n is used only in condition, not in data operations
+}
+```
+
+### 3. CFG para a função `main`
+
+```dot
+digraph CFG_main {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: int a;"];
+    N2 [label="2: a = 30;"];
+    N3 [label="3: fib(a);"];
+    N4 [label="4: return a;"];
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4;
+}
+```
+
+### 4. DFG para a função `main`
+
+```dot
+digraph DFG_main {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    const_30 [label="30"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_assign_a [label="a = 30"];
+    op_call_fib [label="fib(a)"];
+    op_return [label="return a"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    a_out [label="a"];
+
+    const_30 -> op_assign_a;
+    op_assign_a -> a_out;
+    a_out -> op_call_fib;
+    a_out -> op_return;
+}
+```
+
+### Análise de Caminhos Inviáveis (*Infeasible Paths*)
+
+**Resposta: NÃO**
+
+**Justificativa:**  
+Não existem caminhos inviáveis no código analisado. O CFG da função `fib` possui um loop que itera enquanto `i <= 30 && i <= n`. Como `n` é fixado em 30 pela função `main`, a condição `i <= n` é sempre verdadeira para `i` entre 2 e 30, tornando a condição equivalente a `i <= 30`. O loop executa 29 iterações (de `i = 2` a `i = 30`) e depois sai normalmente. Todas as arestas do CFG são alcançáveis para a entrada `n = 30`, e não há combinações de condições que levem a caminhos semanticamente impossíveis. O DFG confirma que os dados fluem de forma consistente, sem dependências inviáveis.

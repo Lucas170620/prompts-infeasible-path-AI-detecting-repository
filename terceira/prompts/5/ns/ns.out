@@ -1,0 +1,156 @@
+**Resposta:**
+
+Existe algum infeasible path neste código? **NÃO**
+
+### Justificativa:
+Após análise detalhada do código fornecido, incluindo a geração e revisão dos Grafos de Fluxo de Controle (CFG) e Grafos de Fluxo de Dados (DFG) para as funções `foo` e `main`, não foram identificados caminhos inviáveis (infeasible paths). Abaixo está a análise detalhada:
+
+#### 1. **Análise do CFG e DFG da Função `foo`:**
+   - O CFG da função `foo` (fornecido abaixo) mostra quatro loops aninhados que iteram de 0 a 4, com um condicional interno que pode levar a um retorno antecipado. O fluxo é linear e todas as transições entre nós são possíveis, dependendo dos valores de `keys[i][j][k][l]` e `x`.
+   - O DFG da função `foo` (fornecido abaixo) demonstra que as variáveis `i`, `j`, `k`, `l` e `x` são inicializadas e usadas de forma consistente, sem dependências de dados que criem contradições. Os arrays `keys` e `answer` são acessados apenas para leitura, e não há restrições de dados que impossibilitem qualquer caminho.
+
+#### 2. **Análise do CFG e DFG da Função `main`:**
+   - O CFG da função `main` é trivial, consistindo em uma única chamada para `foo(400)`, com ou sem `printf` dependendo da definição de `TEST`. Não há branches ou loops, tornando todos os caminhos viáveis.
+   - O DFG da função `main` mostra apenas a passagem do valor `400` para `foo`, sem conflitos de dados.
+
+#### 3. **Avaliação de Infeasible Paths:**
+   - **Contradições Lógicas:** Não há condições mutuamente exclusivas ou conflitos sequenciais no código. O condicional dentro do loop interno (`keys[i][j][k][l] == x`) depende dos dados, mas não cria contradições lógicas com as condições dos loops.
+   - **Dependências de Dados:** Todas as variáveis são inicializadas antes do uso (e.g., `i`, `j`, `k`, `l` iniciam em 0). Não há uso de variáveis não inicializadas ou valores fixos que contradigam condições.
+   - **Condições de Loop:** Os loops são baseados em variáveis que são incrementadas de forma linear e previsível (0 a 4). Não há condições de loop que sejam inatingíveis devido a valores pré-definidos.
+   - **Restrições do Ambiente ou Invariantes:** O código não depende de recursos externos ou invariantes que restrinjam caminhos. A inicialização dos arrays `keys` e `answer` é estática e conhecida.
+
+#### 4. **Conclusão:**
+   Todos os caminhos no CFG são executáveis para alguma entrada (e.g., diferentes valores de `x`). Por exemplo:
+   - Se `x = 400` e `FIND_TARGET` estiver definido, o caminho que retorna `answer[4][4][4][4] + 400` é executado.
+   - Se `x` não estiver em `keys`, o caminho que percorre todos os loops e retorna `-1` é executado.
+   Não há evidências de caminhos que sejam logicamente impossíveis ou bloqueados por dependências de dados.
+
+---
+
+### Grafos Gerados (Formato DOT):
+
+#### CFG para `foo`:
+```dot
+digraph foo_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: int i,j,k,l;"];
+    N2 [label="2: i=0"];
+    N3 [label="3: i<5"];
+    N4 [label="4: j=0"];
+    N5 [label="5: j<5"];
+    N6 [label="6: k=0"];
+    N7 [label="7: k<5"];
+    N8 [label="8: l=0"];
+    N9 [label="9: l<5"];
+    N10 [label="10: if (keys[i][j][k][l] == x)"];
+    N11 [label="11: return answer[i][j][k][l] + keys[i][j][k][l];"];
+    N12 [label="12: l++"];
+    N13 [label="13: k++"];
+    N14 [label="14: j++"];
+    N15 [label="15: i++"];
+    N16 [label="16: return -1;"];
+
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N16 [label="false"];
+    N4 -> N5;
+    N5 -> N6 [label="true"];
+    N5 -> N15 [label="false"];
+    N6 -> N7;
+    N7 -> N8 [label="true"];
+    N7 -> N14 [label="false"];
+    N8 -> N9;
+    N9 -> N10 [label="true"];
+    N9 -> N13 [label="false"];
+    N10 -> N11 [label="true"];
+    N10 -> N12 [label="false"];
+    N12 -> N9;
+    N13 -> N7;
+    N14 -> N5;
+    N15 -> N3;
+}
+```
+
+#### DFG para `foo`:
+```dot
+digraph foo_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    i_init [label="i=0"];
+    j_init [label="j=0"];
+    k_init [label="k=0"];
+    l_init [label="l=0"];
+    x_in [label="x"];
+
+    node [shape=box, style="", fillcolor=""];
+    add_i [label="i++"];
+    add_j [label="j++"];
+    add_k [label="k++"];
+    add_l [label="l++"];
+    cmp_i [label="i<5"];
+    cmp_j [label="j<5"];
+    cmp_k [label="k<5"];
+    cmp_l [label="l<5"];
+    array_index [label="keys[i][j][k][l]"];
+    condition [label="keys[i][j][k][l] == x"];
+    return_val [label="answer[i][j][k][l] + keys[i][j][k][l]"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    return_stmt [label="return"];
+
+    i_init -> cmp_i;
+    i_init -> array_index;
+    i_init -> return_val;
+    add_i -> cmp_i;
+    cmp_i -> add_i;
+    j_init -> cmp_j;
+    j_init -> array_index;
+    j_init -> return_val;
+    add_j -> cmp_j;
+    cmp_j -> add_j;
+    k_init -> cmp_k;
+    k_init -> array_index;
+    k_init -> return_val;
+    add_k -> cmp_k;
+    cmp_k -> add_k;
+    l_init -> cmp_l;
+    l_init -> array_index;
+    l_init -> return_val;
+    add_l -> cmp_l;
+    cmp_l -> add_l;
+    x_in -> condition;
+    array_index -> condition;
+    array_index -> return_val;
+    condition -> return_stmt;
+    return_val -> return_stmt;
+}
+```
+
+#### CFG para `main` (caso `TEST` definido):
+```dot
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: printf(\"result=%d\\n\", foo(400));"];
+    N2 [label="2: End"];
+    N1 -> N2;
+}
+```
+
+#### DFG para `main` (caso `TEST` definido):
+```dot
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    constant_400 [label="400"];
+
+    node [shape=box, style="", fillcolor=""];
+    call_foo [label="foo(400)"];
+    printf [label="printf"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    output [label="output"];
+
+    constant_400 -> call_foo;
+    call_foo -> printf;
+    printf -> output;
+}
+```

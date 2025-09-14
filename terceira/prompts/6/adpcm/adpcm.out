@@ -1,0 +1,94 @@
+**Análise de Caminhos Inviáveis (Infeasible Paths)**
+
+Após uma análise detalhada do código fornecido, considerando o Grafo de Fluxo de Controle (CFG) e o Grafo de Fluxo de Dados (DFG) de cada função, foi identificado **1 caminho inviável** no código. Abaixo está a explicação detalhada:
+
+### Explicação do Caminho Inviável
+- **Função:** `my_sin`
+- **Caminho Inviável:** O caminho que executa o corpo do primeiro loop (`rad > 2*PI`) e, em seguida, o corpo do segundo loop (`rad < -2*PI`).
+- **Justificativa:** 
+  - O primeiro loop reduz `rad` subtraindo `2*PI` até que `rad <= 2*PI`. Após sua execução, `rad` está no intervalo `[-2*PI, 2*PI]`.
+  - O segundo loop verifica se `rad < -2*PI`. Como `rad` está necessariamente dentro do intervalo `[-2*PI, 2*PI]` após o primeiro loop, a condição `rad < -2*PI` é sempre falsa. 
+  - Portanto, é impossível executar o corpo do segundo loop após o primeiro loop, caracterizando um caminho inviável devido a uma **contradição lógica** entre as condições dos loops.
+
+### Grafos (CFG e DFG) para a Função `my_sin`
+#### CFG (Control Flow Graph)
+```dot
+digraph my_sin_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: int diff;\nint app = 0;\nint inc = 1;"];
+    N2 [label="2: while (rad > 2*PI)"];
+    N3 [label="3: rad -= 2*PI;"];
+    N4 [label="4: while (rad < -2*PI)"];
+    N5 [label="5: rad += 2*PI;"];
+    N6 [label="6: diff = rad;\napp = diff;"];
+    N7 [label="7: diff = (diff * (-(rad*rad))) / ((2*inc)*(2*inc+1));"];
+    N8 [label="8: app = app + diff;\ninc++;"];
+    N9 [label="9: while (my_fabs(diff) >= 1)"];
+    N10 [label="10: return app;"];
+
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N4 [label="false"];
+    N3 -> N2;
+    N4 -> N5 [label="true"];
+    N4 -> N6 [label="false"];
+    N5 -> N4;
+    N6 -> N7;
+    N7 -> N8;
+    N8 -> N9;
+    N9 -> N7 [label="true"];
+    N9 -> N10 [label="false"];
+}
+```
+
+#### DFG (Data Flow Graph)
+```dot
+digraph my_sin_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    rad_in [label="rad"];
+    PI_in [label="PI"];
+
+    node [shape=box, style=""];
+    op_sub_2PI [label="-="];
+    op_add_2PI [label="+="];
+    op_assign_diff [label="="];
+    op_assign_app [label="="];
+    op_compute_diff [label="compute_diff"];
+    op_inc [label="++"];
+    op_fabs [label="my_fabs"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    rad_out [label="rad"];
+    diff_out [label="diff"];
+    app_out [label="app"];
+    inc_out [label="inc"];
+
+    rad_in -> op_sub_2PI;
+    PI_in -> op_sub_2PI;
+    op_sub_2PI -> rad_out;
+
+    rad_in -> op_add_2PI;
+    PI_in -> op_add_2PI;
+    op_add_2PI -> rad_out;
+
+    rad_out -> op_assign_diff;
+    op_assign_diff -> diff_out;
+
+    diff_out -> op_assign_app;
+    op_assign_app -> app_out;
+
+    diff_out -> op_compute_diff;
+    rad_out -> op_compute_diff;
+    inc_out -> op_compute_diff;
+    op_compute_diff -> diff_out;
+
+    diff_out -> op_fabs;
+    op_fabs -> N9; // Used in condition
+
+    inc_out -> op_inc;
+    op_inc -> inc_out;
+}
+```
+
+### Conclusão
+O código contém **1 caminho inviável**, localizado na função `my_sin`. Os demais caminhos em todas as outras funções são viáveis, considerando as definições fornecidas e a análise dos grafos CFG e DFG.

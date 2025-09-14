@@ -1,0 +1,45 @@
+digraph fibcall_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    // Funcao fib
+    fib_entry [label="fib entry"];
+    fib_decl [label="int i, Fnew, Fold, temp, ans;"];
+    fib_init [label="Fnew = 1; Fold = 0;"];
+    fib_loop_init [label="i = 2"];
+    fib_cond [label="i <= 30 && i <= n"];
+    fib_body [label="temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;"];
+    fib_inc [label="i++"];
+    fib_ans [label="ans = Fnew;"];
+    fib_return [label="return ans;"];
+    fib_exit [label="fib exit"];
+
+    // Funcao main
+    main_entry [label="main entry"];
+    main_decl [label="int a;"];
+    main_assign [label="a = 30;"];
+    main_call [label="fib(a);"];
+    main_return [label="return a;"];
+    main_exit [label="main exit"];
+
+    // Fluxo fib
+    fib_entry -> fib_decl;
+    fib_decl -> fib_init;
+    fib_init -> fib_loop_init;
+    fib_loop_init -> fib_cond;
+    fib_cond -> fib_body [label="true"];
+    fib_cond -> fib_ans [label="false"];
+    fib_body -> fib_inc;
+    fib_inc -> fib_cond;
+    fib_ans -> fib_return;
+    fib_return -> fib_exit;
+
+    // Fluxo main
+    main_entry -> main_decl;
+    main_decl -> main_assign;
+    main_assign -> main_call;
+    main_call -> main_return;
+    main_return -> main_exit;
+
+    // Chamada de funcao
+    main_call -> fib_entry [style=dashed, color=blue];
+    fib_exit -> main_return [style=dashed, color=blue];
+}

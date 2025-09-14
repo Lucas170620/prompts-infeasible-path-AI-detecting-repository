@@ -1,0 +1,27 @@
+digraph Sum_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    Array_input [label="Array"];
+    node [shape=box, style=""];
+    Add_Ptotal [label="+="];
+    Add_Ntotal [label="+="];
+    Inc_Pcnt [label="++"];
+    Inc_Ncnt [label="++"];
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    Ptotal_out [label="Ptotal"];
+    Ntotal_out [label="Ntotal"];
+    Pcnt_out [label="Pcnt"];
+    Ncnt_out [label="Ncnt"];
+
+    // Fluxo de dados
+    Array_input -> CheckValue;
+    CheckValue -> UpdatePos [label="true path"];
+    CheckValue -> UpdateNeg [label="false path"];
+    UpdatePos -> Add_Ptotal;
+    UpdatePos -> Inc_Pcnt;
+    UpdateNeg -> Add_Ntotal;
+    UpdateNeg -> Inc_Ncnt;
+    Add_Ptotal -> Ptotal_out;
+    Add_Ntotal -> Ntotal_out;
+    Inc_Pcnt -> Pcnt_out;
+    Inc_Ncnt -> Ncnt_out;
+}

@@ -1,0 +1,119 @@
+**Análise de Caminhos Inviáveis (Infeasible Paths) no Código `qsort-exam.c`**
+
+### 1. Grafos de Fluxo de Controle (CFG) e Fluxo de Dados (DFG)
+Foram gerados grafos CFG e DFG para a função `sort` (o `main` é trivial). Devido à complexidade do código, os grafos estão representados de forma simplificada na linguagem DOT do Graphviz.
+
+#### CFG (Grafo de Fluxo de Controle) para `sort`:
+```dot
+digraph CFG {
+  node [shape=box];
+  entry [label="Entrada: sort(n)"];
+  exit [label="Saída"];
+
+  // Blocos básicos
+  BB0 [label="Inicializações: i, ir=n, j, k, l=1, jstack=0, flag=0, a, temp"];
+  BB1 [label="Loop principal: for (;;)"];
+  BB2 [label="if (ir - l < M)"];
+  BB3 [label="Insertion sort: j = l+1 to ir"];
+  BB4 [label="a = arr[j]; i = j-1"];
+  BB5 [label="Loop interno: i >= l"];
+  BB6 [label="if (arr[i] <= a) break"];
+  BB7 [label="arr[i+1] = arr[i]; i--"];
+  BB8 [label="arr[i+1] = a; j++"];
+  BB9 [label="if (jstack == 0) break;"];
+  BB10 [label="Pop: ir = istack[jstack--]; l = istack[jstack--]"];
+  BB11 [label="Quicksort: k = (l+ir)>>1; SWAPs; i=l+1; j=ir; a=arr[l+1]"];
+  BB12 [label="Loop interno: for (;;)"];
+  BB13 [label="i++; while (arr[i] < a) i++"];
+  BB14 [label="j--; while (arr[j] > a) j--"];
+  BB15 [label="if (j < i) break"];
+  BB16 [label="SWAP(arr[i], arr[j])"];
+  BB17 [label="arr[l+1]=arr[j]; arr[j]=a; jstack+=2"];
+  BB18 [label="if (ir-i+1 >= j-l)"];
+  BB19 [label="Push: istack[jstack]=ir; istack[jstack-1]=i; ir=j-1"];
+  BB20 [label="Push: istack[jstack]=j-1; istack[jstack-1]=l; l=i"];
+
+  // Conexões
+  entry -> BB0;
+  BB0 -> BB1;
+  BB1 -> BB2;
+  BB2 -> BB3 [label="Verdadeiro"];
+  BB2 -> BB11 [label="Falso"];
+  BB3 -> BB4;
+  BB4 -> BB5;
+  BB5 -> BB6 [label="i>=l"];
+  BB5 -> BB8 [label="i<l"];
+  BB6 -> BB7 [label="Falso"];
+  BB6 -> BB8 [label="Verdadeiro"];
+  BB7 -> BB5;
+  BB8 -> BB3 [label="Próximo j"];
+  BB8 -> BB9 [label="Fim do loop j"];
+  BB9 -> exit [label="Verdadeiro"];
+  BB9 -> BB10 [label="Falso"];
+  BB10 -> BB1;
+  BB11 -> BB12;
+  BB12 -> BB13;
+  BB13 -> BB14;
+  BB14 -> BB15;
+  BB15 -> BB17 [label="Verdadeiro"];
+  BB15 -> BB16 [label="Falso"];
+  BB16 -> BB12;
+  BB17 -> BB18;
+  BB18 -> BB19 [label="Verdadeiro"];
+  BB18 -> BB20 [label="Falso"];
+  BB19 -> BB1;
+  BB20 -> BB1;
+}
+```
+
+#### DFG (Grafo de Fluxo de Dados) para `sort`:
+```dot
+digraph DFG {
+  node [shape=box];
+  // Definições e usos de variáveis
+  n [label="n (parâmetro)"];
+  ir [label="ir = n"];
+  l [label="l = 1"];
+  jstack [label="jstack = 0"];
+  arr [label="arr[20] (global)"];
+  istack [label="istack[100] (global)"];
+
+  // Dependências de dados
+  n -> ir;
+  ir -> BB2;
+  l -> BB2;
+  arr -> BB4;
+  arr -> BB6;
+  arr -> BB11;
+  arr -> BB13;
+  arr -> BB14;
+  arr -> BB16;
+  jstack -> BB9;
+  jstack -> BB10;
+  jstack -> BB17;
+  istack -> BB10;
+  istack -> BB19;
+  istack -> BB20;
+}
+```
+
+### 2. Análise de Caminhos Inviáveis
+**Total de caminhos inviáveis identificados: 2**
+
+#### Explicação dos caminhos inviáveis:
+1. **Caminho: `BB2 -> BB3 -> BB4 -> BB5 -> BB6 (Verdadeiro) -> BB8` sem executar `BB7`**
+   - **Motivo:** No loop interno do insertion sort (`BB5`), se `arr[i] <= a` for verdadeiro na primeira iteração, o controle salta para `BB8`. Porém, `BB8` assume que `i` foi decrementado pelo menos uma vez (já que `arr[i+1] = a` requer que `i` tenha sido modificado). Se `i` não for decrementado (devido ao `break` imediato), `i+1` ainda é `j`, e a atribuição `arr[j] = a` é redundante (pois `a = arr[j]` inicialmente). No entanto, isso não torna o caminho inviável — apenas ineficiente. **Correção:** Esse caminho é **viável**, pois corresponde a um cenário onde o elemento `arr[j]` já está na posição correta.
+
+2. **Caminho: `BB18 -> BB19` e `BB18 -> BB20` simultaneamente**
+   - **Motivo:** A condição `if (ir-i+1 >= j-l)` em `BB18` é mutuamente exclusiva. Ou é verdadeira (executando `BB19`) ou falsa (executando `BB20`). Não há cenário onde ambas as branches sejam executadas sequencialmente no mesmo estado. **Isso não é um caminho, mas sim branches alternativas.** Portanto, não se aplica.
+
+3. **Caminho inviável real: Loop infinito em `BB12` sem `break`**
+   - **Motivo:** O loop `for (;;)` em `BB12` depende das condições em `BB13`, `BB14` e `BB15` para terminar. Se as condições `arr[i] < a` e `arr[j] > a` forem sempre verdadeiras, `i` e `j` podem nunca atingir `j < i`. No entanto, como `a` é o pivot (elemento médio), e o array é finito, eventualmente `j < i` torna-se verdadeiro. **Este caminho é viável.**
+
+4. **Caminho inviável real: `BB9 -> exit` com `jstack != 0`**
+   - **Motivo:** A condição `if (jstack == 0)` em `BB9` só permite sair do loop principal se `jstack` for zero. Se `jstack != 0`, o controle vai para `BB10` (pop). Portanto, o caminho que tenta sair com `jstack != 0` é **inviável** por contradição lógica.
+
+5. **Caminho inviável real: `BB2 -> BB11` com `ir - l < M` verdadeiro**
+   - **Motivo:** A condição em `BB2` direciona o fluxo para `BB3` se `ir - l < M` for verdadeiro, e para `BB11` se falso. Se `ir - l < M` for verdadeiro, é impossível executar `BB11` a partir de `BB2`. Portanto, o caminho `BB2 -> BB11` com a condição verdadeira é **inviável**.
+
+**Conclusão:** Existem **2 caminhos inviáveis** no código, decorrentes de contradições lógicas nas condições de desvio.

@@ -1,0 +1,94 @@
+### Análise do Código e Construção dos Grafos
+
+Com base no código fornecido `fibcall.c`, construí o Grafo de Fluxo de Controle (CFG) e o Grafo de Fluxo de Dados (DFG) usando a linguagem DOT do Graphviz. Após a análise, determinei que não há caminhos infeasible (inviáveis) no código. Abaixo, apresento os grafos e a explicação detalhada.
+
+#### Grafo de Fluxo de Controle (CFG)
+O CFG para a função `fib` é representado abaixo. A função `main` é simples e linear, portanto, não é incluída aqui para brevidade. O CFG mostra o fluxo de controle dentro da função `fib`, que consiste em inicializações, um loop e um retorno.
+
+```dot
+digraph fib_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="Fnew = 1;\nFold = 0;\ni = 2;"];
+    N2 [label="if (i <= 30 && i <= n)"];
+    N3 [label="temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;\ni++;"];
+    N4 [label="ans = Fnew;\nreturn ans;"];
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N4 [label="false"];
+    N3 -> N2;
+}
+```
+
+**Explicação do CFG:**
+- **N1:** Bloco de inicialização onde `Fnew`, `Fold` e `i` são definidos.
+- **N2:** Nó de condição que verifica se `i` é menor ou igual a 30 e a `n`. Se verdadeiro, o fluxo vai para N3; se falso, para N4.
+- **N3:** Corpo do loop onde os valores de `Fnew`, `Fold` e `i` são atualizados.
+- **N4:** Bloco final onde `ans` é atribuído e retornado.
+- As arestas mostram o fluxo de controle, incluindo o loop de N3 para N2.
+
+#### Grafo de Fluxo de Dados (DFG)
+O DFG para a função `fib` mostra as dependências de dados entre as operações. Devido ao loop, existem dependências cíclicas nas variáveis `Fnew`, `Fold` e `i`. O DFG é simplificado para destacar as operações principais e suas dependências.
+
+```dot
+digraph fib_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_input [label="n"];
+    const_1 [label="1"];
+    const_0 [label="0"];
+    const_2 [label="2"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_init_Fnew [label="="];
+    op_init_Fold [label="="];
+    op_init_i [label="="];
+    op_temp [label="temp = Fnew"];
+    op_add [label="+"];
+    op_assign_Fnew [label="Fnew ="];
+    op_assign_Fold [label="Fold = temp"];
+    op_inc [label="i++"];
+    op_ans [label="ans = Fnew"];
+    op_return [label="return"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    Fnew_out [label="Fnew"];
+    Fold_out [label="Fold"];
+    i_out [label="i"];
+    ans_out [label="ans"];
+
+    const_1 -> op_init_Fnew;
+    const_0 -> op_init_Fold;
+    const_2 -> op_init_i;
+    op_init_Fnew -> Fnew_out;
+    op_init_Fold -> Fold_out;
+    op_init_i -> i_out;
+
+    Fnew_out -> op_temp;
+    op_temp -> op_assign_Fold;
+    Fnew_out -> op_add;
+    Fold_out -> op_add;
+    op_add -> op_assign_Fnew;
+    op_assign_Fnew -> Fnew_out [label="new value"];
+    op_assign_Fold -> Fold_out [label="new value"];
+    i_out -> op_inc;
+    op_inc -> i_out [label="new value"];
+
+    Fnew_out -> op_ans;
+    op_ans -> ans_out;
+    ans_out -> op_return;
+}
+```
+
+**Explicação do DFG:**
+- **Nós azuis:** Representam as entradas (parâmetro `n` e constantes).
+- **Nós retangulares:** Representam operações de atribuição e arithmeticas.
+- **Nós verdes:** Representam as saídas ou valores das variáveis após as operações.
+- As arestas mostram o fluxo de dados, onde os valores são consumidos e produzidos. Por exemplo, `Fnew` é usado na operação `op_temp` e `op_add`, e atualizado por `op_assign_Fnew`.
+
+### Análise de Caminhos Infeasible
+Após a análise do CFG e DFG, conclui que **não existem caminhos infeasible** no código.理由如下:
+- **Contradições Lógicas:** Não há condições mutuamente exclusivas no código. A condição `i <= 30 && i <= n` é sempre avaliada com base nos valores de `i` e `n`, que são consistentes. Como `i` é incrementado a cada iteração, a condição eventualmente se torna falsa, mas não há contradição.
+- **Dependências de Dados:** Todas as variáveis são inicializadas antes do uso. Não há uso de variáveis não inicializadas ou dependências que causem inconsistências.
+- **Contexto de Execução:** No programa principal, `n` é sempre fixado em 30 pela função `main`, thus ensuring that the condition `i <= 30 && i <= n` is equivalent to `i <= 30`, which is always true for `i` from 2 to 30 and false otherwise. Isso torna todos os caminhos possíveis de executar.
+- **Loop e Condições:** O loop é controlado por uma condição que depende de valores variáveis, mas como `i` começa em 2 e aumenta, e `n` é 30, o loop executa exatamente 29 iterações, e depois sai normalmente.
+
+Portanto, o número de caminhos infeasible é **0**.

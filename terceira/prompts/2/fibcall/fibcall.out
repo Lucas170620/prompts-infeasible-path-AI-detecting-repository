@@ -1,0 +1,108 @@
+**Análise de Caminhos Inviáveis (Infeasible Paths) no Código**
+
+### 1. Grafos de Fluxo de Controle (CFG) e Fluxo de Dados (DFG)
+#### Função `fib`
+**CFG (DOT):**
+```dot
+digraph CFG_fib {
+    node [shape=box];
+    entry [label="Entry", shape=ellipse];
+    exit [label="Exit", shape=ellipse];
+    node1 [label="Fnew = 1;\nFold = 0;\ni = 2;"];
+    node2 [label="Condition: i<=30 && i<=n", shape=diamond];
+    node3 [label="temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;\ni++;"];
+    node4 [label="ans = Fnew;\nreturn ans;"];
+
+    entry -> node1;
+    node1 -> node2;
+    node2 -> node3 [label="true"];
+    node2 -> node4 [label="false"];
+    node3 -> node2;
+    node4 -> exit;
+}
+```
+
+**DFG (DOT):**
+```dot
+digraph DFG_fib {
+    node [shape=box];
+    n [label="n (input)", shape=ellipse];
+    i_init [label="i = 2"];
+    Fnew_init [label="Fnew = 1"];
+    Fold_init [label="Fold = 0"];
+    cond [label="Condition: i<=30 && i<=n", shape=diamond];
+    temp_assign [label="temp = Fnew"];
+    Fnew_assign [label="Fnew = Fnew + Fold"];
+    Fold_assign [label="Fold = temp"];
+    i_inc [label="i++"];
+    ans_assign [label="ans = Fnew"];
+    return [label="return ans"];
+
+    n -> cond;
+    i_init -> cond;
+    Fnew_init -> temp_assign;
+    Fnew_init -> Fnew_assign;
+    Fold_init -> Fnew_assign;
+    temp_assign -> Fold_assign;
+    Fnew_assign -> temp_assign [label="loop-carried"];
+    Fnew_assign -> Fnew_assign [label="loop-carried"];
+    Fold_assign -> Fnew_assign [label="loop-carried"];
+    i_inc -> cond [label="loop-carried"];
+    cond -> temp_assign [label="true (control)"];
+    cond -> ans_assign [label="false (control)"];
+    Fnew_assign -> ans_assign;
+}
+```
+
+#### Função `main`
+**CFG (DOT):**
+```dot
+digraph CFG_main {
+    node [shape=box];
+    entry [label="Entry", shape=ellipse];
+    exit [label="Exit", shape=ellipse];
+    node1 [label="int a;\na = 30;"];
+    node2 [label="fib(a);"];
+    node3 [label="return a;"];
+
+    entry -> node1;
+    node1 -> node2;
+    node2 -> node3;
+    node3 -> exit;
+}
+```
+
+**DFG (DOT):**
+```dot
+digraph DFG_main {
+    node [shape=box];
+    a_assign [label="a = 30"];
+    fib_call [label="fib(a)"];
+    return [label="return a"];
+
+    a_assign -> fib_call;
+    a_assign -> return;
+}
+```
+
+---
+
+### 2. Identificação de Caminhos Inviáveis
+**Total de Caminhos Inviáveis: 29**
+
+#### Explicação Detalhada:
+O código possui um loop na função `fib` que itera de `i = 2` até `min(30, n)`. No contexto do programa, `main` chama `fib(30)`, fixando `n = 30`. Assim, o loop deve executar exatamente **29 iterações** (de `i = 2` a `i = 30`). 
+
+- **Critério Violado:** Contradição Lógica e Dependências de Dados.
+- **Justificativa:** 
+  - O condition `i<=30 && i<=n` é sempre verdadeiro para `i ∈ [2, 30]` quando `n = 30`.
+  - Qualquer caminho que não execute o loop 29 vezes é inviável:
+    - **0 iterações:** Requer `i > 30` ou `i > n` no primeiro teste, mas `i = 2` e `n = 30`.
+    - **1 iteração:** Requer que o condition falhe na segunda iteração (`i = 3`), mas `3 <= 30` e `3 <= 30`.
+    - ...
+    - **28 iterações:** Requer que o condition falhe na 29ª iteração (`i = 31`), mas `i` só chega a `31` após 29 iterações.
+  - Apenas o caminho com **29 iterações** é viável, pois:
+    - `i` incrementa de 2 para 31.
+    - O condition falha quando `i = 31` (após 29 iterações).
+
+Os 29 caminhos inviáveis correspondem às tentativas de execução do loop com 0 a 28 iterações, todas impossibilitadas pela combinação fixa de `n = 30` e a lógica do loop.

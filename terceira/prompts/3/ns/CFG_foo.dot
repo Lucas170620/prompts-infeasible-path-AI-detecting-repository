@@ -1,0 +1,45 @@
+digraph CFG_foo {
+    node [shape=box, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    START [label="Inicio", shape=ellipse];
+    END [label="Fim", shape=ellipse];
+
+    N1 [label="i = 0"];
+    N2 [label="i < 5?", shape=diamond];
+    N3 [label="j = 0"];
+    N4 [label="j < 5?", shape=diamond];
+    N5 [label="k = 0"];
+    N6 [label="k < 5?", shape=diamond];
+    N7 [label="l = 0"];
+    N8 [label="l < 5?", shape=diamond];
+    N9 [label="keys[i][j][k][l] == x?", shape=diamond];
+    N10 [label="return answer[i][j][k][l] + keys[i][j][k][l];"];
+    N11 [label="l++"];
+    N12 [label="k++"];
+    N13 [label="j++"];
+    N14 [label="i++"];
+    N15 [label="return -1;"];
+
+    START -> N1;
+    N1 -> N2;
+    N2 -> N3 [label="Sim"];
+    N2 -> N15 [label="Nao"];
+    N3 -> N4;
+    N4 -> N5 [label="Sim"];
+    N4 -> N14 [label="Nao"];
+    N5 -> N6;
+    N6 -> N7 [label="Sim"];
+    N6 -> N13 [label="Nao"];
+    N7 -> N8;
+    N8 -> N9 [label="Sim"];
+    N8 -> N12 [label="Nao"];
+    N9 -> N10 [label="Sim"];
+    N9 -> N11 [label="Nao"];
+    N10 -> END;
+    N11 -> N8;
+    N12 -> N6;
+    N13 -> N4;
+    N14 -> N2;
+    N15 -> END;
+}

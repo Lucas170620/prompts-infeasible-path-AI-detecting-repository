@@ -1,0 +1,76 @@
+**Resposta:**  
+Existem **2^100 - 1** caminhos inviáveis (infeasible paths) no código fornecido.  
+
+### Explicação Detalhada:
+1. **Análise do Código e Grafos Construídos:**
+   - O código define um array `matrix` de tamanho 10x10 (MAXSIZE=10) e o preenche com valores não negativos (0 a 8094) via `RandomInteger()`, que depende de uma semente inicializada em 0.
+   - A função `Sum` percorre o array e verifica se cada elemento é negativo (`Array[Outer][Inner] < 0`). Como todos os elementos são não negativos, **a condição é sempre falsa**, tornando o bloco `if` (que atualiza `Ptotal` e `Pcnt`) inalcançável.
+   - **CFG (Control Flow Graph) da função `Sum`:**  
+     ```dot
+     digraph CFG_Sum {
+         node [shape=box];
+         entry [label="Entry", shape=ellipse];
+         exit [label="Exit", shape=ellipse];
+         B1 [label="Outer=0"];
+         B2 [label="Outer < MAXSIZE?"];
+         B3 [label="Inner=0"];
+         B4 [label="Inner < MAXSIZE?"];
+         B5 [label="Array[Outer][Inner] < 0?"];
+         B6 [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+         B7 [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+         B8 [label="Inner++"];
+         B9 [label="Outer++"];
+         B10 [label="Postotal=Ptotal\nPoscnt=Pcnt\nNegtotal=Ntotal\nNegcnt=Ncnt"];
+
+         entry -> B1;
+         B1 -> B2;
+         B2 -> B3 [label="Sim"];
+         B2 -> B10 [label="Não"];
+         B3 -> B4;
+         B4 -> B5 [label="Sim"];
+         B4 -> B9 [label="Não"];
+         B5 -> B6 [label="Sim"];
+         B5 -> B7 [label="Não"];
+         B6 -> B8;
+         B7 -> B8;
+         B8 -> B4;
+         B9 -> B2;
+         B10 -> exit;
+     }
+     ```
+   - **DFG (Data Flow Graph) da função `Sum`:**  
+     ```dot
+     digraph DFG_Sum {
+         node [shape=box];
+         // Nós de entrada (dados iniciais)
+         Array_input [label="Array", shape=ellipse, fillcolor=lightblue, style=filled];
+         Zero [label="0", shape=ellipse, fillcolor=lightblue, style=filled];
+
+         // Nós de operação
+         Init [label="Ptotal=Ntotal=Pcnt=Ncnt=0"];
+         Outer_loop [label="Outer=0 to MAXSIZE-1"];
+         Inner_loop [label="Inner=0 to MAXSIZE-1"];
+         Check_Neg [label="Array[Outer][Inner] < 0?"];
+         Update_P [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+         Update_N [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+         Assign [label="Postotal=Ptotal\nPoscnt=Pcnt\nNegtotal=Ntotal\nNegcnt=Ncnt"];
+
+         // Arestas de dependência de dados
+         Zero -> Init;
+         Init -> Update_P;
+         Init -> Update_N;
+         Array_input -> Check_Neg;
+         Check_Neg -> Update_P [label="Condição verdadeira (inviável)"];
+         Check_Neg -> Update_N [label="Condição falsa (sempre executada)"];
+         Update_P -> Assign [label="Dados nunca produzidos"];
+         Update_N -> Assign;
+     }
+     ```
+
+2. **Justificativa dos Caminhos Inviáveis:**
+   - **Contradição Lógica:** A condição `Array[Outer][Inner] < 0` é sempre falsa devido à inicialização não negativa do array (0 a 8094). Thus, o bloco `if` (caminho "Sim" em `B5`) é **inviável**.
+   - **Dependências de Dados:** O DFG mostra que `Update_P` depende de `Check_Neg` ser verdadeiro, mas nenhum dado flui para `Update_P` porque a condição nunca é atendida.
+   - **Número de Caminhos:** O loop duplo em `Sum` executa 10×10 = 100 iterações. Cada iteração tem 2 caminhos possíveis (if/else), resultando em **2^100 caminhos totais**. Apenas 1 caminho é viável (onde o else é sempre executado). Logo, **2^100 - 1 caminhos são inviáveis**.
+
+3. **Conclusão:**  
+   A invariante do programa (array sempre não negativo) torna impossível a execução do branch `if` em `Sum`, invalidando todos os caminhos que incluem esse branch. O número total de caminhos inviáveis é **2^100 - 1**.

@@ -1,0 +1,6 @@
+digraph RandomInteger_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="Seed = ((Seed * 133) + 81) % 8095"];
+    N2 [label="return Seed"];
+    N1 -> N2 [label="Seed"];
+}

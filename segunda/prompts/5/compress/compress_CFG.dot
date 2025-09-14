@@ -1,0 +1,26 @@
+digraph compress_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nos (Basic Blocks)
+    BB0 [label="BB0: Entry\noffset=0\nbytes_out=3\nout_count=0\nclear_flg=0\nratio=0\nin_count=1\ncheckpoint=CHECK_GAP\nn_bits=INIT_BITS\nmaxcode=MAXCODE(n_bits)\nfree_ent = (block_compress)?FIRST:256\nent=getbyte()\ncompute hshift\nhsize_reg=hsize\ncl_hash(hsize_reg)"];
+    BB1 [label="BB1: while (InCnt > 0)"];
+    BB2 [label="BB2: c=getbyte()\nin_count++\nfcode=((c<<maxbits)+ent)\ni=((c<<hshift)^ent)\nif (htab[i]==fcode) -> BB1\nelse if (htab[i]<0) -> BB5\nelse -> BB3"];
+    BB3 [label="BB3: disp = hsize_reg - i\nif (i==0) disp=1"];
+    BB4 [label="BB4: i -= disp\nif (i<0) i+=hsize_reg\nif (htab[i]==fcode) -> BB1\nelse if (htab[i]>0 && bound<in_count) -> BB4\nelse -> BB5"];
+    BB5 [label="BB5: out_count++\nent=c\nif (free_ent < maxmaxcode) update tables\nelse if (in_count>=checkpoint && block_compress) cl_block()"];
+    BB6 [label="BB6: if (bytes_out>in_count) exit_stat=2\nreturn"];
+
+    // Arestas
+    BB0 -> BB1;
+    BB1 -> BB2 [label="true"];
+    BB1 -> BB6 [label="false"];
+    BB2 -> BB1 [label="match"];
+    BB2 -> BB5 [label="empty slot"];
+    BB2 -> BB3 [label="no match"];
+    BB3 -> BB4;
+    BB4 -> BB1 [label="match"];
+    BB4 -> BB4 [label="probe again"];
+    BB4 -> BB5 [label="no match"];
+    BB5 -> BB1;
+}

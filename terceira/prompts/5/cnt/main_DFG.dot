@@ -1,0 +1,7 @@
+digraph main_DFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="InitSeed()"];
+    N2 [label="Test(Array)"];
+    N3 [label="return 1"];
+    N1 -> N2 [label="Seed (global)"];
+}

@@ -1,0 +1,28 @@
+digraph DFG_fib {
+    node [shape=box];
+    n [label="n (input)", shape=ellipse];
+    i_init [label="i = 2"];
+    Fnew_init [label="Fnew = 1"];
+    Fold_init [label="Fold = 0"];
+    cond [label="Condition: i<=30 && i<=n", shape=diamond];
+    temp_assign [label="temp = Fnew"];
+    Fnew_assign [label="Fnew = Fnew + Fold"];
+    Fold_assign [label="Fold = temp"];
+    i_inc [label="i++"];
+    ans_assign [label="ans = Fnew"];
+    return [label="return ans"];
+
+    n -> cond;
+    i_init -> cond;
+    Fnew_init -> temp_assign;
+    Fnew_init -> Fnew_assign;
+    Fold_init -> Fnew_assign;
+    temp_assign -> Fold_assign;
+    Fnew_assign -> temp_assign [label="loop-carried"];
+    Fnew_assign -> Fnew_assign [label="loop-carried"];
+    Fold_assign -> Fnew_assign [label="loop-carried"];
+    i_inc -> cond [label="loop-carried"];
+    cond -> temp_assign [label="true (control)"];
+    cond -> ans_assign [label="false (control)"];
+    Fnew_assign -> ans_assign;
+}

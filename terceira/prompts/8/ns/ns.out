@@ -1,0 +1,139 @@
+**Análise do Código e Grafos Gerados**
+
+### 1. Grafo de Fluxo de Controle (CFG) para a função `foo`
+```dot
+digraph CFG_foo {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nós
+    N1 [label="1: int c = 0; (if TEST)"];
+    N2 [label="2: i = 0"];
+    N3 [label="3: i < 5"];
+    N4 [label="4: j = 0"];
+    N5 [label="5: j < 5"];
+    N6 [label="6: k = 0"];
+    N7 [label="7: k < 5"];
+    N8 [label="8: l = 0"];
+    N9 [label="9: l < 5"];
+    N10 [label="10: c++ (if TEST)\nif (keys[i][j][k][l] == x)"];
+    N11 [label="11: return answer[i][j][k][l] + keys[i][j][k][l];"];
+    N12 [label="12: l++"];
+    N13 [label="13: k++"];
+    N14 [label="14: j++"];
+    N15 [label="15: i++"];
+    N16 [label="16: return -1;"];
+
+    // Arestas
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="true"];
+    N3 -> N16 [label="false"];
+    N4 -> N5;
+    N5 -> N6 [label="true"];
+    N5 -> N15 [label="false"];
+    N6 -> N7;
+    N7 -> N8 [label="true"];
+    N7 -> N14 [label="false"];
+    N8 -> N9;
+    N9 -> N10 [label="true"];
+    N9 -> N13 [label="false"];
+    N10 -> N11 [label="true"];
+    N10 -> N12 [label="false"];
+    N12 -> N9;
+    N13 -> N7;
+    N14 -> N5;
+    N15 -> N3;
+    N11 -> END [style=invis]; // Nó de retorno não conectado a outros
+    N16 -> END [style=invis];
+
+    // Nó de fim invisível para layout
+    END [shape=point, style=invis];
+}
+```
+
+### 2. Grafo de Fluxo de Dados (DFG) para a função `foo`
+```dot
+digraph DFG_foo {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    i [label="i"];
+    j [label="j"];
+    k [label="k"];
+    l [label="l"];
+    x [label="x (input)"];
+    keys [label="keys[][][][]"];
+    answer [label="answer[][][][]"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_inc_i [label="i++"];
+    op_inc_j [label="j++"];
+    op_inc_k [label="k++"];
+    op_inc_l [label="l++"];
+    op_access_keys [label="keys[i][j][k][l]"];
+    op_access_answer [label="answer[i][j][k][l]"];
+    op_eq [label="=="];
+    op_add [label="+"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    return_val [label="return value"];
+
+    // Fluxo de dados
+    i -> op_inc_i;
+    op_inc_i -> i;
+    j -> op_inc_j;
+    op_inc_j -> j;
+    k -> op_inc_k;
+    op_inc_k -> k;
+    l -> op_inc_l;
+    op_inc_l -> l;
+
+    i -> op_access_keys;
+    j -> op_access_keys;
+    k -> op_access_keys;
+    l -> op_access_keys;
+    keys -> op_access_keys;
+
+    i -> op_access_answer;
+    j -> op_access_answer;
+    k -> op_access_answer;
+    l -> op_access_answer;
+    answer -> op_access_answer;
+
+    op_access_keys -> op_eq;
+    x -> op_eq;
+
+    op_access_keys -> op_add;
+    op_access_answer -> op_add;
+    op_add -> return_val;
+}
+```
+
+### 3. CFG e DFG para a função `main`
+**CFG para `main`:**
+```dot
+digraph CFG_main {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N1 [label="1: foo(400);"];
+    N2 [label="2: Fim", shape=doublecircle];
+    N1 -> N2;
+}
+```
+
+**DFG para `main`:**
+```dot
+digraph DFG_main {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    constant_400 [label="400"];
+
+    node [shape=box, style="", fillcolor=""];
+    call_foo [label="foo(400)"];
+
+    constant_400 -> call_foo;
+}
+```
+
+### 4. Análise de Caminhos Inviáveis (*Infeasible Paths*)
+**Resposta:** NÃO.
+
+**Justificativa:**  
+O código consiste em quatro loops aninhados que iteram sobre índices fixos (0 a 4) e uma condição que verifica se `keys[i][j][k][l] == x`. Todas as combinações de `i, j, k, l` são possíveis (5⁴ = 625 iterações), e a condição depende do valor de `x` e dos dados em `keys`, que são inicializados de forma estática. Não há contradições lógicas ou condições mutuamente exclusivas que impossibilitem qualquer caminho de execução. Ambos os branches da condição (`return` prematuro ou continuação dos loops) são semanticamente viáveis para diferentes entradas `x`. Portanto, **não existem caminhos inviáveis** no código.

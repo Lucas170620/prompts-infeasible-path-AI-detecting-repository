@@ -1,0 +1,97 @@
+digraph DFG {
+    node [shape=box, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    // Data nodes
+    arr [label="arr[]", shape=ellipse];
+    istack [label="istack[]", shape=ellipse];
+    n [label="n (input)", shape=ellipse];
+    i [label="i", shape=ellipse];
+    ir [label="ir", shape=ellipse];
+    j [label="j", shape=ellipse];
+    k [label="k", shape=ellipse];
+    l [label="l", shape=ellipse];
+    jstack [label="jstack", shape=ellipse];
+    a [label="a", shape=ellipse];
+    temp [label="temp", shape=ellipse];
+
+    // Operation nodes
+    init [label="Initialize variables"];
+    comp1 [label="Compare: ir - l < M"];
+    comp2 [label="Compare: jstack == 0"];
+    comp3 [label="Compare: arr[l] > arr[ir]"];
+    comp4 [label="Compare: arr[l+1] > arr[ir]"];
+    comp5 [label="Compare: arr[l] > arr[l+1]"];
+    comp6 [label="Compare: arr[i] < a"];
+    comp7 [label="Compare: arr[j] > a"];
+    comp8 [label="Compare: j < i"];
+    comp9 [label="Compare: ir-i+1 >= j-l"];
+    swap1 [label="SWAP(arr[k], arr[l+1])"];
+    swap2 [label="SWAP(arr[l], arr[ir])"];
+    swap3 [label="SWAP(arr[l+1], arr[ir])"];
+    swap4 [label="SWAP(arr[l], arr[l+1])"];
+    swap5 [label="SWAP(arr[i], arr[j])"];
+    assign1 [label="a = arr[j]"];
+    assign2 [label="arr[i+1] = arr[i]"];
+    assign3 [label="arr[i+1] = a"];
+    assign4 [label="a = arr[l+1]"];
+    assign5 [label="arr[l+1] = arr[j]"];
+    assign6 [label="arr[j] = a"];
+    update1 [label="jstack += 2"];
+    update2 [label="ir = istack[jstack--]"];
+    update3 [label="l = istack[jstack--]"];
+
+    // Data flow edges
+    n -> init;
+    init -> ir;
+    init -> l;
+    init -> jstack;
+    ir -> comp1;
+    l -> comp1;
+    jstack -> comp2;
+    arr -> comp3;
+    arr -> comp4;
+    arr -> comp5;
+    arr -> comp6;
+    arr -> comp7;
+    a -> comp6;
+    a -> comp7;
+    i -> comp8;
+    j -> comp8;
+    ir -> comp9;
+    i -> comp9;
+    j -> comp9;
+    l -> comp9;
+    arr -> swap1;
+    arr -> swap2;
+    arr -> swap3;
+    arr -> swap4;
+    arr -> swap5;
+    temp -> swap1;
+    temp -> swap2;
+    temp -> swap3;
+    temp -> swap4;
+    temp -> swap5;
+    arr -> assign1;
+    assign1 -> a;
+    arr -> assign2;
+    assign2 -> arr;
+    a -> assign3;
+    assign3 -> arr;
+    arr -> assign4;
+    assign4 -> a;
+    arr -> assign5;
+    assign5 -> arr;
+    a -> assign6;
+    assign6 -> arr;
+    jstack -> update1;
+    update1 -> jstack;
+    istack -> update2;
+    update2 -> ir;
+    jstack -> update2;
+    update2 -> jstack;
+    istack -> update3;
+    update3 -> l;
+    jstack -> update3;
+    update3 -> jstack;
+}

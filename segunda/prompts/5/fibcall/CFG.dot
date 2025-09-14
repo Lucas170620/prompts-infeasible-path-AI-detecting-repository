@@ -1,0 +1,36 @@
+digraph CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nos da funcao main
+    main_start [label="main: int a;"];
+    main_assign [label="main: a = 30;"];
+    main_call [label="main: fib(a);"];
+    main_return [label="main: return a;"];
+
+    // Nos da funcao fib
+    fib_start [label="fib: int i, Fnew, Fold, temp, ans;"];
+    fib_init [label="fib: Fnew = 1;\nFold = 0;"];
+    fib_loop_cond [label="fib: for (i = 2;\ni <= 30 && i <= n;"];
+    fib_loop_body [label="fib: temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;\ni++"];
+    fib_after_loop [label="fib: ans = Fnew;"];
+    fib_return [label="fib: return ans;"];
+
+    // Arestas do main
+    main_start -> main_assign;
+    main_assign -> main_call;
+    main_call -> main_return [label="Chama fib"];
+    main_return -> end [label="Saida"];
+
+    // Arestas do fib
+    fib_start -> fib_init;
+    fib_init -> fib_loop_cond;
+    fib_loop_cond -> fib_loop_body [label="Verdadeiro"];
+    fib_loop_cond -> fib_after_loop [label="Falso"];
+    fib_loop_body -> fib_loop_cond;
+    fib_after_loop -> fib_return;
+    fib_return -> main_return [label="Retorno"];
+
+    // No de fim
+    end [label="Fim", shape=doublecircle];
+}

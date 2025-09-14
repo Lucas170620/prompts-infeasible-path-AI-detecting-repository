@@ -1,0 +1,59 @@
+digraph CFG {
+  node [shape=box];
+  entry [label="Entrada: sort(n)"];
+  exit [label="Saida"];
+
+  // Blocos basicos
+  BB0 [label="Inicializacoes: i, ir=n, j, k, l=1, jstack=0, flag=0, a, temp"];
+  BB1 [label="Loop principal: for (;;)"];
+  BB2 [label="if (ir - l < M)"];
+  BB3 [label="Insertion sort: j = l+1 to ir"];
+  BB4 [label="a = arr[j]; i = j-1"];
+  BB5 [label="Loop interno: i >= l"];
+  BB6 [label="if (arr[i] <= a) break"];
+  BB7 [label="arr[i+1] = arr[i]; i--"];
+  BB8 [label="arr[i+1] = a; j++"];
+  BB9 [label="if (jstack == 0) break;"];
+  BB10 [label="Pop: ir = istack[jstack--]; l = istack[jstack--]"];
+  BB11 [label="Quicksort: k = (l+ir)>>1; SWAPs; i=l+1; j=ir; a=arr[l+1]"];
+  BB12 [label="Loop interno: for (;;)"];
+  BB13 [label="i++; while (arr[i] < a) i++"];
+  BB14 [label="j--; while (arr[j] > a) j--"];
+  BB15 [label="if (j < i) break"];
+  BB16 [label="SWAP(arr[i], arr[j])"];
+  BB17 [label="arr[l+1]=arr[j]; arr[j]=a; jstack+=2"];
+  BB18 [label="if (ir-i+1 >= j-l)"];
+  BB19 [label="Push: istack[jstack]=ir; istack[jstack-1]=i; ir=j-1"];
+  BB20 [label="Push: istack[jstack]=j-1; istack[jstack-1]=l; l=i"];
+
+  // Conexoes
+  entry -> BB0;
+  BB0 -> BB1;
+  BB1 -> BB2;
+  BB2 -> BB3 [label="Verdadeiro"];
+  BB2 -> BB11 [label="Falso"];
+  BB3 -> BB4;
+  BB4 -> BB5;
+  BB5 -> BB6 [label="i>=l"];
+  BB5 -> BB8 [label="i<l"];
+  BB6 -> BB7 [label="Falso"];
+  BB6 -> BB8 [label="Verdadeiro"];
+  BB7 -> BB5;
+  BB8 -> BB3 [label="Proximo j"];
+  BB8 -> BB9 [label="Fim do loop j"];
+  BB9 -> exit [label="Verdadeiro"];
+  BB9 -> BB10 [label="Falso"];
+  BB10 -> BB1;
+  BB11 -> BB12;
+  BB12 -> BB13;
+  BB13 -> BB14;
+  BB14 -> BB15;
+  BB15 -> BB17 [label="Verdadeiro"];
+  BB15 -> BB16 [label="Falso"];
+  BB16 -> BB12;
+  BB17 -> BB18;
+  BB18 -> BB19 [label="Verdadeiro"];
+  BB18 -> BB20 [label="Falso"];
+  BB19 -> BB1;
+  BB20 -> BB1;
+}

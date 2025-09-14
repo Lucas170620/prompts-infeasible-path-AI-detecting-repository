@@ -1,0 +1,22 @@
+digraph initbuffer_DFG {
+    node [shape=ellipse, fillcolor=lightblue, style=filled];
+    seed_init [label="1"];
+    i_init [label="0"];
+    node [shape=box];
+    op_seed [label="*133 +81 %8095"];
+    op_seed_mod [label="%256"];
+    assign_tabort [label="="];
+    assign_seed [label="="];
+    assign_orig [label="="];
+    increment_i [label="++"];
+    seed_init -> op_seed;
+    op_seed -> assign_seed;
+    assign_seed -> seed;
+    seed -> op_seed_mod;
+    op_seed_mod -> assign_orig;
+    i -> assign_tabort;
+    i -> assign_orig;
+    i -> increment_i;
+    increment_i -> i;
+    i_init -> i;
+}

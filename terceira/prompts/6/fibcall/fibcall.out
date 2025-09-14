@@ -1,0 +1,101 @@
+**Resposta:**
+
+### 1. Grafos de Fluxo de Controle (CFG) e Fluxo de Dados (DFG)
+
+#### Função `fib(int n)`
+**CFG (Graphviz DOT):**
+```dot
+digraph fib_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    N0 [label="0: Fnew = 1;\nFold = 0;\ni = 2;"];
+    N1 [label="1: if (i <= 30 && i <= n)"];
+    N2 [label="2: temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;\ni++;"];
+    N3 [label="3: ans = Fnew;\nreturn ans;"];
+    N0 -> N1;
+    N1 -> N2 [label="true"];
+    N1 -> N3 [label="false"];
+    N2 -> N1;
+}
+```
+
+**DFG (Graphviz DOT):**
+```dot
+digraph fib_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_param [label="n (parameter)"];
+    const_1 [label="1"];
+    const_0 [label="0"];
+    const_2 [label="2"];
+    node [shape=box, style="", fillcolor=""];
+    assign_Fnew0 [label="Fnew = 1"];
+    assign_Fold0 [label="Fold = 0"];
+    assign_i0 [label="i = 2"];
+    condition [label="i<=30 && i<=n", shape=diamond];
+    assign_temp [label="temp = Fnew"];
+    add [label="Fnew + Fold"];
+    assign_Fnew [label="Fnew = add"];
+    assign_Fold [label="Fold = temp"];
+    increment_i [label="i = i + 1"];
+    assign_ans [label="ans = Fnew"];
+    return [label="return ans"];
+    const_1 -> assign_Fnew0;
+    const_0 -> assign_Fold0;
+    const_2 -> assign_i0;
+    assign_Fnew0 -> assign_temp;
+    assign_Fnew0 -> add;
+    assign_Fold0 -> add;
+    assign_i0 -> condition;
+    n_param -> condition;
+    assign_i0 -> increment_i;
+    assign_temp -> assign_Fold;
+    add -> assign_Fnew;
+    assign_Fnew -> assign_temp [label="next iteration"];
+    assign_Fnew -> add [label="next iteration"];
+    assign_Fnew -> assign_ans;
+    assign_ans -> return;
+    increment_i -> condition [label="next iteration"];
+}
+```
+
+#### Função `main()`
+**CFG (Graphviz DOT):**
+```dot
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    M0 [label="0: a = 30;\nfib(a);\nreturn a;"];
+}
+```
+
+**DFG (Graphviz DOT):**
+```dot
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    const_30 [label="30"];
+    node [shape=box, style="", fillcolor=""];
+    assign_a [label="a = 30"];
+    call_fib [label="fib(a)"];
+    return_a [label="return a"];
+    const_30 -> assign_a;
+    assign_a -> call_fib;
+    assign_a -> return_a;
+}
+```
+
+---
+
+### 2. Análise de Caminhos Inviáveis (Infeasible Paths)
+
+**Número de caminhos inviáveis: 0**
+
+**Explicação Detalhada:**
+- O código consiste em duas funções: `fib(int n)` e `main()`. A função `main()` é linear (sem branches) e a função `fib()` contém um loop com uma condição composta (`i <= 30 && i <= n`).
+- **Análise do CFG/DFG:**
+  - **Função `main()`:** Possui um único caminho viável, sem branches ou condições.
+  - **Função `fib()`:** A condição do loop (`i <= 30 && i <= n`) é avaliada como um todo (não há branches separados para cada subcondição). O loop é executado enquanto ambas as subcondições forem verdadeiras.
+- **Avaliação de viabilidade:**
+  - Não há contradições lógicas entre condições (ex: `x > 10` e `x < 5` sequenciais).
+  - Não há dependências de dados que invalidem condições (ex: variável não inicializada).
+  - O loop é controlado por `i` e `n`, que são inicializados ou passados como parâmetro, permitindo execuções válidas para diferentes valores de `n`.
+  - Para `n >= 2`, o loop executa pelo menos uma vez; para `n < 2`, o loop é skipado. Ambos os casos são viáveis.
+  - A chamada `fib(30)` em `main()` garante que `n = 30`, resultando em 29 iterações do loop (viável).
+- **Conclusão:** Todos os caminhos no CFG são alcançáveis para entradas válidas (ex: `n = 30`), e não há restrições de sistema ou invariantes que bloqueiem execuções. Thus, **0 caminhos inviáveis** foram identificados.

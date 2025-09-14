@@ -1,0 +1,45 @@
+digraph sort_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nos (basic blocks)
+    N1 [label="1: Declaracoes e inicializacoes\nir = n; l = 1; jstack = 0; flag = 0;"];
+    N2 [label="2: for (;;)\nif (ir - l < M)"];
+    N3 [label="3: for (j = l+1; j <= ir; j++)\na = arr[j];\nfor (i = j-1; i >= l; i--)"];
+    N4 [label="4: if (arr[i] <= a)"];
+    N5 [label="5: arr[i+1] = arr[i];"];
+    N6 [label="6: arr[i+1] = a;"];
+    N7 [label="7: if (jstack == 0)"];
+    N8 [label="8: ir = istack[jstack--];\nl = istack[jstack--];"];
+    N9 [label="9: else\nk = (l+ir) >> 1;\nSWAP(arr[k], arr[l+1]);\n...\ni = l+1; j = ir; a = arr[l+1];"];
+    N10 [label="10: for (;;)\ni++; while (arr[i] < a) i++;\nj--; while (arr[j] > a) j--;\nif (j < i) break;"];
+    N11 [label="11: SWAP(arr[i], arr[j]);"];
+    N12 [label="12: arr[l+1] = arr[j];\narr[j] = a;\njstack += 2;"];
+    N13 [label="13: if (ir - i + 1 >= j - l)"];
+    N14 [label="14: istack[jstack] = ir;\nistack[jstack-1] = i;\nir = j-1;"];
+    N15 [label="15: istack[jstack] = j-1;\nistack[jstack-1] = l;\nl = i;"];
+    N16 [label="16: return (fim)"];
+
+    // Arestas
+    N1 -> N2;
+    N2 -> N3 [label="true"];
+    N2 -> N9 [label="false"];
+    N3 -> N4;
+    N4 -> N6 [label="true (break)"];
+    N4 -> N5 [label="false"];
+    N5 -> N4;
+    N6 -> N3 [label="j++"];
+    N3 -> N7 [label="j > ir (saida do loop)"];
+    N7 -> N16 [label="true (break)"];
+    N7 -> N8 [label="false"];
+    N8 -> N2;
+    N9 -> N10;
+    N10 -> N12 [label="j < i"];
+    N10 -> N11 [label="else"];
+    N11 -> N10;
+    N12 -> N13;
+    N13 -> N14 [label="true"];
+    N13 -> N15 [label="false"];
+    N14 -> N2;
+    N15 -> N2;
+}

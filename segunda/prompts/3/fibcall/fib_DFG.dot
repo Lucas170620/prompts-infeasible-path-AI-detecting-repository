@@ -1,0 +1,29 @@
+digraph fib_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_input [label="n (input)"];
+    node [shape=box, style=""];
+    op_init_fnew [label="Fnew = 1"];
+    op_init_fold [label="Fold = 0"];
+    op_cond [label="i <= 30 && i <= n"];
+    op_temp [label="temp = Fnew"];
+    op_add [label="Fnew + Fold"];
+    op_assign_fnew [label="Fnew = ..."];
+    op_assign_fold [label="Fold = temp"];
+    op_inc_i [label="i++"];
+    op_ans [label="ans = Fnew"];
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    ans_output [label="ans (output)"];
+
+    // Fluxo de dados
+    n_input -> op_cond;
+    op_init_fnew -> op_temp;
+    op_init_fnew -> op_add;
+    op_init_fold -> op_add;
+    op_add -> op_assign_fnew;
+    op_assign_fnew -> op_temp [style=dashed];
+    op_assign_fnew -> op_add [style=dashed];
+    op_assign_fnew -> op_ans;
+    op_temp -> op_assign_fold;
+    op_assign_fold -> op_add [style=dashed];
+    op_ans -> ans_output;
+}

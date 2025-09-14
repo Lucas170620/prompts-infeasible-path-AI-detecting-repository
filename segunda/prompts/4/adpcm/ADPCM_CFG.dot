@@ -1,0 +1,24 @@
+digraph ADPCM_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Nos principais
+    N1 [label="main: Inicio"];
+    N2 [label="reset: Inicializa variaveis"];
+    N3 [label="Loop principal (i < SIZE)"];
+    N4 [label="my_cos: Calcula cosseno"];
+    N5 [label="my_sin: Calcula seno"];
+    N6 [label="encode: Codifica dados"];
+    N7 [label="decode: Decodifica dados"];
+    N8 [label="Fim do programa"];
+
+    // Arestas
+    N1 -> N2;
+    N2 -> N3;
+    N3 -> N4 [label="chama my_cos"];
+    N4 -> N5 [label="chama my_sin"];
+    N5 -> N3 [label="proxima iteracao"];
+    N3 -> N6 [label="chama encode"];
+    N6 -> N7 [label="chama decode"];
+    N7 -> N8;
+}

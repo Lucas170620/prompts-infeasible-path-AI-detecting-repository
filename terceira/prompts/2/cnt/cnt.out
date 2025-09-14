@@ -1,0 +1,38 @@
+**Análise de Caminhos Inviáveis (Infeasible Paths) no Código**
+
+### Resposta:
+Existem **1.267.650.600.228.229.401.496.703.205.375** (2¹⁰⁰ - 1) caminhos inviáveis no código.
+
+### Explicação Detalhada:
+O código contém um caminho inviável devido a uma **contradição lógica** na função `Sum`, especificamente na condição que verifica se elementos da matriz são negativos. Aqui está a análise baseada nos Grafos de Fluxo de Controle (CFG) e de Dados (DFG):
+
+1. **CFG da Função `Sum`**:
+   - A função `Sum` itera sobre todos os elementos da matriz `Array` (de tamanho 10x10, totalizando 100 elementos).
+   - Para cada elemento, há uma condição `if (Array[Outer][Inner] < 0)` que define dois caminhos:
+     - **Caminho Verdadeiro**: Executado se o elemento for negativo.
+     - **Caminho Falso**: Executado se o elemento for não negativo.
+   - O CFG mostra que cada iteração do loop interno possui dois ramos, resultando em 2¹⁰⁰ caminhos possíveis.
+
+2. **DFG e Inicialização da Matriz**:
+   - A matriz `Array` é inicializada pela função `Initialize`, que preenche cada elemento com valores gerados por `RandomInteger`.
+   - `RandomInteger` utiliza a semente inicial `Seed = 0` e gera valores usando a fórmula:
+     ```
+     Seed = ((Seed * 133) + 81) % 8095
+     ```
+   - **Todos os valores gerados são não negativos** (o menor valor possível é 0, e o maior é 8094), conforme confirmado pela execução do código. Por exemplo:
+     - Primeira chamada: `((0 * 133) + 81) % 8095 = 81`
+     - Segunda chamada: `((81 * 133) + 81) % 8095 = 2759`
+     - Terceira chamada: `((2759 * 133) + 81) % 8095 = 367028 % 8095 = 367028 - 45*8095 = 367028 - 364275 = 2753` (não negativo).
+
+3. **Contradição Lógica**:
+   - A condição `if (Array[Outer][Inner] < 0)` em `Sum` depende de valores que **sempre são não negativos**.
+   - Portanto, o **ramo verdadeiro (que processa elementos negativos) é inviável** para todas as 100 iterações.
+   - Apenas o **ramo falso (não negativos)** é executado em todas as iterações, resultando em **apenas 1 caminho válido** entre os 2¹⁰⁰ possíveis.
+
+4. **Total de Caminhos Inviáveis**:
+   - Total de caminhos possíveis: 2¹⁰⁰.
+   - Caminho viável: 1 (onde o ramo falso é sempre tomado).
+   - Caminhos inviáveis: 2¹⁰⁰ - 1 = **1.267.650.600.228.229.401.496.703.205.375**.
+
+### Conclusão:
+A inviabilidade é causada por uma dependência de dados entre `Initialize` e `Sum`: a matriz é preenchida com valores não negativos, mas `Sum` tenta verificar a existência de valores negativos. Isso cria uma contradição lógica que torna todos os caminhos contendo o ramo verdadeiro inviáveis.

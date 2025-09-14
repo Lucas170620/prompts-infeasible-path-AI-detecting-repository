@@ -1,0 +1,41 @@
+digraph DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    n_input [label="n (from main)"];
+    constant_1 [label="1"];
+    constant_0 [label="0"];
+    constant_2 [label="2"];
+
+    node [shape=box, style="", fillcolor=""];
+    op_assign_fnew [label="="];
+    op_assign_fold [label="="];
+    op_assign_i [label="="];
+    op_cond [label="&&"];
+    op_assign_temp [label="="];
+    op_add [label="+"];
+    op_assign_fold_next [label="="];
+    op_assign_ans [label="="];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    fnew_out [label="Fnew"];
+    fold_out [label="Fold"];
+    i_out [label="i"];
+    ans_out [label="ans"];
+
+    // Data flow edges
+    n_input -> op_cond;
+    constant_1 -> op_assign_fnew;
+    constant_0 -> op_assign_fold;
+    constant_2 -> op_assign_i;
+    op_assign_i -> i_out;
+    i_out -> op_cond;
+    op_cond -> op_assign_temp [label="condition true"];
+    op_assign_fnew -> fnew_out;
+    fnew_out -> op_assign_temp;
+    op_assign_temp -> op_add;
+    fold_out -> op_add;
+    op_add -> op_assign_fnew;
+    op_assign_temp -> op_assign_fold_next;
+    op_assign_fold_next -> fold_out;
+    fnew_out -> op_assign_ans;
+    op_assign_ans -> ans_out;
+}

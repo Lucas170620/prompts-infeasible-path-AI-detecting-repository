@@ -1,0 +1,152 @@
+**Função:** `foo`
+
+**Grafo de Fluxo de Controle (CFG) em formato Graphviz:**
+
+```dot
+digraph foo_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    // Basic blocks
+    START [label="Start foo"];
+    B1 [label="i = 0"];
+    B2 [label="i < 5"];
+    B3 [label="j = 0"];
+    B4 [label="j < 5"];
+    B5 [label="k = 0"];
+    B6 [label="k < 5"];
+    B7 [label="l = 0"];
+    B8 [label="l < 5"];
+    B9 [label="keys[i][j][k][l] == x"];
+    B10 [label="return answer[i][j][k][l] + keys[i][j][k][l];"];
+    B11 [label="l++"];
+    B12 [label="k++"];
+    B13 [label="j++"];
+    B14 [label="i++"];
+    B15 [label="return -1;"];
+    END [label="End foo", shape=doublecircle];
+
+    // Edges
+    START -> B1;
+    B1 -> B2;
+    B2 -> B3 [label="true"];
+    B2 -> B15 [label="false"];
+    B3 -> B4;
+    B4 -> B5 [label="true"];
+    B4 -> B14 [label="false"];
+    B5 -> B6;
+    B6 -> B7 [label="true"];
+    B6 -> B13 [label="false"];
+    B7 -> B8;
+    B8 -> B9 [label="true"];
+    B8 -> B12 [label="false"];
+    B9 -> B10 [label="true"];
+    B9 -> B11 [label="false"];
+    B10 -> END;
+    B11 -> B8;
+    B12 -> B6;
+    B13 -> B4;
+    B14 -> B2;
+    B15 -> END;
+}
+```
+
+**Grafo de Fluxo de Dados (DFG) em formato Graphviz:**
+
+```dot
+digraph foo_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    x [label="x (parameter)"];
+    keys [label="keys (array)"];
+    answer [label="answer (array)"];
+
+    node [shape=box, style="", fillcolor=""];
+    add [label="+"];
+    eq [label="=="];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    result [label="result"];
+
+    // Data flow edges
+    keys -> eq;
+    x -> eq;
+    eq -> B9_cond [style=dashed]; // Conditional branch in CFG
+
+    keys -> add;
+    answer -> add;
+    add -> result;
+
+    // Loop indices (simplified)
+    i [label="i", fillcolor=lightblue];
+    j [label="j", fillcolor=lightblue];
+    k [label="k", fillcolor=lightblue];
+    l [label="l", fillcolor=lightblue];
+
+    i -> keys [label="index"];
+    j -> keys [label="index"];
+    k -> keys [label="index"];
+    l -> keys [label="index"];
+    i -> answer [label="index"];
+    j -> answer [label="index"];
+    k -> answer [label="index"];
+    l -> answer [label="index"];
+}
+```
+
+**Análise de Caminhos Inviáveis:**
+**Pergunta:** Quantos infeasible paths existem nesta função?
+**Resposta:** `625`
+
+**Justificativa:**
+A função `foo` contém quatro loops aninhados que iteram sobre um array 4D `keys`. O único caminho viável é aquele em que nenhum elemento de `keys` corresponde a `x` (resultando em `return -1`). Os demais 625 caminhos (5 × 5 × 5 × 5 iterações) tentam retornar `answer[i][j][k][l] + keys[i][j][k][l]`, mas são inviáveis devido à inicialização do array `keys`:
+
+- O array `keys` é inicializado com valores `0`, `1`, `2`, `3`, `4` ou `401` (último elemento), mas a função é chamada com `x = 400`.
+- Como `400` não está presente em `keys` (o valor `401` é usado no último elemento se `FIND_TARGET` não estiver definido), a condição `keys[i][j][k][l] == x` é sempre falsa.
+- Isso cria uma contradição lógica: o caminho que entra no bloco `B10` (return antecipado) exige que `keys[i][j][k][l] == 400`, mas nenhum elemento satisfaz essa condição.
+
+Portanto, todos os 625 caminhos que tentam acessar `B10` são inviáveis. O único caminho viável é a execução completa dos loops seguida por `return -1`.
+
+---
+
+**Função:** `main`
+
+**Grafo de Fluxo de Controle (CFG) em formato Graphviz:**
+
+```dot
+digraph main_CFG {
+    node [shape=box, style=rounded, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    START [label="Start main"];
+    B1 [label="foo(400);"];
+    END [label="End main", shape=doublecircle];
+
+    START -> B1;
+    B1 -> END;
+}
+```
+
+**Grafo de Fluxo de Dados (DFG) em formato Graphviz:**
+
+```dot
+digraph main_DFG {
+    node [shape=ellipse, style=filled, fillcolor=lightblue];
+    x [label="400 (literal)"];
+
+    node [shape=box, style="", fillcolor=""];
+    call_foo [label="foo()"];
+
+    node [shape=ellipse, style=filled, fillcolor=lightgreen];
+    result [label="result (ignored)"];
+
+    x -> call_foo;
+    call_foo -> result [style=dashed];
+}
+```
+
+**Análise de Caminhos Inviáveis:**
+**Pergunta:** Quantos infeasible paths existem nesta função?
+**Resposta:** `0`
+
+**Justificativa:**
+A função `main` consiste em uma única chamada para `foo(400)`, sem分支条件ais ou loops. Não há contradições lógicas ou dependências de dados que tornem qualquer caminho inviável. O único caminho existente é viável.
