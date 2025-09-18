@@ -1,0 +1,90 @@
+digraph validateIdentifier_DFG {
+    /* Estilos para diferenciar os tipos de nos */
+    node [fontname="Helvetica"];
+    graph [fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+
+    /* Nos de Operacao e Atribuicao (Retangulos) */
+    node [shape=box, style="rounded, filled", fillcolor="lightblue"];
+    N1 [label="= (valid_id)\nfalse"];
+    N3_1 [label="charAt(0)"];
+    N3_2 [label="valid_s?"];
+    N5_1 [label="charAt(1)"];
+    N5_2 [label="= (i)\n1"];
+    N6_1 [label="charAt(i)"];
+    N6_2 [label="valid_f?"];
+    N7 [label="= (valid_id)\nfalse"];
+    N9 [label="++ (i)"];
+
+    /* Nos de Constante (Circulos) */
+    node [shape=ellipse, style=filled, fillcolor="lightyellow"];
+    const_0 [label="0"];
+    const_1 [label="1"];
+    const_6 [label="6"];
+
+    /* Nos de Decisao (Diamantes) */
+    node [shape=diamond, style=filled, fillcolor="orange"];
+    BR2 [label="branch\nlength>0?"];
+    BR4 [label="branch\nlength>1?"];
+    BR6 [label="branch\n!valid_f?"];
+    BR8 [label="branch\nvalid_id &&\nlength>=1 &&\nlength<6?"];
+
+    /* Nos de Loop (Retangulos Duplos) */
+    node [shape=doublebox, style=filled, fillcolor="pink"];
+    ENTRY_loop [label="entry"];
+    EXIT_loop [label="exit"];
+
+    /* Nos de Merge (Circulos com "M") */
+    node [shape=circle, label="M", style=filled, fillcolor="lightgrey"];
+    MERGE_loop;
+
+    /* Nos de Entrada/Saida (Circulos) */
+    node [shape=ellipse, style=filled, fillcolor="green"];
+    input_s [label="s"];
+    output [label="return"];
+
+    /* Arestas de Dados (Azuis) */
+    edge [color="blue"];
+    input_s -> N3_1;
+    input_s -> N5_1;
+    input_s -> N6_1;
+    input_s -> BR2;
+    input_s -> BR4;
+    input_s -> BR8 [label="length"];
+    const_0 -> N3_1;
+    N3_1 -> N3_2;
+    N3_2 -> BR8 [label="valid_id"];
+    const_1 -> N5_1;
+    const_1 -> N5_2;
+    N5_1 -> N6_2;
+    N5_2 -> ENTRY_loop [label="i"];
+    N9 -> ENTRY_loop [label="i"];
+    ENTRY_loop -> N6_1 [label="i"];
+    N6_1 -> N6_2;
+    N6_2 -> BR6;
+    const_6 -> BR8;
+
+    /* Arestas de Controle (Vermelhas) - Conectam a saida de um branch a entrada de controle de outro */
+    edge [color="red"];
+    BR2 -> BR4 [label="true (ctrl)"];
+    BR2 -> BR8 [label="false (ctrl)"];
+    BR4 -> ENTRY_loop [label="true (ctrl)"];
+    BR4 -> BR8 [label="false (ctrl)"];
+    BR6 -> N7 [label="true (ctrl)"];
+    BR6 -> N9 [label="false (ctrl)"];
+    BR8 -> output [label="true (ctrl)"];
+    BR8 -> output [label="false (ctrl)"];
+
+    /* Arestas para Merge e Saida do Loop */
+    edge [color="purple"];
+    N7 -> MERGE_loop;
+    N9 -> MERGE_loop;
+    MERGE_loop -> EXIT_loop;
+    EXIT_loop -> BR8 [label="valid_id"]; // O fluxo sai do loop e vai para a decisao final
+
+    /* Arestas de Ativacao (Pontilhadas, para constantes e inicializacao) */
+    edge [style=dotted, label="source"];
+    BR2 -> const_0;
+    BR4 -> const_1;
+    ENTRY_loop -> const_1; // Para inicializar o loop, ativa a constante '1' para o no N5_2
+}
