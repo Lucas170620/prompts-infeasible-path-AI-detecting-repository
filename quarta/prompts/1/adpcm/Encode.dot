@@ -1,0 +1,87 @@
+digraph Encode {
+    rankdir=TB;
+    node [shape=box, fontname="Courier"];
+    edge [fontname="Courier"];
+
+    start [label="Inicio (encode)", shape=ellipse];
+    end [label="Fim (encode)", shape=ellipse];
+
+    // Blocos principais
+    init [label="Inicializa ponteiros e variaveis"];
+    compute_xa_xb [label="Calcula xa e xb (acumulacoes iniciais)"];
+    update_tqmf [label="Atualiza buffer tqmf"];
+    compute_xl_xh [label="Calcula xl = (xa + xb) >> 15\nxh = (xa - xb) >> 15"];
+    compute_szl [label="szl = filtez(delay_bpl, delay_dltx)"];
+    compute_spl [label="spl = filtep(rlt1, al1, rlt2, al2)"];
+    compute_sl [label="sl = szl + spl"];
+    compute_el [label="el = xl - sl"];
+    quantize_el [label="il = quantl(el, detl)"];
+    compute_dlt [label="dlt = (detl * qq4_code4_table[il>>2]) >> 15"];
+    update_nbl [label="nbl = logscl(il, nbl)"];
+    update_detl [label="detl = scalel(nbl, 8)"];
+    compute_plt [label="plt = dlt + szl"];
+    update_delay_bpl [label="upzero(dlt, delay_dltx, delay_bpl)"];
+    update_al2 [label="al2 = uppol2(al1, al2, plt, plt1, plt2)"];
+    update_al1 [label="al1 = uppol1(al1, al2, plt, plt1)"];
+    update_rlt [label="rlt = sl + dlt\nrlt2 = rlt1\nrlt1 = rlt\nplt2 = plt1\nplt1 = plt"];
+    compute_szh [label="szh = filtez(delay_bph, delay_dhx)"];
+    compute_sph [label="sph = filtep(rh1, ah1, rh2, ah2)"];
+    compute_sh [label="sh = sph + szh"];
+    compute_eh [label="eh = xh - sh"];
+    cond_eh [label="eh >= 0 ?", shape=diamond];
+    set_ih_pos [label="ih = 3"];
+    set_ih_neg [label="ih = 1"];
+    compute_decis [label="decis = (564 * deth) >> 12"];
+    cond_abs_eh [label="|eh| > decis ?", shape=diamond];
+    dec_ih [label="ih--"];
+    compute_dh [label="dh = (deth * qq2_code2_table[ih]) >> 15"];
+    update_nbh [label="nbh = logsch(ih, nbh)"];
+    update_deth [label="deth = scalel(nbh, 10)"];
+    compute_ph [label="ph = dh + szh"];
+    update_delay_bph [label="upzero(dh, delay_dhx, delay_bph)"];
+    update_ah2 [label="ah2 = uppol2(ah1, ah2, ph, ph1, ph2)"];
+    update_ah1 [label="ah1 = uppol1(ah1, ah2, ph, ph1)"];
+    update_yh [label="yh = sh + dh\nrh2 = rh1\nrh1 = yh\nph2 = ph1\nph1 = ph"];
+    return_val [label="return (il | (ih << 6))"];
+
+    // Fluxo de controle
+    start -> init;
+    init -> compute_xa_xb;
+    compute_xa_xb -> update_tqmf;
+    update_tqmf -> compute_xl_xh;
+    compute_xl_xh -> compute_szl;
+    compute_szl -> compute_spl;
+    compute_spl -> compute_sl;
+    compute_sl -> compute_el;
+    compute_el -> quantize_el;
+    quantize_el -> compute_dlt;
+    compute_dlt -> update_nbl;
+    update_nbl -> update_detl;
+    update_detl -> compute_plt;
+    compute_plt -> update_delay_bpl;
+    update_delay_bpl -> update_al2;
+    update_al2 -> update_al1;
+    update_al1 -> update_rlt;
+    update_rlt -> compute_szh;
+    compute_szh -> compute_sph;
+    compute_sph -> compute_sh;
+    compute_sh -> compute_eh;
+    compute_eh -> cond_eh;
+    cond_eh -> set_ih_pos [label="Sim"];
+    cond_eh -> set_ih_neg [label="Nao"];
+    set_ih_pos -> compute_decis;
+    set_ih_neg -> compute_decis;
+    compute_decis -> cond_abs_eh;
+    cond_abs_eh -> dec_ih [label="Sim"];
+    cond_abs_eh -> compute_dh [label="Nao"];
+    dec_ih -> compute_dh;
+    compute_dh -> update_nbh;
+    update_nbh -> update_deth;
+    update_deth -> compute_ph;
+    compute_ph -> update_delay_bph;
+    update_delay_bph -> update_ah2;
+    update_ah2 -> update_ah1;
+    update_ah1 -> update_yh;
+    update_yh -> return_val;
+    return_val -> end;
+}

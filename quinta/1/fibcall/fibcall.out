@@ -1,0 +1,53 @@
+**Resposta:**
+
+### 1. Grafo de Fluxo de Controle e Dados (CDFG) para cada função
+
+#### Função `fib`:
+```dot
+digraph fib {
+    rankdir=LR;
+    node [shape=box];
+
+    1 [label="1\nFnew = 1\nFold = 0\ni = 2\ndefinição={Fnew, Fold, i}"];
+    2 [label="2\nCondição: i <= 30 && i <= n\np-uso={i, n}", shape=diamond];
+    3 [label="3\ntemp = Fnew\nFnew = Fnew + Fold\nFold = temp\ni++\ndefinição={temp, Fnew, Fold, i}\nc-uso={Fnew, Fold}"];
+    4 [label="4\nans = Fnew\nreturn ans\nc-uso={Fnew}"];
+
+    1 -> 2;
+    2 -> 3 [label="Verdadeiro"];
+    2 -> 4 [label="Falso"];
+    3 -> 2;
+}
+```
+
+#### Função `main`:
+```dot
+digraph main {
+    rankdir=LR;
+    node [shape=box];
+
+    A [label="A\na = 30\ndefinição={a}"];
+    B [label="B\nfib(a)\nc-uso={a}"];
+    C [label="C\nreturn a\nc-uso={a}"];
+
+    A -> B -> C;
+}
+```
+
+### 2. Identificação de *Infeasible Paths*
+**NÃO**. Não existem *infeasible paths* neste código.
+
+### 3. Explicação Detalhada
+- **Análise da função `fib`:**
+  - O loop `for` possui uma condição de saída clara (`i <= 30 && i <= n`), que é verificada a cada iteração.
+  - As variáveis `i`, `Fnew` e `Fold` são inicializadas antes do loop e atualizadas de forma consistente dentro do loop.
+  - Não há contradições lógicas ou dependências de dados que impossibilitem a execução de qualquer caminho. Por exemplo:
+    - Se `n < 2`, o loop não é executado (caminho direto para o return).
+    - Se `n ≥ 2`, o loop executa até `i = min(30, n)`.
+  - Todas as combinações de condições são viáveis, pois a condição do loop depende apenas de `i` e `n`, que são inteiros e não possuem restrições mutuamente exclusivas.
+
+- **Análise da função `main`:**
+  - O fluxo é linear e sem condições, tornando todos os caminhos triviais e viáveis.
+  - A variável `a` é inicializada antes do uso, e não há dependências complexas.
+
+**Conclusão:** O código é estruturado e não contém caminhos inviáveis, seja por contradições lógicas, dependências de dados ou invariantes de programa. Todos os caminhos nos CFGs e DFGs são executáveis para entradas válidas (inteiros).
