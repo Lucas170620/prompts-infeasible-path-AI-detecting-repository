@@ -24,3 +24,5 @@ Fazer um teste em um prompt com pipeline na quinta tentatca
 - para cada uma das funções usar um prompt especifico para aquela função para gerar dos CDFG identificando quais infeasible paths
 - salvar esses grafos
 - Fazer uma analise completa de todos os grafos apartir do ponto de entada
+
+- Para a rodada 4 como ele indicava aonde estava os infeasible paths , decidi não fazer os que CONTA a quantida , isto é prompt 2 , 4 ,6 

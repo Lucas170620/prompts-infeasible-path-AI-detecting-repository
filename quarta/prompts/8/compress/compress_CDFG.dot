@@ -1,0 +1,49 @@
+digraph compress_CDFG {
+    rankdir=TB;
+    node [shape=rectangle, fontname="Courier"];
+
+    // Nos (Blocos Basicos)
+    1 [label="1: Inicializacao\n(compress)\ndef: offset, bytes_out, out_count, clear_flg, ratio, in_count, checkpoint, maxcode, free_ent, ent, hshift, hsize_reg\nc-use: hsize, block_compress, INIT_BITS, FIRST, getbyte\np-use: "];
+    2 [label="2: Loop Principal\nwhile (InCnt > 0)\np-use: InCnt"];
+    3 [label="3: Corpo do Loop\ndef: apsim_bound111, c, in_count, fcode, i\nc-use: maxbits, ent, hshift\np-use: "];
+    4 [label="4: Condicao 1\nif (htabof(i) == fcode)\nc-use: htabof(i), fcode, codetabof(i)\np-use: htabof(i), fcode"];
+    5 [label="5: Condicao 2\nelse if (htabof(i) < 0)\nc-use: htabof(i)\np-use: htabof(i)"];
+    6 [label="6: Calculo de disp\ndef: disp\nc-use: hsize_reg, i\np-use: i"];
+    7 [label="7: Loop Interno (probe)\nif (i -= disp) < 0\ndef: i\nc-use: disp, hsize_reg\np-use: i, disp"];
+    8 [label="8: Condicao no Probe\nif (htabof(i) == fcode)\nc-use: htabof(i), fcode, codetabof(i)\np-use: htabof(i), fcode"];
+    9 [label="9: Condicao de Continuidade\nif (htabof(i) > 0 && apsim_bound111 < in_count)\nc-use: htabof(i), apsim_bound111, in_count\np-use: htabof(i), apsim_bound111, in_count"];
+    10 [label="10: Bloco nomatch\ndef: out_count, ent\nc-use: c, free_ent, maxmaxcode, in_count, checkpoint, block_compress\np-use: free_ent, maxmaxcode, in_count, checkpoint, block_compress"];
+    11 [label="11: Pos-Loop\nif (bytes_out > in_count)\ndef: exit_stat\nc-use: bytes_out, in_count\np-use: bytes_out, in_count"];
+    12 [label="12: Retorno\nreturn"];
+
+    // Arestas de Controle
+    1 -> 2;
+    2 -> 3 [label="InCnt > 0"];
+    2 -> 11 [label="InCnt <= 0"];
+    3 -> 4;
+    4 -> 2 [label="true (continue)"];
+    4 -> 5 [label="false"];
+    5 -> 10 [label="true (goto nomatch)"];
+    5 -> 6 [label="false"];
+    6 -> 7;
+    7 -> 8 [label="i >= 0"];
+    7 -> 8 [label="i < 0 (i += hsize_reg)"];
+    8 -> 2 [label="true (continue)"];
+    8 -> 9 [label="false"];
+    9 -> 8 [label="true (goto probe)"];
+    9 -> 10 [label="false"];
+    10 -> 2;
+    11 -> 12 [label="false"];
+    11 -> 12 [label="true (exit_stat=2)"];
+
+    // Arestas de Dados (Def-Use)
+    1 -> 3 [label="ent, hshift" style=dashed color=blue];
+    3 -> 4 [label="fcode, i" style=dashed color=green];
+    3 -> 8 [label="fcode" style=dashed color=green];
+    3 -> 10 [label="c" style=dashed color=green];
+    10 -> 3 [label="ent" style=dashed color=blue];
+    3 -> 9 [label="in_count" style=dashed color=orange];
+    10 -> 9 [label="in_count" style=dashed color=orange];
+    1 -> 11 [label="bytes_out, in_count" style=dashed color=red];
+    3 -> 11 [label="in_count" style=dashed color=red];
+}

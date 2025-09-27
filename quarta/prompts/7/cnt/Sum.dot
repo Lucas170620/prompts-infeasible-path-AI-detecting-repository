@@ -1,0 +1,43 @@
+digraph Sum {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nos do CDFG
+    start [label="Inicio Sum", shape=ellipse];
+    end [label="Fim Sum", shape=ellipse];
+    node1 [label="B1\nPtotal = 0\nNtotal = 0\nPcnt = 0\nNcnt = 0"];
+    node2 [label="B2\nOuter = 0"];
+    node3 [label="B3\nOuter < MAXSIZE?"];
+    node4 [label="B4\nInner = 0"];
+    node5 [label="B5\nInner < MAXSIZE?"];
+    node6 [label="B6\nArray[Outer][Inner] < 0?"];
+    node7 [label="B7\nPtotal += Array[Outer][Inner]\nPcnt++"];
+    node8 [label="B8\nNtotal += Array[Outer][Inner]\nNcnt++"];
+    node9 [label="B9\nInner++"];
+    node10 [label="B10\nOuter++"];
+    node11 [label="B11\nPostotal = Ptotal\nPoscnt = Pcnt\nNegtotal = Ntotal\nNegcnt = Ncnt"];
+
+    // Arestas de controle
+    start -> node1;
+    node1 -> node2;
+    node2 -> node3;
+    node3 -> node4 [label="True"];
+    node3 -> node11 [label="False"];
+    node4 -> node5;
+    node5 -> node6 [label="True"];
+    node5 -> node10 [label="False"];
+    node6 -> node7 [label="True (Infeasible)", color="red", fontcolor="red"];
+    node6 -> node8 [label="False"];
+    node7 -> node9 [color="red"];
+    node8 -> node9;
+    node9 -> node5;
+    node10 -> node3;
+    node11 -> end;
+
+    // Fluxo de dados (definicoes e usos)
+    node1 [xlabel="def: Ptotal, Ntotal, Pcnt, Ncnt"];
+    node6 [xlabel="c-use: Array, Outer, Inner\np-use: Array"];
+    node7 [xlabel="c-use: Array, Outer, Inner, Ptotal, Pcnt\ndef: Ptotal, Pcnt"];
+    node8 [xlabel="c-use: Array, Outer, Inner, Ntotal, Ncnt\ndef: Ntotal, Ncnt"];
+    node11 [xlabel="c-use: Ptotal, Pcnt, Ntotal, Ncnt\ndef: Postotal, Poscnt, Negtotal, Negcnt"];
+}

@@ -1,0 +1,13 @@
+digraph Test {
+      node [shape=box];
+      start [label="Start", shape=ellipse];
+      end [label="End", shape=ellipse];
+      initialize [label="Initialize(Array)"];
+      start_time [label="StartTime = 1000.0"];
+      sum [label="Sum(Array)"];
+      stop_time [label="StopTime = 1500.0"];
+      total_time [label="TotalTime = (StopTime - StartTime) / 1000.0"];
+      return [label="return 0"];
+
+      start -> initialize -> start_time -> sum -> stop_time -> total_time -> return -> end;
+  }

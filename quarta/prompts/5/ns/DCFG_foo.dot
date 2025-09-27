@@ -1,0 +1,34 @@
+digraph DCFG_foo {
+    rankdir=TB;
+    node [shape=rectangle];
+
+    // Nos (blocos basicos)
+    start [label="Inicio da funcao\nint i, j, k, l;\n#ifdef TEST: int c = 0;"];
+    loop_i [label="Loop i: i = 0 a 4"];
+    loop_j [label="Loop j: j = 0 a 4"];
+    loop_k [label="Loop k: k = 0 a 4"];
+    loop_l [label="Loop l: l = 0 a 4"];
+    body [label="Corpo do loop l:\n#ifdef TEST: c++;\nif (keys[i][j][k][l] == x)"];
+    return_found [label="return answer[i][j][k][l] + keys[i][j][k][l];", shape=doublecircle];
+    return_not_found [label="return -1;", shape=doublecircle];
+
+    // Arestas de controle
+    start -> loop_i;
+    loop_i -> loop_j [label="i < 5"];
+    loop_i -> return_not_found [label="i >= 5"];
+    loop_j -> loop_k [label="j < 5"];
+    loop_j -> loop_i [label="j >= 5", constraint=false];
+    loop_k -> loop_l [label="k < 5"];
+    loop_k -> loop_j [label="k >= 5", constraint=false];
+    loop_l -> body [label="l < 5"];
+    loop_l -> loop_k [label="l >= 5", constraint=false];
+    body -> return_found [label="Condicao verdadeira"];
+    body -> loop_l [label="Condicao falsa", constraint=false];
+
+    // Arestas de dados (def-use)
+    body -> return_found [label="c-use: keys, answer, i, j, k, l", style=dashed, color=blue];
+    loop_i -> body [label="def: i", style=dashed, color=green];
+    loop_j -> body [label="def: j", style=dashed, color=green];
+    loop_k -> body [label="def: k", style=dashed, color=green];
+    loop_l -> body [label="def: l", style=dashed, color=green];
+}

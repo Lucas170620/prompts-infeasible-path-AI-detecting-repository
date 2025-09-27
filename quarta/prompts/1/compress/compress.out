@@ -1,0 +1,105 @@
+**Resposta:**
+
+**SIM**, existe um *infeasible path* neste código.
+
+---
+
+### 🔍 Análise Detalhada
+
+O código analisado contém uma função principal (`main`) e várias funções auxiliares (`compress`, `cl_block`, `cl_hash`, `getbyte`, `putbyte`, `writebytes`, `output`). A função `compress` é a mais complexa e onde foi identificado um caminho inviável.
+
+#### 📊 CDFG da Função `compress` (Graphviz DOT)
+
+```dot
+digraph CompressCFG {
+    rankdir=TB;
+    node [shape=box, fontname="Courier"];
+
+    // Nós principais
+    start [label="compress() - Start", shape=ellipse];
+    init [label="Inicializações:\noffset=0, bytes_out=3, ..."];
+    ent_getbyte [label="ent = getbyte()"];
+    hshift_calc [label="Calcular hshift"];
+    cl_hash_call [label="cl_hash(hsize_reg)"];
+    loop_cond [label="InCnt > 0?", shape=diamond];
+    c_getbyte [label="c = getbyte()\nin_count++"];
+    fcode_calc [label="fcode = (c << maxbits) + ent"];
+    i_calc [label="i = (c << hshift) ^ ent"];
+    cond_htab [label="htab[i] == fcode?", shape=diamond];
+    cond_htab_neg [label="htab[i] < 0?", shape=diamond];
+    probe_loop [label="Ajuste i via disp\n(loop probe)"];
+    nomatch [label="nomatch:\nout_count++\nent = c"];
+    cond_free_ent [label="free_ent < maxmaxcode?", shape=diamond];
+    cond_checkpoint [label="(in_count >= checkpoint) && block_compress?", shape=diamond];
+    cl_block_call [label="cl_block()", color=red, fontcolor=red];
+    update_tables [label="codetab[i] = free_ent++\nhtab[i] = fcode"];
+    end_loop [label="Fim do loop"];
+    end_compress [label="Verifica bytes_out > in_count", shape=ellipse];
+
+    // Arestas
+    start -> init;
+    init -> ent_getbyte;
+    ent_getbyte -> hshift_calc;
+    hshift_calc -> cl_hash_call;
+    cl_hash_call -> loop_cond;
+
+    loop_cond -> c_getbyte [label="Sim"];
+    loop_cond -> end_compress [label="Não"];
+
+    c_getbyte -> fcode_calc;
+    fcode_calc -> i_calc;
+    i_calc -> cond_htab;
+
+    cond_htab -> loop_cond [label="Sim"];
+    cond_htab -> cond_htab_neg [label="Não"];
+
+    cond_htab_neg -> nomatch [label="Sim"];
+    cond_htab_neg -> probe_loop [label="Não"];
+
+    probe_loop -> cond_htab [label="Re-checar htab[i]"];
+
+    nomatch -> cond_free_ent;
+
+    cond_free_ent -> update_tables [label="Sim"];
+    cond_free_ent -> cond_checkpoint [label="Não"];
+
+    cond_checkpoint -> cl_block_call [label="Sim", color=red, fontcolor=red];
+    cond_checkpoint -> loop_cond [label="Não"];
+
+    update_tables -> loop_cond;
+    cl_block_call -> loop_cond [color=red];
+
+    // Caminho inviável em vermelho
+    cond_checkpoint -> cl_block_call [color=red];
+    cl_block_call -> loop_cond [color=red];
+}
+```
+
+---
+
+### ❌ Explicação do Caminho Inviável
+
+**Função:** `compress`
+
+**Caminho Inviável:**  
+A condição que leva à chamada de `cl_block()` é inviável devido a uma **contradição lógica** entre os valores das variáveis `in_count` e `checkpoint`.
+
+- `in_count` é inicializado em `1` e incrementado a cada byte processado.
+- `checkpoint` é inicializado com `CHECK_GAP = 10000`.
+- O buffer de entrada (`InBuff`) tem tamanho fixo `BUFFERSIZE = 50`.
+
+Como `in_count` nunca ultrapassará `51` (1 + 50), a condição:
+
+```c
+((count_int)in_count >= checkpoint) && (block_compress)
+```
+
+**nunca será verdadeira**, pois `in_count` (≤51) é sempre menor que `checkpoint` (10000). Portanto, o caminho que chama `cl_block()` é **inviável**.
+
+---
+
+### ✅ Conclusão
+
+- **Caminho inviável identificado:** Sim, na função `compress`.
+- **Motivo:** Contradição lógica entre o tamanho do buffer e o valor de `checkpoint`.
+- **Impacto:** A função `cl_block()` nunca será executada durante a compressão do buffer de entrada, o que pode afetar a lógica de reset da tabela de compressão em cenários reais com buffers maiores.

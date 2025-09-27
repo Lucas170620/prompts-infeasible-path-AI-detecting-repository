@@ -1,0 +1,57 @@
+digraph encode_DCFG {
+    rankdir=TB;
+    node [shape=rectangle, fontname="Courier"];
+
+    // Nos (blocos basicos) com definicoes e usos de variaveis
+    1 [label="Inicio encode\nDef: i, h_ptr, tqmf_ptr, xa, xb\nUse: h, tqmf"];
+    2 [label="Loop: i=0 a 10\nDef: xa, xb, i\nUse: tqmf_ptr, h_ptr"];
+    3 [label="Atualiza xa, xb\nDef: xa, xb\nUse: tqmf_ptr, h_ptr"];
+    4 [label="Atualiza tqmf\nDef: tqmf\nUse: tqmf_ptr"];
+    5 [label="Calcula xl, xh\nDef: xl, xh\nUse: xa, xb"];
+    6 [label="Chama filtez, filtep\nDef: szl, spl, sl, el\nUse: delay_bpl, delay_dltx, rlt1, al1, rlt2, al2, xl"];
+    7 [label="Chama quantl\nDef: il, dlt\nUse: el, detl"];
+    8 [label="Atualiza nbl, detl\nDef: nbl, detl\nUse: il, nbl"];
+    9 [label="Calcula plt\nDef: plt\nUse: dlt, szl"];
+    10 [label="Chama upzero\nDef: delay_dltx, delay_bpl\nUse: dlt"];
+    11 [label="Chama uppol2, uppol1\nDef: al2, al1, rlt, rlt1, rlt2, plt1, plt2\nUse: al1, al2, plt, plt1, plt2"];
+    12 [label="Calcula szh, sph, sh, eh\nDef: szh, sph, sh, eh\nUse: delay_bph, delay_dhx, rh1, ah1, rh2, ah2, xh"];
+    13 [label="if (eh >= 0)\nDef: ih\nUse: eh"];
+    14 [label="ih = 3"];
+    15 [label="ih = 1"];
+    16 [label="Calcula decis\nDef: decis\nUse: deth, eh"];
+    17 [label="if (|eh| > decis)\nUse: eh, decis"];
+    18 [label="ih--"];
+    19 [label="Calcula dh, nbh, deth, ph\nDef: dh, nbh, deth, ph\nUse: ih, deth"];
+    20 [label="Chama upzero, uppol2, uppol1\nDef: delay_dhx, delay_bph, ah2, ah1, yh, rh1, rh2, ph1, ph2\nUse: dh, ah1, ah2, ph, ph1"];
+    21 [label="Retorno\nUse: il, ih"];
+
+    // Arestas de controle
+    1 -> 2;
+    2 -> 3;
+    3 -> 4;
+    4 -> 5;
+    5 -> 6;
+    6 -> 7;
+    7 -> 8;
+    8 -> 9;
+    9 -> 10;
+    10 -> 11;
+    11 -> 12;
+    12 -> 13;
+    13 -> 14 [label="eh >= 0"];
+    13 -> 15 [label="eh < 0"];
+    14 -> 16;
+    15 -> 16;
+    16 -> 17;
+    17 -> 18 [label="|eh| > decis"];
+    17 -> 19 [label="|eh| <= decis"];
+    18 -> 19;
+    19 -> 20;
+    20 -> 21;
+
+    // Arestas de dados (exemplo)
+    5 -> 6 [label="dados: xl", style=dashed, color=blue];
+    6 -> 7 [label="dados: el", style=dashed, color=blue];
+    12 -> 13 [label="dados: eh", style=dashed, color=blue];
+    16 -> 17 [label="dados: decis", style=dashed, color=blue];
+}

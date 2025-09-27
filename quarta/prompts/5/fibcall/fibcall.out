@@ -1,0 +1,96 @@
+Analisando o código fornecido, vou construir o **DCFG (Data Control Flow Graph)** para as funções `fib` e `main` e identificar possíveis *infeasible paths*. 
+
+---
+
+### 1. DCFG da Função `fib` (Graphviz DOT)
+
+```dot
+digraph Fib {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nós
+    start [label="Início fib(n)", shape=ellipse];
+    decl [label="1: Declara i, Fnew, Fold, temp, ans"];
+    init [label="2: Fnew = 1, Fold = 0"];
+    for_init [label="3: i = 2"];
+    for_cond [label="4: i <= 30 && i <= n"];
+    loop_body [label="5: temp = Fnew\nFnew = Fnew + Fold\nFold = temp"];
+    inc [label="6: i++"];
+    assign_ans [label="7: ans = Fnew"];
+    ret [label="8: return ans", shape=ellipse];
+
+    // Arestas de controle
+    start -> decl;
+    decl -> init;
+    init -> for_init;
+    for_init -> for_cond;
+    for_cond -> loop_body [label="True"];
+    for_cond -> assign_ans [label="False"];
+    loop_body -> inc;
+    inc -> for_cond;
+    assign_ans -> ret;
+
+    // Arestas de dados (def-use)
+    init -> loop_body [label="Fnew, Fold", style=dashed, color=blue];
+    loop_body -> loop_body [label="Fnew, Fold, temp", style=dashed, color=blue];
+    for_init -> for_cond [label="i", style=dashed, color=blue];
+    inc -> for_cond [label="i", style=dashed, color=blue];
+    init -> assign_ans [label="Fnew", style=dashed, color=blue];
+    loop_body -> assign_ans [label="Fnew", style=dashed, color=blue];
+}
+```
+
+---
+
+### 2. DCFG da Função `main` (Graphviz DOT)
+
+```dot
+digraph Main {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nós
+    start [label="Início main()", shape=ellipse];
+    decl [label="1: int a"];
+    assign [label="2: a = 30"];
+    call_fib [label="3: fib(a)"];
+    ret [label="4: return a", shape=ellipse];
+
+    // Arestas de controle
+    start -> decl;
+    decl -> assign;
+    assign -> call_fib;
+    call_fib -> ret;
+
+    // Arestas de dados
+    assign -> call_fib [label="a", style=dashed, color=blue];
+    assign -> ret [label="a", style=dashed, color=blue];
+}
+```
+
+---
+
+### 3. Análise de Infeasible Paths
+
+**Pergunta:** Existe algum *infeasible path* neste código?  
+**Resposta:** **NÃO**
+
+#### Justificativa:
+
+- **Fluxo de Controle:** O CFG das funções `fib` e `main` é simples e linear, sem ramificações complexas ou condições contraditórias. O loop em `fib` depende de `i <= 30 && i <= n`, mas como `n` é passado como 30 pela `main`, a condição `i <= n` é equivalente a `i <= 30`, tornando-a redundante, porém não contraditória.
+
+- **Fluxo de Dados:** Todas as variáveis são inicializadas antes do uso:
+  - `Fnew` e `Fold` são inicializados em `init`.
+  - `i` é inicializado no `for_init`.
+  - `a` em `main` é inicializado antes de ser usado na chamada de `fib`.
+
+- **Condições de Loop:** O loop em `fib` é executado enquanto `i <= 30`. Como `i` começa em 2 e é incrementado a cada iteração, não há contradição que impeça a execução do loop ou do pós-loop.
+
+- **Conflitos Lógicos:** Não há condições sequenciais mutuamente exclusivas (ex.: `if (x > 10)` seguido de `if (x < 5)`). A única condição (`i <= 30 && i <= n`) é consistente quando `n = 30`.
+
+- **Conclusão:** Todos os caminhos no CFG são viáveis para a entrada `a = 30`. Não há contradições lógicas, dependências de dados inviáveis ou restrições ambientais que impossibilitem a execução de qualquer caminho.
+
+--- 
+
+**Nota:** Se `n` fosse menor que 2, o loop não executaria, mas isso ainda seria um caminho válido, não um *infeasible path*. A inviabilidade ocorreria apenas se houvesse uma contradição lógica ou dependência impossível, o que não é o caso aqui.

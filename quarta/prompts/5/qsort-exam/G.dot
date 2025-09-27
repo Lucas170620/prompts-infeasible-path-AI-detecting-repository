@@ -1,0 +1,37 @@
+digraph G {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nos (Blocos Basicos)
+    entry [label="Entrada: sort(n)\ndef: i, ir=n, j, k, l=1, jstack=0, flag=0, a, temp"];
+    loop_start [label="Loop Principal\np-uso: ir, l"];
+    cond1 [label="Cond: ir-l < M\np-uso: ir, l"];
+    insertion_sort [label="Insercao Direta\ndef: j, a, i\nc-uso: arr, l, ir, j, a, i\np-uso: j<=ir, i>=l, arr[i]<=a"];
+    cond2 [label="Cond: jstack == 0\np-uso: jstack"];
+    break [label="Break do Loop"];
+    quick_sort [label="QuickSort Prep.\ndef: k, a, i, j\nc-uso: l, ir, arr\np-uso: arr[l]>arr[ir], arr[l+1]>arr[ir], arr[l]>arr[l+1]"];
+    partition [label="Particionamento\ndef: i, j\nc-uso: a, arr\np-uso: arr[i]<a, arr[j]>a, j<i"];
+    update [label="Atualiza Pivot\ndef: arr[j], jstack\nc-uso: l, j, a"];
+    cond3 [label="Cond: ir-i+1 >= j-l\np-uso: ir, i, j, l"];
+    push_right [label="Empilha Direita\ndef: istack, ir\nc-uso: ir, i, jstack"];
+    push_left [label="Empilha Esquerda\ndef: istack, l\nc-uso: j, l, jstack"];
+    exit [label="Saida: Fim"];
+
+    // Arestas de Controle
+    entry -> loop_start;
+    loop_start -> cond1;
+    cond1 -> insertion_sort [label="True"];
+    cond1 -> quick_sort [label="False"];
+    insertion_sort -> cond2;
+    cond2 -> break [label="True"];
+    cond2 -> loop_start [label="False"];
+    break -> exit;
+    quick_sort -> partition;
+    partition -> partition [label="Loop (j>=i)"];
+    partition -> update [label="Break (j<i)"];
+    update -> cond3;
+    cond3 -> push_right [label="True"];
+    cond3 -> push_left [label="False"];
+    push_right -> loop_start;
+    push_left -> loop_start;
+}

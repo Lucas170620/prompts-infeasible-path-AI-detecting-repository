@@ -1,0 +1,70 @@
+digraph compress {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nos
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+
+    B1 [label="B1\nInicializacoes\noffset=0, bytes_out=3, ..."];
+    B2 [label="B2\nhshift = 0\nhsize_reg = hsize\ncl_hash(hsize_reg)"];
+    B3 [label="B3\nif (InCnt > 0)", shape=diamond];
+    B4 [label="B4\nc = getbyte()\nin_count++\nfcode = (c << maxbits) + ent\ni = (c << hshift) ^ ent"];
+    B5 [label="B5\nif (htab[i] == fcode)", shape=diamond];
+    B6 [label="B6\nent = codetab[i]"];
+    B7 [label="B7\nelse if (htab[i] < 0)", shape=diamond];
+    B8 [label="B8\ndisp = hsize_reg - i\nif (i == 0) disp = 1"];
+    B9 [label="B9\nprobe:\ni -= disp\nif (i < 0) i += hsize_reg"];
+    B10 [label="B10\nif (htab[i] == fcode)", shape=diamond];
+    B11 [label="B11\nent = codetab[i]"];
+    B12 [label="B12\nif (htab[i] > 0 && apsim_bound111++ < in_count)", shape=diamond];
+    B13 [label="B13\nnomatch:\nout_count++\nent = c"];
+    B14 [label="B14\nif (free_ent < maxmaxcode)", shape=diamond];
+    B15 [label="B15\ncodetab[i] = free_ent++\nhtab[i] = fcode"];
+    B16 [label="B16\nelse if (in_count >= checkpoint && block_compress)", shape=diamond];
+    B17 [label="B17\ncl_block()"];
+
+    // Arestas de controle
+    start -> B1;
+    B1 -> B2;
+    B2 -> B3;
+    B3 -> B4 [label="True"];
+    B3 -> end [label="False"];
+    B4 -> B5;
+    B5 -> B6 [label="True"];
+    B5 -> B7 [label="False"];
+    B6 -> B3;
+    B7 -> B13 [label="True"];
+    B7 -> B8 [label="False"];
+    B8 -> B9;
+    B9 -> B10;
+    B10 -> B11 [label="True"];
+    B10 -> B12 [label="False"];
+    B11 -> B3;
+    B12 -> B9 [label="True"];
+    B12 -> B13 [label="False"];
+    B13 -> B14;
+    B14 -> B15 [label="True"];
+    B14 -> B16 [label="False"];
+    B15 -> B3;
+    B16 -> B17 [label="True"];
+    B16 -> B3 [label="False"];
+    B17 -> B3;
+
+    // Fluxo de dados (def/use)
+    B1 [xlabel="def: offset, bytes_out, out_count, clear_flg, ratio, in_count, checkpoint, maxcode, free_ent, ent"];
+    B2 [xlabel="def: hshift, hsize_reg"];
+    B4 [xlabel="def: c, in_count, fcode, i\nc-use: ent, maxbits, hshift"];
+    B5 [xlabel="p-use: htab[i], fcode"];
+    B6 [xlabel="def: ent\nc-use: codetab[i]"];
+    B8 [xlabel="def: disp\nc-use: i, hsize_reg"];
+    B9 [xlabel="def: i\nc-use: disp, hsize_reg"];
+    B10 [xlabel="p-use: htab[i], fcode"];
+    B11 [xlabel="def: ent\nc-use: codetab[i]"];
+    B12 [xlabel="p-use: htab[i], apsim_bound111, in_count"];
+    B13 [xlabel="def: out_count, ent\nc-use: c"];
+    B14 [xlabel="p-use: free_ent, maxmaxcode"];
+    B15 [xlabel="def: free_ent, codetab[i], htab[i]\nc-use: fcode"];
+    B16 [xlabel="p-use: in_count, checkpoint, block_compress"];
+    B17 [xlabel="c-use: in_count, bytes_out, hsize"];
+}

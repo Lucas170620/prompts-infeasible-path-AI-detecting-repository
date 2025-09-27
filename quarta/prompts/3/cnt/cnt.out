@@ -1,0 +1,152 @@
+**Resposta Final:**  
+**NÃO** existem *infeasible paths* no código fornecido.
+
+---
+
+### Análise Detalhada por Função
+
+#### 1. Função `main`
+- **CFG:** Sequência linear: `InitSeed()` → `Test(Array)` → `return 1`.
+- **DFG:** Não há variáveis locais ou condições. Apenas chamadas de função.
+- **CDFG:**
+  ```dot
+  digraph main {
+      rankdir=TB;
+      node [shape=box];
+      start [label="main: Start", shape=ellipse];
+      end [label="main: End", shape=ellipse];
+      n1 [label="InitSeed()"];
+      n2 [label="Test(Array)"];
+      n3 [label="return 1"];
+      start -> n1 -> n2 -> n3 -> end;
+  }
+  ```
+- **Infeasible Paths?** Não. Fluxo sequencial sem ramificações.
+
+---
+
+#### 2. Função `Test`
+- **CFG:** Sequência linear: `Initialize(Array)` → `StartTime = 1000.0` → `Sum(Array)` → `StopTime = 1500.0` → `TotalTime = ...` → `return 0`.
+- **DFG:** Variáveis locais `StartTime`, `StopTime`, `TotalTime` são definidas e usadas sequencialmente.
+- **CDFG:**
+  ```dot
+  digraph Test {
+      rankdir=TB;
+      node [shape=box];
+      start [label="Test: Start", shape=ellipse];
+      end [label="Test: End", shape=ellipse];
+      n1 [label="Initialize(Array)"];
+      n2 [label="StartTime = 1000.0"];
+      n3 [label="Sum(Array)"];
+      n4 [label="StopTime = 1500.0"];
+      n5 [label="TotalTime = (StopTime - StartTime) / 1000.0"];
+      n6 [label="return 0"];
+      start -> n1 -> n2 -> n3 -> n4 -> n5 -> n6 -> end;
+  }
+  ```
+- **Infeasible Paths?** Não. Fluxo linear sem decisões.
+
+---
+
+#### 3. Função `Initialize`
+- **CFG:** Dois loops aninhados. Cada iteração atribui um valor aleatório a `Array[OuterIndex][InnerIndex]`.
+- **DFG:** 
+  - `OuterIndex` e `InnerIndex` são inicializados, incrementados e usados como índices.
+  - `Array` é definido em cada iteração.
+- **CDFG:**
+  ```dot
+  digraph Initialize {
+      rankdir=TB;
+      node [shape=box];
+      start [label="Initialize: Start", shape=ellipse];
+      end [label="Initialize: End", shape=ellipse];
+      n1 [label="OuterIndex = 0"];
+      n2 [label="OuterIndex < MAXSIZE?", shape=diamond];
+      n3 [label="InnerIndex = 0"];
+      n4 [label="InnerIndex < MAXSIZE?", shape=diamond];
+      n5 [label="Array[OuterIndex][InnerIndex] = RandomInteger()"];
+      n6 [label="InnerIndex++"];
+      n7 [label="OuterIndex++"];
+      start -> n1 -> n2;
+      n2 -> n3 [label="True"];
+      n2 -> end [label="False"];
+      n3 -> n4;
+      n4 -> n5 [label="True"];
+      n4 -> n7 [label="False"];
+      n5 -> n6 -> n4;
+      n7 -> n2;
+  }
+  ```
+- **Infeasible Paths?** Não. Todos os caminhos dos loops são viáveis.
+
+---
+
+#### 4. Função `Sum`
+- **CFG:** Dois loops aninhados com uma condição interna (dependente de `WORSTCASE`).
+- **DFG:**
+  - Variáveis locais `Ptotal`, `Ntotal`, `Pcnt`, `Ncnt` são definidas e atualizadas condicionalmente.
+  - `Array` é usado para decidir o ramo a ser executado.
+- **CDFG:**
+  ```dot
+  digraph Sum {
+      rankdir=TB;
+      node [shape=box];
+      start [label="Sum: Start", shape=ellipse];
+      end [label="Sum: End", shape=ellipse];
+      n1 [label="Ptotal = 0\nNtotal = 0\nPcnt = 0\nNcnt = 0"];
+      n2 [label="Outer = 0"];
+      n3 [label="Outer < MAXSIZE?", shape=diamond];
+      n4 [label="Inner = 0"];
+      n5 [label="Inner < MAXSIZE?", shape=diamond];
+      n6 [label="Array[Outer][Inner] < 0?", shape=diamond];
+      n7 [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+      n8 [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+      n9 [label="Inner++"];
+      n10 [label="Outer++"];
+      n11 [label="Postotal = Ptotal\nPoscnt = Pcnt\nNegtotal = Ntotal\nNegcnt = Ncnt"];
+      start -> n1 -> n2 -> n3;
+      n3 -> n4 [label="True"];
+      n3 -> n11 [label="False"];
+      n4 -> n5;
+      n5 -> n6 [label="True"];
+      n5 -> n10 [label="False"];
+      n6 -> n7 [label="True"];
+      n6 -> n8 [label="False"];
+      n7 -> n9;
+      n8 -> n9;
+      n9 -> n5;
+      n10 -> n3;
+      n11 -> end;
+  }
+  ```
+- **Infeasible Paths?** Não. A condição `Array[Outer][Inner] < 0` (ou `>= 0` se `WORSTCASE` estiver definido) depende de valores aleatórios, mas ambos os ramos são possíveis. Não há contradição lógica ou invariante que impeça a execução de qualquer caminho.
+
+---
+
+#### 5. Função `RandomInteger`
+- **CFG:** Sequência linear: `Seed = ((Seed * 133) + 81) % 8095` → `return Seed`.
+- **DFG:** A variável global `Seed` é lida e atualizada.
+- **CDFG:**
+  ```dot
+  digraph RandomInteger {
+      rankdir=TB;
+      node [shape=box];
+      start [label="RandomInteger: Start", shape=ellipse];
+      end [label="RandomInteger: End", shape=ellipse];
+      n1 [label="Seed = ((Seed * 133) + 81) % 8095"];
+      n2 [label="return Seed"];
+      start -> n1 -> n2 -> end;
+  }
+  ```
+- **Infeasible Paths?** Não. Fluxo linear.
+
+---
+
+### Justificativa Final
+- **Contradições Lógicas:** Não há condições mutuamente exclusivas no código.
+- **Dependências de Dados:** Todas as variáveis são inicializadas antes do uso.
+- **Condições de Loop:** Os loops são controlados por variáveis que são incrementadas corretamente.
+- **Invariantes de Programa:** Não há regras de negócio ou invariantes que restrinjam os caminhos.
+- **Valores Aleatórios:** A função `RandomInteger` gera valores que podem satisfazer tanto a condição `Array[Outer][Inner] < 0` quanto `>= 0`, tornando ambos os ramos em `Sum` viáveis.
+
+Portanto, **todos os caminhos são viáveis** no código analisado.

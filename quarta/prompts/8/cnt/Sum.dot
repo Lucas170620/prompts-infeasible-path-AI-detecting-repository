@@ -1,0 +1,35 @@
+digraph Sum {
+    rankdir=TB;
+    node [shape=box, fontname="Courier"];
+
+    // Nos do grafo
+    start [label="Inicio Sum\nDef: Ptotal=0, Ntotal=0, Pcnt=0, Ncnt=0"];
+    loop_outer_start [label="Loop Outer\nDef: Outer=0"];
+    loop_outer_cond [label="Condicao Outer < MAXSIZE?\nP-Use: Outer"];
+    loop_inner_start [label="Loop Inner\nDef: Inner=0"];
+    loop_inner_cond [label="Condicao Inner < MAXSIZE?\nP-Use: Inner"];
+    condition [label="Array[Outer][Inner] < 0?\nC-Use: Array, Outer, Inner\nP-Use: Array"];
+    if_block [label="Bloco IF\nDef: Ptotal, Pcnt\nC-Use: Array, Ptotal, Pcnt"];
+    else_block [label="Bloco ELSE\nDef: Ntotal, Ncnt\nC-Use: Array, Ntotal, Ncnt"];
+    inner_inc [label="Incrementa Inner\nDef: Inner\nC-Use: Inner"];
+    outer_inc [label="Incrementa Outer\nDef: Outer\nC-Use: Outer"];
+    end [label="Atribui a Globais\nDef: Postotal, Poscnt, Negtotal, Negcnt\nC-Use: Ptotal, Pcnt, Ntotal, Ncnt"];
+
+    // Arestas de controle
+    start -> loop_outer_start;
+    loop_outer_start -> loop_outer_cond;
+    loop_outer_cond -> loop_inner_start [label="Verdadeiro"];
+    loop_outer_cond -> end [label="Falso"];
+    loop_inner_start -> loop_inner_cond;
+    loop_inner_cond -> condition [label="Verdadeiro"];
+    loop_inner_cond -> outer_inc [label="Falso"];
+    condition -> if_block [label="Verdadeiro"];
+    condition -> else_block [label="Falso"];
+    if_block -> inner_inc;
+    else_block -> inner_inc;
+    inner_inc -> loop_inner_cond;
+    outer_inc -> loop_outer_cond;
+
+    // No final
+    end [shape=doublecircle];
+}

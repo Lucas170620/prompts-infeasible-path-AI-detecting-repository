@@ -1,0 +1,54 @@
+digraph encode_CDFG {
+    rankdir=TB;
+    node [shape=rectangle];
+
+    // Nos (Blocos Basicos)
+    B1 [label="B1: Inicializacao\nDef: i, h_ptr, tqmf_ptr, tqmf_ptr1, xa, xb"];
+    B2 [label="B2: Loop (10x)\nDef: xa, xb\nUse: tqmf_ptr, h_ptr"];
+    B3 [label="B3: Atualizacao xa, xb\nDef: xa, xb"];
+    B4 [label="B4: Atualizacao tqmf\nDef: tqmf"];
+    B5 [label="B5: Calculo xl, xh\nDef: xl, xh"];
+    B6 [label="B6: Calculo szl, spl, sl, el, il, dlt, nbl, detl, plt\nDef: szl, spl, sl, el, il, dlt, nbl, detl, plt"];
+    B7 [label="B7: Chamada upzero\nDef: delay_bpl, delay_dltx"];
+    B8 [label="B8: Atualizacao al2, al1, rlt, rlt1, rlt2, plt1, plt2\nDef: al2, al1, rlt, rlt1, rlt2, plt1, plt2"];
+    B9 [label="B9: Calculo szh, sph, sh, eh\nDef: szh, sph, sh, eh"];
+    B10 [label="B10: if (eh >= 0)\nUse: eh"];
+    B11 [label="B11: ih = 3\nDef: ih"];
+    B12 [label="B12: ih = 1\nDef: ih"];
+    B13 [label="B13: Calculo decis\nUse: deth"];
+    B14 [label="B14: if (|eh| > decis)\nUse: eh, decis"];
+    B15 [label="B15: ih--\nDef: ih"];
+    B16 [label="B16: Calculo dh, nbh, deth, ph, ah2, ah1, yh, rh1, rh2, ph1, ph2\nDef: dh, nbh, deth, ph, ah2, ah1, yh, rh1, rh2, ph1, ph2"];
+    B17 [label="B17: Retorno il | (ih << 6)"];
+
+    // Arestas de Controle
+    B1 -> B2;
+    B2 -> B2 [label="Loop (i < 10)"];
+    B2 -> B3;
+    B3 -> B4;
+    B4 -> B5;
+    B5 -> B6;
+    B6 -> B7;
+    B7 -> B8;
+    B8 -> B9;
+    B9 -> B10;
+    B10 -> B11 [label="eh >= 0"];
+    B10 -> B12 [label="eh < 0"];
+    B11 -> B13;
+    B12 -> B13;
+    B13 -> B14;
+    B14 -> B15 [label="Verdadeiro"];
+    B14 -> B16 [label="Falso"];
+    B15 -> B16;
+    B16 -> B17;
+
+    // Arestas de Dados (Def-Use)
+    B9 -> B10 [label="Use: eh"];
+    B10 -> B11 [label="p-use: eh"];
+    B10 -> B12 [label="p-use: eh"];
+    B13 -> B14 [label="Use: decis"];
+    B14 -> B15 [label="p-use: eh, decis"];
+    B11 -> B16 [label="Def: ih"];
+    B12 -> B16 [label="Def: ih"];
+    B15 -> B16 [label="Def: ih"];
+}

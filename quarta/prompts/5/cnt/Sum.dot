@@ -1,0 +1,28 @@
+digraph Sum {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nos (com definicoes e usos de variaveis)
+    Start [label="Start\nDefinicoes: Outer=0, Inner=0, Ptotal=0, Ntotal=0, Pcnt=0, Ncnt=0"];
+    LoopOuter [label="LoopOuter\nCondicao: Outer < MAXSIZE\nc-uso: Outer"];
+    LoopInner [label="LoopInner\nCondicao: Inner < MAXSIZE\nc-uso: Inner"];
+    Condition [label="Condition\nCondicao: Array[Outer][Inner] < 0\np-uso: Array[Outer][Inner]"];
+    IfBlock [label="IfBlock\nPtotal += Array[Outer][Inner]\nPcnt++\nc-uso: Ptotal, Pcnt, Array[Outer][Inner]"];
+    ElseBlock [label="ElseBlock\nNtotal += Array[Outer][Inner]\nNcnt++\nc-uso: Ntotal, Ncnt, Array[Outer][Inner]"];
+    UpdateInner [label="UpdateInner\nInner++\nDefinicao: Inner"];
+    UpdateOuter [label="UpdateOuter\nOuter++\nInner=0\nDefinicoes: Outer, Inner"];
+    End [label="End\nPostotal = Ptotal\nPoscnt = Pcnt\nNegtotal = Ntotal\nNegcnt = Ncnt"];
+
+    // Arestas de controle (preto) e dados (azul)
+    Start -> LoopOuter;
+    LoopOuter -> LoopInner [label="Outer < MAXSIZE"];
+    LoopInner -> Condition [label="Inner < MAXSIZE"];
+    Condition -> IfBlock [label="True"];
+    Condition -> ElseBlock [label="False"];
+    IfBlock -> UpdateInner;
+    ElseBlock -> UpdateInner;
+    UpdateInner -> LoopInner;
+    LoopInner -> UpdateOuter [label="Inner >= MAXSIZE"];
+    UpdateOuter -> LoopOuter;
+    LoopOuter -> End [label="Outer >= MAXSIZE"];
+}

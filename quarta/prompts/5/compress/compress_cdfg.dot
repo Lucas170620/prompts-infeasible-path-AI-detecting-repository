@@ -1,0 +1,28 @@
+digraph compress_cdfg {
+    rankdir=TB;
+    node [shape=rect];
+
+    // Nos (Blocos Basicos) com Definicoes e Usos
+    B1 [label="B1: Inicializacao\ndef: offset, bytes_out, out_count, clear_flg, ratio, in_count, checkpoint, n_bits, maxcode, free_ent, ent, hshift, hsize_reg\nuse: hsize, block_compress, FIRST, getbyte, cl_hash"];
+    B2 [label="B2: while (InCnt > 0)\nuse: InCnt"];
+    B3 [label="B3: c = getbyte()\nin_count++\nfcode = (c << maxbits) + ent\ni = (c << hshift) ^ ent\ndef: c, in_count, fcode, i\nuse: maxbits, ent, hshift"];
+    B4 [label="B4: if (htab[i] == fcode)\nuse: htab, i, fcode, codetab\np-uso: fcode, ent"];
+    B5 [label="B5: disp = hsize_reg - i\nif i==0: disp=1\ndef: disp\nuse: hsize_reg, i"];
+    B6 [label="B6: i -= disp\nif i<0: i += hsize_reg\nif (htab[i] == fcode): ent = codetab[i]; continue\nif (htab[i] > 0 && apsim_bound111++ < in_count): goto probe\ndef: i, apsim_bound111\nuse: disp, hsize_reg, htab, fcode, codetab, ent, in_count"];
+    B7 [label="B7: nomatch:\nout_count++\nent = c\nif (free_ent < maxmaxcode): codetab[i] = free_ent++; htab[i] = fcode\nelse if (in_count >= checkpoint && block_compress): cl_block()\ndef: out_count, ent, free_ent, codetab, htab\nuse: c, free_ent, maxmaxcode, in_count, checkpoint, block_compress"];
+    B8 [label="B8: if (bytes_out > in_count): exit_stat = 2\nreturn\nuse: bytes_out, in_count"];
+
+    // Arestas de Controle com Rotulos
+    B1 -> B2;
+    B2 -> B3 [label="InCnt > 0"];
+    B2 -> B8 [label="InCnt <= 0"];
+    B3 -> B4;
+    B4 -> B2 [label="htab[i] == fcode\np-uso: fcode, ent"];
+    B4 -> B5 [label="htab[i] != fcode && htab[i] >= 0"];
+    B4 -> B7 [label="htab[i] < 0"];
+    B5 -> B6;
+    B6 -> B2 [label="htab[i] == fcode\np-uso: fcode, ent"];
+    B6 -> B6 [label="htab[i] != fcode && htab[i] > 0 && apsim_bound111 < in_count"];
+    B6 -> B7 [label="htab[i] <= 0 || apsim_bound111 >= in_count"];
+    B7 -> B2;
+}

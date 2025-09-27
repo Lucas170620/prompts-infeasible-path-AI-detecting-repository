@@ -1,0 +1,34 @@
+digraph foo_DCFG {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nos
+    start [label="Inicio", shape=ellipse];
+    end [label="Fim", shape=ellipse];
+    decl [label="Declaracoes: i, j, k, l, (c se TEST)"];
+    loop_i [label="i = 0; i < 5", shape=diamond];
+    loop_j [label="j = 0; j < 5", shape=diamond];
+    loop_k [label="k = 0; k < 5", shape=diamond];
+    loop_l [label="l = 0; l < 5", shape=diamond];
+    condition [label="keys[i][j][k][l] == x", shape=diamond];
+    return_found [label="return answer[...] + keys[...]"];
+    return_not_found [label="return -1"];
+
+    // Arestas de controle
+    start -> decl;
+    decl -> loop_i;
+    loop_i -> loop_j [label="i < 5"];
+    loop_i -> return_not_found [label="i >= 5"];
+    loop_j -> loop_k [label="j < 5"];
+    loop_j -> loop_i [label="j >= 5"];
+    loop_k -> loop_l [label="k < 5"];
+    loop_k -> loop_j [label="k >= 5"];
+    loop_l -> condition [label="l < 5"];
+    loop_l -> loop_k [label="l >= 5"];
+    condition -> return_found [label="True"];
+    condition -> loop_l [label="False"];
+
+    // Arestas de dados (def-use)
+    condition -> return_found [label="c-uso=keys, x", style=dashed];
+    return_found -> end [label="c-uso=answer, keys", style=dashed];
+}

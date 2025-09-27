@@ -1,0 +1,13 @@
+digraph Test {
+      rankdir=TB;
+      node [shape=box];
+      start [label="Test: Start", shape=ellipse];
+      end [label="Test: End", shape=ellipse];
+      n1 [label="Initialize(Array)"];
+      n2 [label="StartTime = 1000.0"];
+      n3 [label="Sum(Array)"];
+      n4 [label="StopTime = 1500.0"];
+      n5 [label="TotalTime = (StopTime - StartTime) / 1000.0"];
+      n6 [label="return 0"];
+      start -> n1 -> n2 -> n3 -> n4 -> n5 -> n6 -> end;
+  }

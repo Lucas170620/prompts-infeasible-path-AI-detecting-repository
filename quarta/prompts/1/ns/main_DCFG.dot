@@ -1,0 +1,14 @@
+digraph main_DCFG {
+    rankdir=TB;
+    node [shape=box];
+
+    start [label="Inicio", shape=ellipse];
+    end [label="Fim", shape=ellipse];
+    call_foo [label="foo(400)"];
+    print [label="printf(\"result=%d\\n\", ...)"];
+
+    start -> call_foo;
+    call_foo -> print [label="Se TEST definido"];
+    call_foo -> end [label="Se TEST nao definido"];
+    print -> end;
+}

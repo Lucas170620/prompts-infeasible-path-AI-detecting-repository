@@ -1,0 +1,26 @@
+digraph Fib {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nos
+    entry [label="Entrada fib(n)", shape=ellipse];
+    block1 [label="Bloco 1\ni = 2\nFnew = 1\nFold = 0"];
+    block2 [label="Bloco 2\nCondicao: i <= 30 && i <= n"];
+    block3 [label="Bloco 3\ntemp = Fnew\nFnew = Fnew + Fold\nFold = temp\ni++"];
+    block4 [label="Bloco 4\nans = Fnew"];
+    exit [label="Retorna ans", shape=ellipse];
+
+    // Arestas de controle
+    entry -> block1;
+    block1 -> block2;
+    block2 -> block3 [label="Verdadeiro"];
+    block2 -> block4 [label="Falso"];
+    block3 -> block2;
+    block4 -> exit;
+
+    // Fluxo de dados (definicoes e usos)
+    block1 [xlabel="def: i, Fnew, Fold"];
+    block2 [xlabel="p-use: i, n"];
+    block3 [xlabel="def: temp, Fnew, Fold, i\nc-use: Fnew, Fold"];
+    block4 [xlabel="def: ans\nc-use: Fnew"];
+}

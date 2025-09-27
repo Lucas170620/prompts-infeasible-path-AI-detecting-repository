@@ -1,0 +1,38 @@
+digraph DCFG {
+    rankdir=TB;
+    node [shape=box, fontname="Courier"];
+
+    // Nos (Blocos Basicos)
+    B1 [label="B1: Inicio\nDef: i, ir, j, k, l=1, jstack=0, flag=0, a, temp"];
+    B2 [label="B2: if (ir-l < M)\nP-Use: ir, l"];
+    B3 [label="B3: Insertion Sort\nDef: j, a, i, arr[]\nC-Use: l, ir, arr[]"];
+    B4 [label="B4: if (jstack == 0)\nP-Use: jstack"];
+    B5 [label="B5: ir=istack[jstack--]; l=istack[jstack--]\nDef: ir, l, jstack\nC-Use: jstack, istack"];
+    B6 [label="B6: Particao QuickSort\nDef: k, arr[], i, j, a, jstack\nC-Use: l, ir, arr[]"];
+    B7 [label="B7: if (ir-i+1 >= j-l)\nP-Use: ir, i, j, l"];
+    B8 [label="B8: istack[jstack]=ir; istack[jstack-1]=i; ir=j-1\nDef: istack, ir\nC-Use: ir, i, jstack"];
+    B9 [label="B9: istack[jstack]=j-1; istack[jstack-1]=l; l=i\nDef: istack, l\nC-Use: j, l, i, jstack"];
+    B10 [label="B10: Fim da funcao"];
+
+    // Arestas de Controle
+    B1 -> B2;
+    B2 -> B3 [label="True"];
+    B2 -> B6 [label="False"];
+    B3 -> B4;
+    B4 -> B10 [label="True (break)"];
+    B4 -> B5 [label="False"];
+    B5 -> B2;
+    B6 -> B7;
+    B7 -> B8 [label="True"];
+    B7 -> B9 [label="False"];
+    B8 -> B2;
+    B9 -> B2;
+
+    // Arestas de Dados (Def-Use)
+    B2 -> B2 [label="D: ir, l" color="blue" style="dashed"];
+    B3 -> B4 [label="D: jstack" color="blue" style="dashed"];
+    B5 -> B2 [label="D: ir, l, jstack" color="blue" style="dashed"];
+    B6 -> B7 [label="D: i, j, jstack" color="blue" style="dashed"];
+    B8 -> B2 [label="D: ir, jstack" color="blue" style="dashed"];
+    B9 -> B2 [label="D: l, jstack" color="blue" style="dashed"];
+}

@@ -1,0 +1,78 @@
+Analisando o código fornecido (`qsort-exam.c`), construí um **DCFG (Data Control Flow Graph)** integrando fluxo de controle e dados. Abaixo está o grafo gerado no formato Graphviz, seguido da análise de *infeasible paths*.
+
+---
+
+### **DCFG da Função `sort`** (Graphviz DOT)
+
+```dot
+digraph G {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nós (Blocos Básicos)
+    entry [label="Entrada: sort(n)\ndef: i, ir=n, j, k, l=1, jstack=0, flag=0, a, temp"];
+    loop_start [label="Loop Principal\np-uso: ir, l"];
+    cond1 [label="Cond: ir-l < M\np-uso: ir, l"];
+    insertion_sort [label="Inserção Direta\ndef: j, a, i\nc-uso: arr, l, ir, j, a, i\np-uso: j<=ir, i>=l, arr[i]<=a"];
+    cond2 [label="Cond: jstack == 0\np-uso: jstack"];
+    break [label="Break do Loop"];
+    quick_sort [label="QuickSort Prep.\ndef: k, a, i, j\nc-uso: l, ir, arr\np-uso: arr[l]>arr[ir], arr[l+1]>arr[ir], arr[l]>arr[l+1]"];
+    partition [label="Particionamento\ndef: i, j\nc-uso: a, arr\np-uso: arr[i]<a, arr[j]>a, j<i"];
+    update [label="Atualiza Pivot\ndef: arr[j], jstack\nc-uso: l, j, a"];
+    cond3 [label="Cond: ir-i+1 >= j-l\np-uso: ir, i, j, l"];
+    push_right [label="Empilha Direita\ndef: istack, ir\nc-uso: ir, i, jstack"];
+    push_left [label="Empilha Esquerda\ndef: istack, l\nc-uso: j, l, jstack"];
+    exit [label="Saída: Fim"];
+
+    // Arestas de Controle
+    entry -> loop_start;
+    loop_start -> cond1;
+    cond1 -> insertion_sort [label="True"];
+    cond1 -> quick_sort [label="False"];
+    insertion_sort -> cond2;
+    cond2 -> break [label="True"];
+    cond2 -> loop_start [label="False"];
+    break -> exit;
+    quick_sort -> partition;
+    partition -> partition [label="Loop (j>=i)"];
+    partition -> update [label="Break (j<i)"];
+    update -> cond3;
+    cond3 -> push_right [label="True"];
+    cond3 -> push_left [label="False"];
+    push_right -> loop_start;
+    push_left -> loop_start;
+}
+```
+
+---
+
+### **Análise de Infeasible Paths**
+
+**Resposta: NÃO**
+
+#### Justificativa:
+Não foram identificados *infeasible paths* no código da função `sort` após análise do DCFG. Abaixo estão os motivos:
+
+1. **Fluxo de Controle Consistente**:
+   - Todos os caminhos do CFG são alcançáveis através de condições lógicas válidas (ex: `ir-l < M`, `jstack == 0`).
+   - Loops (`for (;;)`) têm condições de saída bem-definidas (ex: `jstack == 0` no bloco de inserção).
+
+2. **Fluxo de Dados Válido**:
+   - Variáveis são inicializadas antes do uso (ex: `l=1`, `jstack=0`).
+   - Não há conflitos entre definições e usos (ex: `a` é definido antes do particionamento).
+   - Operações de swap (`SWAP`) não criam dependências inviáveis.
+
+3. **Ausência de Condições Contraditórias**:
+   - Condições como `arr[l] > arr[ir]` e `arr[l+1] > arr[ir]` são independentes e não geram exclusividade mútua.
+   - O particionamento sempre converge (`j < i` é alcançável devido aos incrementos/decrementos de `i` e `j`).
+
+4. **Conformidade com as Restrições do Código**:
+   - O código segue as regras do benchmark (sem `break` em loops internos, expressões simples, etc.), o que elimina caminhos inviáveis por construção.
+
+5. **Invariantes de Loop Preservados**:
+   - Exemplo: `ir` e `l` são atualizados de forma a manter `l <= ir`, garantindo que o loop principal avance.
+
+---
+
+### Conclusão
+O algoritmo de ordenação implementado é estruturalmente sólido, sem contradições lógicas ou dependências de dados inviáveis. Todos os caminhos do DCFG são executáveis sob entradas válidas (ex: `n=20`). Portanto, **não há infeasible paths** neste código.

@@ -1,0 +1,36 @@
+digraph sort {
+    rankdir=TB;
+    node [shape=box];
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+
+    B1 [label="B1\ni, ir=n, j, k, l=1, jstack=0, flag=0\ndef={i, ir, j, k, l, jstack, flag}"];
+    B2 [label="B2: for (;;) begin"];
+    B3 [label="B3: if (ir-l < M)\np-use={ir, l}", shape=diamond];
+    B4 [label="B4: insertion sort on [l,ir]\ndef={a, i, j, arr[]}\nc-use={l, ir, arr[]}"];
+    B6 [label="B6: if (jstack == 0)\np-use={jstack}", shape=diamond];
+    B7 [label="B7: break out of loop"];
+    B9 [label="B9: ir=istack[jstack--], l=istack[jstack--]\ndef={ir, l}\nc-use={jstack}"];
+    B5 [label="B5: quicksort partitioning on [l,ir]\ndef={k, a, i, j, arr[]}\nc-use={l, ir, arr[]}"];
+    B10 [label="B10: jstack +=2\ndef={jstack}"];
+    B11 [label="B11: if (ir-i+1 >= j-l)\np-use={ir, i, j, l}", shape=diamond];
+    B12 [label="B12: push i and ir to stack, set ir=j-1\ndef={istack, ir}\nc-use={i, ir, j}"];
+    B13 [label="B13: push l and j-1 to stack, set l=i\ndef={istack, l}\nc-use={l, j, i}"];
+
+    start -> B1;
+    B1 -> B2;
+    B2 -> B3;
+    B3 -> B4 [label="True"];
+    B3 -> B5 [label="False"];
+    B4 -> B6;
+    B6 -> B7 [label="True"];
+    B6 -> B9 [label="False"];
+    B7 -> end;
+    B9 -> B3;
+    B5 -> B10;
+    B10 -> B11;
+    B11 -> B12 [label="True"];
+    B11 -> B13 [label="False"];
+    B12 -> B3;
+    B13 -> B3;
+}

@@ -1,0 +1,62 @@
+digraph CompressCFG {
+    rankdir=TB;
+    node [shape=box, fontname="Courier"];
+
+    // Nos principais
+    start [label="compress() - Start", shape=ellipse];
+    init [label="Inicializacoes:\noffset=0, bytes_out=3, ..."];
+    ent_getbyte [label="ent = getbyte()"];
+    hshift_calc [label="Calcular hshift"];
+    cl_hash_call [label="cl_hash(hsize_reg)"];
+    loop_cond [label="InCnt > 0?", shape=diamond];
+    c_getbyte [label="c = getbyte()\nin_count++"];
+    fcode_calc [label="fcode = (c << maxbits) + ent"];
+    i_calc [label="i = (c << hshift) ^ ent"];
+    cond_htab [label="htab[i] == fcode?", shape=diamond];
+    cond_htab_neg [label="htab[i] < 0?", shape=diamond];
+    probe_loop [label="Ajuste i via disp\n(loop probe)"];
+    nomatch [label="nomatch:\nout_count++\nent = c"];
+    cond_free_ent [label="free_ent < maxmaxcode?", shape=diamond];
+    cond_checkpoint [label="(in_count >= checkpoint) && block_compress?", shape=diamond];
+    cl_block_call [label="cl_block()", color=red, fontcolor=red];
+    update_tables [label="codetab[i] = free_ent++\nhtab[i] = fcode"];
+    end_loop [label="Fim do loop"];
+    end_compress [label="Verifica bytes_out > in_count", shape=ellipse];
+
+    // Arestas
+    start -> init;
+    init -> ent_getbyte;
+    ent_getbyte -> hshift_calc;
+    hshift_calc -> cl_hash_call;
+    cl_hash_call -> loop_cond;
+
+    loop_cond -> c_getbyte [label="Sim"];
+    loop_cond -> end_compress [label="Nao"];
+
+    c_getbyte -> fcode_calc;
+    fcode_calc -> i_calc;
+    i_calc -> cond_htab;
+
+    cond_htab -> loop_cond [label="Sim"];
+    cond_htab -> cond_htab_neg [label="Nao"];
+
+    cond_htab_neg -> nomatch [label="Sim"];
+    cond_htab_neg -> probe_loop [label="Nao"];
+
+    probe_loop -> cond_htab [label="Re-checar htab[i]"];
+
+    nomatch -> cond_free_ent;
+
+    cond_free_ent -> update_tables [label="Sim"];
+    cond_free_ent -> cond_checkpoint [label="Nao"];
+
+    cond_checkpoint -> cl_block_call [label="Sim", color=red, fontcolor=red];
+    cond_checkpoint -> loop_cond [label="Nao"];
+
+    update_tables -> loop_cond;
+    cl_block_call -> loop_cond [color=red];
+
+    // Caminho inviavel em vermelho
+    cond_checkpoint -> cl_block_call [color=red];
+    cl_block_call -> loop_cond [color=red];
+}

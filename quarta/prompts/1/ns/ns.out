@@ -1,0 +1,82 @@
+Analisando o código fornecido (`ns.c`), identifiquei que ele contém duas funções: `foo` e `main`. Vou construir o **DCFG (Data Control Flow Graph)** para cada uma e verificar a existência de *infeasible paths*.
+
+---
+
+### 1. DCFG para a função `foo`
+
+```dot
+digraph foo_DCFG {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nós
+    start [label="Início", shape=ellipse];
+    end [label="Fim", shape=ellipse];
+    decl [label="Declarações: i, j, k, l, (c se TEST)"];
+    loop_i [label="i = 0; i < 5", shape=diamond];
+    loop_j [label="j = 0; j < 5", shape=diamond];
+    loop_k [label="k = 0; k < 5", shape=diamond];
+    loop_l [label="l = 0; l < 5", shape=diamond];
+    condition [label="keys[i][j][k][l] == x", shape=diamond];
+    return_found [label="return answer[...] + keys[...]"];
+    return_not_found [label="return -1"];
+
+    // Arestas de controle
+    start -> decl;
+    decl -> loop_i;
+    loop_i -> loop_j [label="i < 5"];
+    loop_i -> return_not_found [label="i >= 5"];
+    loop_j -> loop_k [label="j < 5"];
+    loop_j -> loop_i [label="j >= 5"];
+    loop_k -> loop_l [label="k < 5"];
+    loop_k -> loop_j [label="k >= 5"];
+    loop_l -> condition [label="l < 5"];
+    loop_l -> loop_k [label="l >= 5"];
+    condition -> return_found [label="True"];
+    condition -> loop_l [label="False"];
+
+    // Arestas de dados (def-use)
+    condition -> return_found [label="c-uso=keys, x", style=dashed];
+    return_found -> end [label="c-uso=answer, keys", style=dashed];
+}
+```
+
+---
+
+### 2. DCFG para a função `main`
+
+```dot
+digraph main_DCFG {
+    rankdir=TB;
+    node [shape=box];
+
+    start [label="Início", shape=ellipse];
+    end [label="Fim", shape=ellipse];
+    call_foo [label="foo(400)"];
+    print [label="printf(\"result=%d\\n\", ...)"];
+
+    start -> call_foo;
+    call_foo -> print [label="Se TEST definido"];
+    call_foo -> end [label="Se TEST não definido"];
+    print -> end;
+}
+```
+
+---
+
+### 3. Análise de *Infeasible Paths*
+
+#### Resposta: **NÃO**
+
+Não foram identificados *infeasible paths* no código analisado. Justificativa:
+
+- **Fluxo de Controle**: Todos os loops (`for`) têm limites fixos (0 a 4) e não há condições contraditórias ou saltos inalcançáveis.
+- **Fluxo de Dados**: As variáveis `i, j, k, l` são inicializadas e incrementadas corretamente. A variável `x` é passada como parâmetro e comparada com valores da matriz `keys`, mas não há dependências inviáveis.
+- **Condições de Negócio**: A matriz `keys` contém valores predefinidos (0, 1, 2, 3, 4, 401), e a busca por `x = 400` pode não retornar um resultado, mas isso não caracteriza um *infeasible path*, pois o fluxo é naturalmente direcionado para `return -1`.
+- **Ausência de Contradições**: Não há condições mutuamente exclusivas ou invariantes de programa que impeçam a execução de qualquer caminho.
+
+---
+
+### Conclusão
+
+O código é estruturalmente simples e todos os caminhos são viáveis. A função `foo` realiza uma busca linear em uma matriz 4D, e a função `main` a chama com um argumento fixo. Não há contradições lógicas, dependências inviáveis ou restrições de sistema que impossibilitem a execução de qualquer caminho no DCFG construído.

@@ -1,0 +1,36 @@
+digraph G {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nos (blocos basicos) com definicoes e usos
+    start [label="Inicio da funcao sort", shape=ellipse];
+    end [label="Fim da funcao sort", shape=ellipse];
+
+    B1 [label="B1: Inicializacoes\ndef: i, ir, j, k, l, jstack, flag, a, temp\nc-use: n"];
+    B2 [label="B2: Loop principal\nc-use: ir, l"];
+    B3 [label="B3: Insertion Sort (ir-l < M)\ndef: j, a, i\nc-use: l, ir, arr"];
+    B4 [label="B4: Verifica pilha\nc-use: jstack"];
+    B5 [label="B5: Atualiza pilha\ndef: ir, l\nc-use: jstack, istack"];
+    B6 [label="B6: Mediana de tres\ndef: k, a\nc-use: l, ir, arr"];
+    B7 [label="B7: Particao\ndef: i, j\nc-use: l, ir, a, arr"];
+    B8 [label="B8: Troca e atualiza pilha\ndef: arr, jstack\nc-use: j, l, a, i, ir"];
+    B9 [label="B9: Empilha segmento maior\ndef: ir, l\nc-use: i, j, ir, l, istack"];
+    B10 [label="B10: Empilha segmento menor\ndef: l, ir\nc-use: i, j, l, istack"];
+
+    // Arestas de controle
+    start -> B1;
+    B1 -> B2;
+    B2 -> B3 [label="ir-l < M"];
+    B2 -> B6 [label="ir-l >= M"];
+    B3 -> B4;
+    B4 -> B5 [label="jstack != 0"];
+    B4 -> end [label="jstack == 0"];
+    B5 -> B2;
+    B6 -> B7;
+    B7 -> B8 [label="j < i"];
+    B7 -> B7 [label="j >= i"]; // Loop interno
+    B8 -> B9 [label="ir-i+1 >= j-l"];
+    B8 -> B10 [label="ir-i+1 < j-l"];
+    B9 -> B2;
+    B10 -> B2;
+}

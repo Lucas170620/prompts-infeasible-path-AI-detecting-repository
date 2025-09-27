@@ -1,0 +1,59 @@
+digraph compress {
+    rankdir=TB;
+    node [shape=box];
+
+    start [label="Inicio compress", shape=ellipse];
+    end [label="Fim compress", shape=ellipse];
+
+    // Nos principais
+    node1 [label="Inicializacoes: offset=0, bytes_out=3, ..."];
+    node2 [label="ent = getbyte()"];
+    node3 [label="Calcula hshift"];
+    node4 [label="cl_hash(hsize_reg)"];
+    node5 [label="while (InCnt > 0)"];
+    node6 [label="c = getbyte()\nin_count++"];
+    node7 [label="Calcula fcode, i"];
+    node8 [label="if (htabof(i) == fcode)"];
+    node9 [label="else if (htabof(i) < 0)"];
+    node10 [label="disp = hsize_reg - i"];
+    node11 [label="if (i == 0) disp = 1"];
+    node12 [label="probe:"];
+    node13 [label="i -= disp; se i<0, i += hsize_reg"];
+    node14 [label="if (htabof(i) == fcode)"];
+    node15 [label="if (htabof(i) > 0 && apsim_bound111 < in_count)"];
+    node16 [label="nomatch:"];
+    node17 [label="out_count++\nent = c"];
+    node18 [label="if (free_ent < maxmaxcode)"];
+    node19 [label="codetabof(i) = free_ent++\nhtabof(i) = fcode"];
+    node20 [label="else if (in_count >= checkpoint && block_compress)", color="red", fontcolor="red"];
+    node21 [label="cl_block()", color="red", fontcolor="red"];
+    node22 [label="Fim do loop"];
+    node23 [label="if (bytes_out > in_count)\nexit_stat = 2"];
+
+    // Arestas
+    start -> node1 -> node2 -> node3 -> node4 -> node5;
+    node5 -> node6 [label="InCnt > 0"];
+    node5 -> node23 [label="InCnt <= 0"];
+    node6 -> node7 -> node8;
+    node8 -> node5 [label="True"];
+    node8 -> node9 [label="False"];
+    node9 -> node16 [label="True"];
+    node9 -> node10 [label="False"];
+    node10 -> node11 -> node12 -> node13 -> node14;
+    node14 -> node5 [label="True"];
+    node14 -> node15 [label="False"];
+    node15 -> node12 [label="True"];
+    node15 -> node16 [label="False"];
+    node16 -> node17 -> node18;
+    node18 -> node19 [label="True"];
+    node18 -> node20 [label="False"];
+    node19 -> node22;
+    node20 -> node21 [label="True", color="red", fontcolor="red"];
+    node20 -> node22 [label="False"];
+    node21 -> node22 [color="red", fontcolor="red"];
+    node22 -> node5;
+    node23 -> end;
+
+    // Caminho inviavel em vermelho
+    node20 -> node21 [label="INVIAVEL", color="red", fontcolor="red"];
+}

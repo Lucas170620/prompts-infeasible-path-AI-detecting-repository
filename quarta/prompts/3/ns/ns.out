@@ -1,0 +1,113 @@
+**Resposta Final:**  
+**NÃO** existem *infeasible paths* no código fornecido.
+
+---
+
+### Análise Detalhada
+
+#### 1. Grafo de Fluxo de Controle e Dados (DCFG) para a função `foo`
+```dot
+digraph foo {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nós do CFG com informações de dados (definições e usos)
+    start [label="Início foo", shape=ellipse];
+    end [label="Fim foo", shape=ellipse];
+    block1 [label="B1: i = 0"];
+    block2 [label="B2: i < 5", shape=diamond];
+    block3 [label="B3: j = 0"];
+    block4 [label="B4: j < 5", shape=diamond];
+    block5 [label="B5: k = 0"];
+    block6 [label="B6: k < 5", shape=diamond];
+    block7 [label="B7: l = 0"];
+    block8 [label="B8: l < 5", shape=diamond];
+    block9 [label="B9: c++ (se TEST)\nif (keys[i][j][k][l] == x)", shape=diamond];
+    block10 [label="B10: return answer[...] + keys[...]"];
+    block11 [label="B11: l++"];
+    block12 [label="B12: k++"];
+    block13 [label="B13: j++"];
+    block14 [label="B14: i++"];
+    block15 [label="B15: return -1"];
+
+    // Arestas de controle
+    start -> block1;
+    block1 -> block2;
+    block2 -> block3 [label="True"];
+    block2 -> block15 [label="False"];
+    block3 -> block4;
+    block4 -> block5 [label="True"];
+    block4 -> block14 [label="False"];
+    block5 -> block6;
+    block6 -> block7 [label="True"];
+    block6 -> block13 [label="False"];
+    block7 -> block8;
+    block8 -> block9 [label="True"];
+    block8 -> block12 [label="False"];
+    block9 -> block10 [label="True"];
+    block9 -> block11 [label="False"];
+    block10 -> end;
+    block11 -> block8;
+    block12 -> block6;
+    block13 -> block4;
+    block14 -> block2;
+    block15 -> end;
+
+    // Fluxo de dados (definições e usos)
+    block1 [xlabel="def: i"];
+    block2 [xlabel="p-use: i"];
+    block3 [xlabel="def: j"];
+    block4 [xlabel="p-use: j"];
+    block5 [xlabel="def: k"];
+    block6 [xlabel="p-use: k"];
+    block7 [xlabel="def: l"];
+    block8 [xlabel="p-use: l"];
+    block9 [xlabel="c-use: keys, i, j, k, l, x\np-use: keys, i, j, k, l, x"];
+    block10 [xlabel="c-use: answer, keys, i, j, k, l"];
+    block11 [xlabel="def: l"];
+    block12 [xlabel="def: k"];
+    block13 [xlabel="def: j"];
+    block14 [xlabel="def: i"];
+}
+```
+
+#### 2. Grafo DCFG para a função `main`
+```dot
+digraph main {
+    rankdir=LR;
+    node [shape=box];
+
+    start [label="Início main", shape=ellipse];
+    end [label="Fim main", shape=ellipse];
+    block1 [label="B1: foo(400)"];
+    block2 [label="B2: printf (se TEST)"];
+
+    start -> block1;
+    block1 -> block2 [label="Se TEST"];
+    block1 -> end [label="Se não TEST"];
+    block2 -> end;
+}
+```
+
+---
+
+### Justificativa
+
+1. **Análise do CFG e DFG**:
+   - A função `foo` consiste em quatro loops aninhados que iteram sobre índices de 0 a 4. Não há condições conflitantes ou contraditórias no fluxo de controle.
+   - A condição `if (keys[i][j][k][l] == x)` depende dos valores do array `keys` e do parâmetro `x`. O array é estático e contém valores previsíveis (0–4, exceto o último elemento, que é 400 ou 401). Para `x = 400`, o valor 400 existe no array (se `FIND_TARGET` estiver definido), tornando o caminho do retorno antecipado viável. Caso contrário, o loop completo é executado e retorna -1.
+   - Não há dependências de dados inviáveis (ex.: variáveis não inicializadas) ou condições de loop contraditórias.
+
+2. **Critérios de Inviabilidade**:
+   - **Contradição Lógica**: Não há condições mutuamente exclusivas (ex.: `x > 10` e `x < 5`).
+   - **Dependências de Dados**: Todas as variáveis são inicializadas antes do uso.
+   - **Condições de Loop**: Os loops são executados um número fixo de vezes (0 a 4), sem restrições inviáveis.
+   - **Conflitos Sequenciais**: Não há condições sequenciais conflitantes.
+
+3. **Chamada em `main`**:
+   - A chamada `foo(400)` pode percorrer dois caminhos:
+     - Encontrar `400` em `keys` e retornar antecipadamente (viável se `FIND_TARGET` estiver definido).
+     - Percorrer todos os loops e retornar -1 (viável se `400` não estiver em `keys`).
+   - Ambos os caminhos são estruturalmente viáveis.
+
+**Conclusão**: Todos os caminhos no código são viáveis para alguma entrada ou configuração de compilação. Não há *infeasible paths*.

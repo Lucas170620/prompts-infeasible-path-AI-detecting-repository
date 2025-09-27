@@ -1,0 +1,30 @@
+digraph Sum {
+      rankdir=TB;
+      node [shape=box];
+      start [label="Sum: Start", shape=ellipse];
+      end [label="Sum: End", shape=ellipse];
+      n1 [label="Ptotal = 0\nNtotal = 0\nPcnt = 0\nNcnt = 0"];
+      n2 [label="Outer = 0"];
+      n3 [label="Outer < MAXSIZE?", shape=diamond];
+      n4 [label="Inner = 0"];
+      n5 [label="Inner < MAXSIZE?", shape=diamond];
+      n6 [label="Array[Outer][Inner] < 0?", shape=diamond];
+      n7 [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+      n8 [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+      n9 [label="Inner++"];
+      n10 [label="Outer++"];
+      n11 [label="Postotal = Ptotal\nPoscnt = Pcnt\nNegtotal = Ntotal\nNegcnt = Ncnt"];
+      start -> n1 -> n2 -> n3;
+      n3 -> n4 [label="True"];
+      n3 -> n11 [label="False"];
+      n4 -> n5;
+      n5 -> n6 [label="True"];
+      n5 -> n10 [label="False"];
+      n6 -> n7 [label="True"];
+      n6 -> n8 [label="False"];
+      n7 -> n9;
+      n8 -> n9;
+      n9 -> n5;
+      n10 -> n3;
+      n11 -> end;
+  }

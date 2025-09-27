@@ -1,0 +1,119 @@
+**Resposta Final:**
+
+**NÃO**. Não existem *infeasible paths* identificados neste código.
+
+---
+
+### Análise Detalhada por Função
+
+#### 1. **Função `main`**
+- **CDFG:**  
+  Fluxo linear: `InitSeed()` → `Test(Array)` → `return 1`.
+- **Análise:**  
+  Não há condições ou ramificações. Portanto, não há caminhos inviáveis.
+
+#### 2. **Função `Test`**
+- **CDFG:**  
+  ```dot
+  digraph Test {
+      node [shape=box];
+      start [label="Start", shape=ellipse];
+      end [label="End", shape=ellipse];
+      initialize [label="Initialize(Array)"];
+      start_time [label="StartTime = 1000.0"];
+      sum [label="Sum(Array)"];
+      stop_time [label="StopTime = 1500.0"];
+      total_time [label="TotalTime = (StopTime - StartTime) / 1000.0"];
+      return [label="return 0"];
+
+      start -> initialize -> start_time -> sum -> stop_time -> total_time -> return -> end;
+  }
+  ```
+- **Análise:**  
+  Fluxo sequencial sem condições. Todos os caminhos são viáveis.
+
+#### 3. **Função `Initialize`**
+- **CDFG:**  
+  ```dot
+  digraph Initialize {
+      node [shape=box];
+      start [label="Start", shape=ellipse];
+      end [label="End", shape=ellipse];
+      outer_loop [label="OuterIndex = 0", shape=diamond];
+      outer_cond [label="OuterIndex < MAXSIZE"];
+      inner_loop [label="InnerIndex = 0", shape=diamond];
+      inner_cond [label="InnerIndex < MAXSIZE"];
+      assign [label="Array[OuterIndex][InnerIndex] = RandomInteger()"];
+      inc_inner [label="InnerIndex++"];
+      inc_outer [label="OuterIndex++"];
+      return [label="return 0"];
+
+      start -> outer_loop;
+      outer_loop -> outer_cond;
+      outer_cond -> inner_loop [label="True"];
+      outer_cond -> return [label="False"];
+      inner_loop -> inner_cond;
+      inner_cond -> assign [label="True"];
+      inner_cond -> inc_outer [label="False"];
+      assign -> inc_inner -> inner_cond;
+      inc_outer -> outer_cond;
+      return -> end;
+  }
+  ```
+- **Análise:**  
+  Laços aninhados sem condições internas conflitantes. Todos os caminhos são viáveis.
+
+#### 4. **Função `InitSeed`**
+- **CDFG:**  
+  Fluxo linear: `Seed = 0` → `return 0`.
+- **Análise:**  
+  Sem condições. Não há caminhos inviáveis.
+
+#### 5. **Função `Sum`**
+- **CDFG:**  
+  ```dot
+  digraph Sum {
+      node [shape=box];
+      start [label="Start", shape=ellipse];
+      end [label="End", shape=ellipse];
+      decl [label="Ptotal=0, Ntotal=0, Pcnt=0, Ncnt=0"];
+      outer_loop [label="Outer = 0", shape=diamond];
+      outer_cond [label="Outer < MAXSIZE"];
+      inner_loop [label="Inner = 0", shape=diamond];
+      inner_cond [label="Inner < MAXSIZE"];
+      condition [label="Array[Outer][Inner] < 0?", shape=diamond];
+      if_block [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+      else_block [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+      inc_inner [label="Inner++"];
+      inc_outer [label="Outer++"];
+      assign_globals [label="Postotal=Ptotal, Poscnt=Pcnt, Negtotal=Ntotal, Negcnt=Ncnt"];
+
+      start -> decl -> outer_loop;
+      outer_loop -> outer_cond;
+      outer_cond -> inner_loop [label="True"];
+      outer_cond -> assign_globals [label="False"];
+      inner_loop -> inner_cond;
+      inner_cond -> condition [label="True"];
+      inner_cond -> inc_outer [label="False"];
+      condition -> if_block [label="True"];
+      condition -> else_block [label="False"];
+      if_block -> inc_inner;
+      else_block -> inc_inner;
+      inc_inner -> inner_cond;
+      inc_outer -> outer_cond;
+      assign_globals -> end;
+  }
+  ```
+- **Análise:**  
+  A condição `Array[Outer][Inner] < 0` depende de valores gerados aleatoriamente por `RandomInteger()`. Não há contradições lógicas ou invariantes que impeçam a execução de qualquer ramo. Ambos os caminhos (if/else) são viáveis.
+
+#### 6. **Função `RandomInteger`**
+- **CDFG:**  
+  Fluxo linear: `Seed = ((Seed * 133) + 81) % 8095` → `return Seed`.
+- **Análise:**  
+  Sem condições. Não há caminhos inviáveis.
+
+---
+
+### Conclusão
+Nenhum *infeasible path* foi identificado em qualquer função do código. Todos os fluxos de controle são executáveis sob entradas válidas, e não há contradições lógicas ou dependências de dados que impossibilitem a execução de qualquer caminho.

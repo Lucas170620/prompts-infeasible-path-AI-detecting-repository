@@ -1,0 +1,28 @@
+digraph cl_block {
+    rankdir=TB;
+    node [shape=box];
+
+    start [label="Inicio cl_block", shape=ellipse];
+    end [label="Fim cl_block", shape=ellipse];
+
+    node1 [label="checkpoint = in_count + CHECK_GAP"];
+    node2 [label="if (in_count > 0x007fffff)", color="red", fontcolor="red"];
+    node3 [label="rat = bytes_out >> 8\nif (rat==0) rat=0x7fffff\nelse rat=in_count/rat", color="red", fontcolor="red"];
+    node4 [label="rat = (in_count << 8) / bytes_out"];
+    node5 [label="if (rat > ratio)"];
+    node6 [label="ratio = rat"];
+    node7 [label="ratio = 0\ncl_hash(hsize)\nfree_ent = FIRST\nclear_flg = 1\noutput(CLEAR)"];
+
+    start -> node1 -> node2;
+    node2 -> node3 [label="True", color="red", fontcolor="red"];
+    node2 -> node4 [label="False"];
+    node3 -> node5 [color="red", fontcolor="red"];
+    node4 -> node5;
+    node5 -> node6 [label="True"];
+    node5 -> node7 [label="False"];
+    node6 -> end;
+    node7 -> end;
+
+    // Caminho inviavel
+    node2 -> node3 [label="INVIAVEL", color="red", fontcolor="red"];
+}

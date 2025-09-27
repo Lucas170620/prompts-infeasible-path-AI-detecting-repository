@@ -1,0 +1,18 @@
+digraph fib {
+    rankdir=TB;
+    node [shape=box];
+    start [label="Inicio", shape=ellipse];
+    end [label="Fim", shape=ellipse];
+
+    node1 [label="1: Fnew = 1; Fold = 0; i = 2;\ndef={Fnew, Fold, i}"];
+    node2 [label="2: if (i <= 30 && i <= n)\np-use={i, n}", shape=diamond];
+    node3 [label="3: temp = Fnew; Fnew = Fnew + Fold; Fold = temp; i++;\ndef={temp, Fnew, Fold, i}\nc-use={Fnew, Fold}"];
+    node4 [label="4: ans = Fnew; return ans;\ndef={ans}\nc-use={Fnew}"];
+
+    start -> node1;
+    node1 -> node2;
+    node2 -> node3 [label="Verdadeiro"];
+    node2 -> node4 [label="Falso"];
+    node3 -> node2;
+    node4 -> end;
+}

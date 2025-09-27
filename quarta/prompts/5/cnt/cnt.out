@@ -1,0 +1,63 @@
+**Resposta: NÃO**
+
+**Análise Detalhada:**
+
+Construí um **CDFG (Control and Data Flow Graph)** para cada função do código `cnt.c`, com foco na função `Sum` (a mais complexa). Após análise minuciosa, **não foram identificados infeasible paths** no código. Abaixo está o CDFG principal e a justificativa:
+
+---
+
+### **CDFG da Função `Sum` (Graphviz DOT):**
+```dot
+digraph Sum {
+    rankdir=TB;
+    node [shape=box];
+
+    // Nós (com definições e usos de variáveis)
+    Start [label="Start\nDefinições: Outer=0, Inner=0, Ptotal=0, Ntotal=0, Pcnt=0, Ncnt=0"];
+    LoopOuter [label="LoopOuter\nCondição: Outer < MAXSIZE\nc-uso: Outer"];
+    LoopInner [label="LoopInner\nCondição: Inner < MAXSIZE\nc-uso: Inner"];
+    Condition [label="Condition\nCondição: Array[Outer][Inner] < 0\np-uso: Array[Outer][Inner]"];
+    IfBlock [label="IfBlock\nPtotal += Array[Outer][Inner]\nPcnt++\nc-uso: Ptotal, Pcnt, Array[Outer][Inner]"];
+    ElseBlock [label="ElseBlock\nNtotal += Array[Outer][Inner]\nNcnt++\nc-uso: Ntotal, Ncnt, Array[Outer][Inner]"];
+    UpdateInner [label="UpdateInner\nInner++\nDefinição: Inner"];
+    UpdateOuter [label="UpdateOuter\nOuter++\nInner=0\nDefinições: Outer, Inner"];
+    End [label="End\nPostotal = Ptotal\nPoscnt = Pcnt\nNegtotal = Ntotal\nNegcnt = Ncnt"];
+
+    // Arestas de controle (preto) e dados (azul)
+    Start -> LoopOuter;
+    LoopOuter -> LoopInner [label="Outer < MAXSIZE"];
+    LoopInner -> Condition [label="Inner < MAXSIZE"];
+    Condition -> IfBlock [label="True"];
+    Condition -> ElseBlock [label="False"];
+    IfBlock -> UpdateInner;
+    ElseBlock -> UpdateInner;
+    UpdateInner -> LoopInner;
+    LoopInner -> UpdateOuter [label="Inner >= MAXSIZE"];
+    UpdateOuter -> LoopOuter;
+    LoopOuter -> End [label="Outer >= MAXSIZE"];
+}
+```
+
+---
+
+### **Justificativa da Ausência de Infeasible Paths:**
+
+1. **Fluxo de Controle Simples:**  
+   - O código consiste em loops aninhados (`for`) e uma condição `if-else`. Todos os caminhos são viáveis porque as condições dependem de valores variáveis (`Array[Outer][Inner]`), que são inicializados aleatoriamente via `RandomInteger()`. Não há contradições lógicas (ex.: `x > 10` e `x < 5` no mesmo caminho).
+
+2. **Fluxo de Dados Consistente:**  
+   - Variáveis como `Ptotal`, `Ntotal`, `Pcnt` e `Ncnt` são inicializadas antes dos loops e atualizadas de forma correta. Não há uso de variáveis não inicializadas ou redefinições conflitantes.
+
+3. **Ausência de Restrições Críticas:**  
+   - Não há dependências de hardware, invariantes de programa ou estados mutuamente exclusivos que bloqueiem caminhos. O código é auto-contido e deterministicamente executável.
+
+4. **Condições de Loop Viáveis:**  
+   - Os loops terminam quando `Outer` e `Inner` atingem `MAXSIZE (10)`. Como `Outer` e `Inner` são incrementados a cada iteração, não há risco de loops infinitos ou caminhos inalcançáveis.
+
+5. **Diretiva `WORSTCASE` Inofensiva:**  
+   - A condição `#ifdef WORSTCASE` não está definida, então o código usa `Array[Outer][Inner] < 0`. Ambos os ramos (`if` e `else`) são viáveis, pois a matriz `Array` contém valores aleatórios (positivos e negativos).
+
+---
+
+### **Conclusão:**
+Nenhum caminho inviável foi detectado. O código é estruturalmente simples, com fluxo de controle e dados bem definidos, sem contradições lógicas ou dependências problemáticas. Todos os critérios de cobertura (All-Nodes, All-Edges, All-Defs, All-Uses) podem ser satisfeitos com testes adequados.

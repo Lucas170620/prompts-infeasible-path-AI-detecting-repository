@@ -1,0 +1,15 @@
+digraph main {
+    rankdir=TB;
+    node [shape=box];
+    start [label="Inicio main", shape=ellipse];
+    end [label="Fim main", shape=ellipse];
+
+    M1 [label="M1: a = 30;", xlabel="def: a"];
+    M2 [label="M2: fib(a);", xlabel="c-use: a"];
+    M3 [label="M3: return a;", xlabel="c-use: a"];
+
+    start -> M1;
+    M1 -> M2;
+    M2 -> M3;
+    M3 -> end;
+}
