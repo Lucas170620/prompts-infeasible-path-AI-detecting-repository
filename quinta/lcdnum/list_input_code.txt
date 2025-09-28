@@ -1,0 +1,3 @@
+O ponto inicial de execução do código fornecido é a função `main`, que é o padrão em programas escritos em linguagem C. A função `main` está localizada após as declarações das variáveis globais `IN` e `OUT` (aproximadamente na linha 28, considerando a numeração implícita do código). 
+
+Em C, a execução do programa sempre começa pela função `main`, conforme definido pelas convenções da linguagem. Neste caso, a função `main` define um loop que lê da variável `IN`, processa o valor e escreve na variável `OUT` usando a função `num_to_lcd` para os primeiros 5 iterations.

@@ -15,7 +15,7 @@ O Graphviz é uma ferramenta de visualização de grafos que utiliza a linguagem
   * **Arestas (Edges):** Representam as conexões. Em um `digraph`, a sintaxe `A -> B;` cria uma seta do nó A para o nó B.
   * **Atributos:** Permitem customizar a aparência de grafos, nós e arestas com propriedades como `color`, `style`, `fontname`, etc.
 
-### 2. Dado seu conhecimento em Graphviz construa um Grafo de Fluxo de Controle e Dados (DCFG - Data Control Flow Graph)
+### 2. Dado seu conhecimento em Graphviz construa um Grafo de Fluxo de Controle e Dados (CDFG - Data Control Flow Graph)
 
 Um **grafo híbrido de fluxo de controle e dados (CDFG – Control and Data Flow Graph)** integra a visão do **CFG (Control Flow Graph)** e do **DFG (Data Flow Graph)** em uma única representação para a identificação de infeasible paths em um código.
 
@@ -196,12 +196,12 @@ digraph {
 **Análise de Múltiplas Funções:**
 Se o código-fonte fornecido contiver múltiplas funções ou métodos, sua análise deve ser granular. Para **cada função ou método**, você deve:
 
-1.  Construir um Grafo de Fluxo de Controle e Dados (DCFG) dedicado.
+1.  Construir um Grafo de Fluxo de Controle e Dados (CDFG) dedicado.
 3.  Analisar a existência de caminhos inviáveis (*infeasible paths*) dentro do escopo daquela função específica.
 
 **Formato da Saída:**
 Com base no contexto e no código fornecido, sua saída final deve ser:
 
-1.  Para cada função no código, CONSTRUA um grafo **DCFG** no formato Graphviz indicando os infeasible paths em vermelho.
+1.  Para cada função no código, CONSTRUA um grafo **CDFG** no formato Graphviz indicando os infeasible paths em vermelho.
 2.  Uma resposta para a pergunta "Existe algum *infeasible path* neste código?". Responda **SIM** ou **NÃO**.
 3.  Se a resposta for SIM, forneça uma **explicação detalhada** para cada caminho inviável identificado, indicando em qual função ele ocorre e baseando sua análise nos CFGs e DFGs construídos.

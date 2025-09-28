@@ -1,0 +1,26 @@
+### Análise de Caminhos Inviáveis no Código Fornecido
+
+Com base no código e nos grafos n-CDFG fornecidos, realizei uma análise detalhada para identificar caminhos inviáveis, considerando tanto o contexto isolado de cada função quanto o contexto global integrado. Abaixo está a lista consolidada dos resultados:
+
+---
+
+#### **Caminhos Inviáveis Identificados**
+
+1. **Caminho Inviável Global entre `main` e `num_to_lcd`**
+   - **Descrição:** `main` (true_block) → Chamada para `num_to_lcd` (switch_node) → default
+   - **Motivo:** Dependência de dados: No bloco `true_block` da função `main`, a variável `a` é mascarada com `0x0F` (`a = a & 0x0F`), restringindo seu valor ao intervalo `[0x00, 0x0F]`. A função `num_to_lcd` possui um caso `default` que só é alcançado se `a` não estiver entre `0x00` e `0x0F`. Como `a` está sempre nesse intervalo após o masking, o caso `default` é **inalcançável**.
+   - **Variáveis Envolvidas:** `a`
+   - **Localização:** Integração entre `main` (linha 37) e `num_to_lcd` (linha 19).
+
+---
+
+### Observações Adicionais
+- **Análise Isolada por Função:** Nenhum caminho inviável foi identificado nas funções `main` e `num_to_lcd` quando analisadas isoladamente. Todos os fluxos locais são viáveis, pois:
+  - Em `main`: O loop é executado para `i` de 0 a 9, e a condição `i < 5` é consistentemente verificada sem contradições.
+  - Em `num_to_lcd`: O `switch` cobre todos os valores possíveis de `a` (0x00 a 0x0F) e um caso `default`, mas não há contradições lógicas internas.
+- **Contexto Global:** A inviabilidade surge exclusivamente da integração entre `main` e `num_to_lcd`, devido à restrição imposta pelo masking de `a` em `main`.
+
+---
+
+### Conclusão
+O código possui **um caminho inviável global**, resultante da combinação entre o tratamento de `a` em `main` e a estrutura do `switch` em `num_to_lcd`. Esse caminho não é executável em tempo de execução, conforme os critérios de dependência de dados.
