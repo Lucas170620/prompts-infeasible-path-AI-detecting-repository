@@ -1,0 +1,30 @@
+digraph iir_filter {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="iir_filter start", shape=ellipse];
+    end [label="iir_filter end", shape=ellipse];
+    
+    // Declaração de variáveis
+    decl [label="int input, *coef, n, *history"];
+    
+    // Chamada para fir_filter
+    fir_call [label="fir_filter(input, coef, n, history)"];
+    
+    // Retorno
+    return [label="return fir_result"];
+    
+    // Conexões
+    start -> decl;
+    decl -> fir_call;
+    fir_call -> return;
+    return -> end;
+    
+    // Caminho inviável - função não implementada
+    fir_call [color=red, fontcolor=red];
+    return [color=red, fontcolor=red];
+    decl -> fir_call [color=red, fontcolor=red];
+    fir_call -> return [color=red, fontcolor=red];
+    return -> end [color=red, fontcolor=red];
+}

@@ -1,0 +1,38 @@
+```dot
+digraph uppol1 {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="Return apl1", shape=ellipse];
+    
+    // Blocos principais
+    calc_wd2 [label="wd2 = ((long)al1 * 255L) >> 8L"];
+    cond1 [label="(long)plt * plt1 >= 0L", shape=diamond];
+    branch_true [label="apl1 = (int)wd2 + 192"];
+    branch_false [label="apl1 = (int)wd2 - 192"];
+    calc_wd3 [label="wd3 = 15360 - apl2"];
+    cond2 [label="apl1 > wd3", shape=diamond];
+    cond3 [label="apl1 < -wd3", shape=diamond];
+    adjust_upper [label="apl1 = wd3"];
+    adjust_lower [label="apl1 = -wd3"];
+
+    // Fluxo principal
+    start -> calc_wd2;
+    calc_wd2 -> cond1;
+    cond1 -> branch_true [label="True"];
+    cond1 -> branch_false [label="False"];
+    branch_true -> calc_wd3;
+    branch_false -> calc_wd3;
+    calc_wd3 -> cond2;
+    
+    // Caminhos inviáveis (contradição lógica)
+    cond2 -> adjust_upper [label="True", color=red, fontcolor=red];
+    cond2 -> cond3 [label="False"];
+    adjust_upper -> cond3 [color=red, fontcolor=red];
+    cond3 -> adjust_lower [label="True", color=red, fontcolor=red];
+    cond3 -> end [label="False"];
+    adjust_lower -> end [color=red, fontcolor=red];
+}
+```

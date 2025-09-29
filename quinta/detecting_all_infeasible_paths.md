@@ -38,21 +38,19 @@ Siga rigorosamente estes passos para a análise:
 - Anote este ponto, pois a análise começará aqui.
 
 **Passo 2: Análise Isolada por Função (Contexto Local)**
-- Para cada função do código, examine seu n-CDFG em Graphviz.
-- Foque nas arestas e nós marcados em vermelho (indicando caminhos inviáveis locais).
+
+Para cada função, examine seu n-CDFG e correlacione os nós/arestas com as linhas/blocos de código correspondentes.
+
 - Para cada caminho inviável local, identifique:
-  - A sequência de nós (ex: Nó1 → Nó2 → Nó3).
-  - O motivo da inviabilidade (com base nos critérios acima).
-  - Variáveis envolvidas e contradições.
-- Registre esses caminhos em uma lista preliminar.
+    - Localização no Código: Linhas/blocos específicos (ex: linhas 5-7, bloco if (x > 10))
+    - Sequência de nós e seus trechos de código associados
+    - Motivo da inviabilidade com base nos critérios
 
 **Passo 3: Integração dos Grafos (Contexto Global)**
-- Combine todos os n-CDFG das funções, considerando as chamadas entre funções (ex: arestas que ligam grafos diferentes).
-- Analise o fluxo de controle e dados através das funções, partindo do ponto de entrada.
-- Identifique caminhos inviáveis globais que surgem da integração:
-  - Exemplo: Se a Função A chama a Função B, verifique se as condições de saída de A contradizem as condições de entrada de B.
-  - Considere passagem de parâmetros e valores de retorno.
-- Use os critérios de caminhos inviáveis para validar cada caminho potencial.
+
+- Ao identificar caminhos inviáveis globais:
+    - Relacione cada nó/transição aos trechos de código correspondentes nas funções envolvidas
+    - Especifique linhas exatas onde ocorrem contradições entre funções
 
 **Passo 4: Consolidação dos Resultados**
 - Compile uma lista final de todos os caminhos inviáveis, incluindo:
@@ -69,13 +67,17 @@ Siga rigorosamente estes passos para a análise:
 A saída deve ser uma lista numerada, conforme o exemplo abaixo:
 
 1. **Caminho Inviável Local em [Nome da Função]**
-   - **Descrição:** NóA → NóB → NóC
-   - **Motivo:** Contradição lógica: após `x > 10` em NóA, a condição `x < 5` em NóB é impossível.
-   - **Variáveis Envolvidas:** x
+   - **Trechos de Código Envolvidos**:
+     - Linha X: `[código]`
+     - Linha Y: `[código]`
+   - **Descrição do Caminho**: NóA → NóB → NóC
+   - **Motivo**: Contradição lógica entre as condições das linhas X e Y
 
 2. **Caminho Inviável Global entre [Função X] e [Função Y]**
-   - **Descrição:** FunçãoX (NóP) → Chamada para FunçãoY (NóQ) → NóR
-   - **Motivo:** Dependência de dados: FunçãoX define `y = 10`, mas FunçãoY exige `y == 0` para entrar em NóQ.
-   - **Variáveis Envolvidas:** y
+   - **Trechos de Código Envolvidos**:
+     - Função X, Linha A: `[código]`
+     - Função Y, Linha B: `[código]`
+   - **Descrição**: Fluxo interfunções com conflito de dados
+   - **Motivo**: Valor definido na linha A é incompatível com condição na linha B
 
 ... (e assim por diante para todos os caminhos)

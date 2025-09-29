@@ -1,0 +1,17 @@
+my_abs
+my_fabs
+my_sin
+my_cos
+encode
+decode
+reset
+filtez
+filtep
+quantl
+logscl
+scalel
+upzero
+uppol2
+uppol1
+logsch
+main

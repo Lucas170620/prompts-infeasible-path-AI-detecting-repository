@@ -1,0 +1,19 @@
+digraph flags {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="flags() start", shape=ellipse];
+    end [label="flags() end", shape=ellipse];
+    cond1 [label="if (n >= 0)", shape=diamond];
+    block1 [label="m = n"];
+    block2 [label="m = -n"];
+    return [label="return m"];
+
+    start -> cond1;
+    cond1 -> block1 [label="True"];
+    cond1 -> block2 [label="False"];
+    block1 -> return;
+    block2 -> return;
+    return -> end;
+}

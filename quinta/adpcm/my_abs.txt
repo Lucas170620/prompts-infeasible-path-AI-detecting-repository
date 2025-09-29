@@ -1,0 +1,23 @@
+```dot
+digraph my_abs {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    decl_m [label="int m;"];
+    cond [label="if (n >= 0)", shape=diamond];
+    assign_m_n [label="m = n"];
+    assign_m_neg_n [label="m = -n"];
+    return_m [label="return m"];
+
+    start -> decl_m;
+    decl_m -> cond;
+    cond -> assign_m_n [label="True"];
+    cond -> assign_m_neg_n [label="False"];
+    assign_m_n -> return_m;
+    assign_m_neg_n -> return_m;
+    return_m -> end;
+}
+```

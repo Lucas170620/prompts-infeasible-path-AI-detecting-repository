@@ -1,0 +1,39 @@
+```dot
+digraph scalel {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    // Nós principais
+    start [label="Start scalel(nbl, shift_constant)", shape=ellipse];
+    end [label="End", shape=ellipse];
+    
+    wd1_calc [label="wd1 = (nbl >> 6) & 31"];
+    wd2_calc [label="wd2 = nbl >> 11"];
+    wd3_calc [label="wd3 = ilb_table[wd1] >> (shift_constant + 1 - wd2)"];
+    return_calc [label="return wd3 << 3"];
+    
+    // Arestas normais
+    start -> wd1_calc;
+    wd1_calc -> wd2_calc;
+    wd2_calc -> wd3_calc;
+    wd3_calc -> return_calc;
+    return_calc -> end;
+    
+    // Caminho inviável - acesso inválido a ilb_table
+    invalid_index [label="wd1 > 31", shape=diamond, color=red, fontcolor=red];
+    invalid_access [label="ilb_table[wd1] → Invalid", color=red, fontcolor=red];
+    
+    wd1_calc -> invalid_index [color=red];
+    invalid_index -> invalid_access [label="True", color=red, fontcolor=red];
+    invalid_access -> wd3_calc [color=red];
+    
+    // Caminho inviável - shift negativo
+    negative_shift [label="(shift_constant + 1 - wd2) < 0", shape=diamond, color=red, fontcolor=red];
+    undefined_shift [label="Shift negativo → Comportamento indefinido", color=red, fontcolor=red];
+    
+    wd2_calc -> negative_shift [color=red];
+    negative_shift -> undefined_shift [label="True", color=red, fontcolor=red];
+    undefined_shift -> wd3_calc [color=red];
+}
+```

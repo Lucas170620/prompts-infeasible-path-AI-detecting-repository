@@ -1,0 +1,49 @@
+```dot
+digraph uppol2 {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    // Nós principais
+    start [label="Start uppol2(al1, al2, plt, plt1, plt2)", shape=ellipse];
+    end [label="End return apl2", shape=ellipse];
+    
+    block1 [label="wd2 = 4L * (long)al1"];
+    cond1 [label="(long)plt * plt1 >= 0L", shape=diamond];
+    block2 [label="wd2 = -wd2"];
+    block3 [label="wd2 = wd2 >> 7"];
+    cond2 [label="(long)plt * plt2 >= 0L", shape=diamond];
+    block4 [label="wd4 = wd2 + 128"];
+    block5 [label="wd4 = wd2 - 128"];
+    block6 [label="apl2 = wd4 + (127L * al2 >> 7L)"];
+    cond3 [label="apl2 > 12288", shape=diamond];
+    block7 [label="apl2 = 12288"];
+    cond4 [label="apl2 < -12288", shape=diamond];
+    block8 [label="apl2 = -12288"];
+    block9 [label="return apl2"];
+
+    // Arestas normais
+    start -> block1;
+    block1 -> cond1;
+    cond1 -> block2 [label="True"];
+    cond1 -> block3 [label="False"];
+    block2 -> block3;
+    block3 -> cond2;
+    cond2 -> block4 [label="True"];
+    cond2 -> block5 [label="False"];
+    block4 -> block6;
+    block5 -> block6;
+    block6 -> cond3;
+    cond3 -> block7 [label="True"];
+    cond3 -> cond4 [label="False"];
+    block7 -> cond4;
+    cond4 -> block8 [label="True"];
+    cond4 -> block9 [label="False"];
+    block8 -> block9;
+    block9 -> end;
+
+    // Infeasible paths (nenhum identificado - todos os caminhos são viáveis)
+    // Nota: Análise mostra que não há contradições lógicas ou dependências
+    // que tornem qualquer caminho inviável nesta função
+}
+```

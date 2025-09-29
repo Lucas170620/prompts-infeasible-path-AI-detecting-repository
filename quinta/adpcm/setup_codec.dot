@@ -1,0 +1,10 @@
+digraph setup_codec {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="setup_codec Start", shape=ellipse];
+    end [label="setup_codec End", shape=ellipse];
+    
+    start -> end [label="Empty function", color=red, fontcolor=red];
+}

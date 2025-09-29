@@ -1,0 +1,12 @@
+digraph getinput {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="getinput Start", shape=ellipse];
+    end [label="getinput End", shape=ellipse];
+    
+    node1 [label="return flags(0)"];
+    start -> node1;
+    node1 -> end;
+}

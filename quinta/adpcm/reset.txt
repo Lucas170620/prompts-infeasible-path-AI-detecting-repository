@@ -1,0 +1,90 @@
+```dot
+digraph reset {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    
+    // Initial assignments
+    assign1 [label="detl = dec_detl = 32"];
+    assign2 [label="deth = dec_deth = 8"];
+    assign3 [label="nbl = al1 = al2 = plt1 = plt2 = rlt1 = rlt2 = 0"];
+    assign4 [label="nbh = ah1 = ah2 = ph1 = ph2 = rh1 = rh2 = 0"];
+    assign5 [label="dec_nbl = dec_al1 = dec_al2 = dec_plt1 = dec_plt2 = dec_rlt1 = dec_rlt2 = 0"];
+    assign6 [label="dec_nbh = dec_ah1 = dec_ah2 = dec_ph1 = dec_ph2 = dec_rh1 = dec_rh2 = 0"];
+    
+    // First loop
+    loop1_init [label="i = 0"];
+    loop1_cond [label="i < 6?", shape=diamond];
+    loop1_body [label="delay_dltx[i] = 0\ndelay_dhx[i] = 0\ndec_del_dltx[i] = 0\ndec_del_dhx[i] = 0"];
+    loop1_inc [label="i++"];
+    
+    // Second loop
+    loop2_init [label="i = 0"];
+    loop2_cond [label="i < 6?", shape=diamond];
+    loop2_body [label="delay_bpl[i] = 0\ndelay_bph[i] = 0\ndec_del_bpl[i] = 0\ndec_del_bph[i] = 0"];
+    loop2_inc [label="i++"];
+    
+    // Third loop
+    loop3_init [label="i = 0"];
+    loop3_cond [label="i < 23?", shape=diamond];
+    loop3_body [label="tqmf[i] = 0"];
+    loop3_inc [label="i++"];
+    
+    // Fourth loop
+    loop4_init [label="i = 0"];
+    loop4_cond [label="i < 11?", shape=diamond];
+    loop4_body [label="accumc[i] = 0\naccumd[i] = 0"];
+    loop4_inc [label="i++"];
+    
+    return_node [label="return"];
+
+    // Control flow edges
+    start -> assign1;
+    assign1 -> assign2;
+    assign2 -> assign3;
+    assign3 -> assign4;
+    assign4 -> assign5;
+    assign5 -> assign6;
+    assign6 -> loop1_init;
+    
+    loop1_init -> loop1_cond;
+    loop1_cond -> loop1_body [label="True"];
+    loop1_body -> loop1_inc;
+    loop1_inc -> loop1_cond;
+    loop1_cond -> loop2_init [label="False"];
+    
+    loop2_init -> loop2_cond;
+    loop2_cond -> loop2_body [label="True"];
+    loop2_body -> loop2_inc;
+    loop2_inc -> loop2_cond;
+    loop2_cond -> loop3_init [label="False"];
+    
+    loop3_init -> loop3_cond;
+    loop3_cond -> loop3_body [label="True"];
+    loop3_body -> loop3_inc;
+    loop3_inc -> loop3_cond;
+    loop3_cond -> loop4_init [label="False"];
+    
+    loop4_init -> loop4_cond;
+    loop4_cond -> loop4_body [label="True"];
+    loop4_body -> loop4_inc;
+    loop4_inc -> loop4_cond;
+    loop4_cond -> return_node [label="False"];
+    
+    return_node -> end;
+
+    // Data flow edges (def-use relationships)
+    assign1 -> loop1_body [label="def: detl, dec_detl", style=dashed];
+    assign2 -> loop1_body [label="def: deth, dec_deth", style=dashed];
+    assign6 -> loop2_body [label="def: dec_nbh, etc.", style=dashed];
+    loop1_cond -> loop1_body [label="p-use: i", style=dashed];
+    loop1_body -> loop1_inc [label="c-use: i", style=dashed];
+    loop1_inc -> loop1_cond [label="def: i", style=dashed];
+    
+    // No infeasible paths detected - function is sequential with simple loops
+    // All variables are properly initialized before use
+}
+```

@@ -1,0 +1,21 @@
+```dot
+digraph filtez {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    init [label="i = 1\nzl = (long)(*bpl++) * (*dlt++)"];
+    loop_cond [label="i < 6", shape=diamond];
+    loop_body [label="zl += (long)(*bpl++) * (*dlt++)\ni++"];
+    return_node [label="return (int)(zl >> 14)"];
+
+    start -> init;
+    init -> loop_cond;
+    loop_cond -> loop_body [label="True"];
+    loop_cond -> return_node [label="False"];
+    loop_body -> loop_cond;
+    return_node -> end;
+}
+```

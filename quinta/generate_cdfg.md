@@ -23,12 +23,14 @@ Você é um especialista em análise estática de código e teste de software es
 - **Entrada**: 
   - Código fonte completo.
   - Nome de uma função específica para análise.
+        - **nome da funcao** : {substitua aqui o nome da funcao}
+
 - **Processamento**:
   - Construa o CDFG para a função especificada.
   - Identifique todos os *infeasible paths* com base nos critérios acima.
   - Destaque elementos inviáveis em vermelho.
 - **Saída**:
-  - Apenas o código Graphviz/DOT, sem explicações adicionais.
+  - Apenas o código Graphviz/DOT, sem explicações adicionais e sem formatacao adicional, apenas o texto do grafo.
   - Formato:
     ```dot
     digraph NomeDaFuncao {

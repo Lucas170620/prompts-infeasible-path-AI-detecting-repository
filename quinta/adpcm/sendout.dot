@@ -1,0 +1,50 @@
+digraph sendout {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    cond_eh [label="if (eh >= 0)", shape=diamond];
+    block_ih3 [label="ih = 3"];
+    block_ih1 [label="ih = 1"];
+    block_decis [label="decis = (564L*deth) >> 12L"];
+    cond_abs [label="if (my_abs(eh) > decis)", shape=diamond];
+    block_ih_dec [label="ih--"];
+    block_dh [label="dh = (deth*qq2_code2_table[ih]) >> 15L"];
+    block_nbh [label="nbh = logsch(ih,nbh)"];
+    block_deth [label="deth = scalel(nbh,10)"];
+    block_ph [label="ph = dh + szh"];
+    block_upzero [label="upzero(dh,delay_dhx,delay_bph)"];
+    block_ah2 [label="ah2 = uppol2(ah1,ah2,ph,ph1,ph2)"];
+    block_ah1 [label="ah1 = uppol1(ah1,ah2,ph,ph1)"];
+    block_yh [label="yh = sh + dh"];
+    block_rh2 [label="rh2 = rh1"];
+    block_rh1 [label="rh1 = yh"];
+    block_ph2 [label="ph2 = ph1"];
+    block_ph1 [label="ph1 = ph"];
+    block_return [label="return(il | (ih << 6))"];
+
+    start -> cond_eh;
+    cond_eh -> block_ih3 [label="True"];
+    cond_eh -> block_ih1 [label="False"];
+    block_ih3 -> block_decis;
+    block_ih1 -> block_decis;
+    block_decis -> cond_abs;
+    cond_abs -> block_ih_dec [label="True"];
+    cond_abs -> block_dh [label="False"];
+    block_ih_dec -> block_dh;
+    block_dh -> block_nbh;
+    block_nbh -> block_deth;
+    block_deth -> block_ph;
+    block_ph -> block_upzero;
+    block_upzero -> block_ah2;
+    block_ah2 -> block_ah1;
+    block_ah1 -> block_yh;
+    block_yh -> block_rh2;
+    block_rh2 -> block_rh1;
+    block_rh1 -> block_ph2;
+    block_ph2 -> block_ph1;
+    block_ph1 -> block_return;
+    block_return -> end;
+}

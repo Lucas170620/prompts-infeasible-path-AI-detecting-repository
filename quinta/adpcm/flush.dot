@@ -1,0 +1,10 @@
+digraph flush {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="flush() Start", shape=ellipse];
+    end [label="flush() End", shape=ellipse];
+    
+    start -> end [color=red, fontcolor=red];
+}

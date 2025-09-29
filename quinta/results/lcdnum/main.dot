@@ -1,0 +1,30 @@
+digraph main {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    init_n [label="n = 10"];
+    init_i [label="i = 0"];
+    for_cond [label="i < n", shape=diamond];
+    read_a [label="a = IN"];
+    if_cond [label="i < 5", shape=diamond];
+    mask_a [label="a = a & 0x0F"];
+    call_func [label="OUT = num_to_lcd(a)"];
+    inc_i [label="i++"];
+    return_0 [label="return 0"];
+
+    start -> init_n;
+    init_n -> init_i;
+    init_i -> for_cond;
+    for_cond -> read_a [label="True"];
+    for_cond -> return_0 [label="False"];
+    read_a -> if_cond;
+    if_cond -> mask_a [label="True"];
+    if_cond -> inc_i [label="False"];
+    mask_a -> call_func;
+    call_func -> inc_i;
+    inc_i -> for_cond;
+    return_0 -> end;
+}

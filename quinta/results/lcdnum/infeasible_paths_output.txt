@@ -1,0 +1,38 @@
+Analisando o código fornecido e seus grafos n-CDFG, identifiquei os seguintes caminhos inviáveis:
+
+## 1. Caminho Inviável Local em `num_to_lcd`
+- **Trechos de Código Envolvidos**:
+  - Linha 5: `case 0x02: return 1+4+8+16+64;`
+  - Linha 7: `case 0x05: return 1+4+8+16+64;`
+- **Descrição do Caminho**: switch_node → case_2 → end
+- **Motivo**: Redundância lógica - os casos 0x02 e 0x05 retornam exatamente o mesmo valor (93 em decimal). Isso sugere um possível erro de implementação ou duplicação desnecessária, tornando o caminho do caso 0x05 redundante/inviável por duplicação funcional.
+
+## 2. Caminho Inviável Local em `main`
+- **Trechos de Código Envolvidos**:
+  - Linha 37: `if(i<5)`
+  - Linha 40: `OUT = num_to_lcd(a);`
+- **Descrição do Caminho**: for_cond → read_a → if_cond → mask_a → call_func → inc_i
+- **Motivo**: Uso potencial de dados não inicializados - quando `i >= 5`, o valor de `a` é lido de `IN` mas não é processado com a máscara `& 0x0F`. Se `IN` contiver valores acima de 0x0F, a função `num_to_lcd` pode receber valores fora do intervalo esperado (0x00-0x0F), resultando em comportamento indefinido.
+
+## 3. Caminho Inviável Global entre `main` e `num_to_lcd`
+- **Trechos de Código Envolvidos**:
+  - Função main, Linha 39: `a = a &0x0F;`
+  - Função num_to_lcd, Linha 3: `switch(a)`
+- **Descrição**: Fluxo interfunções com conflito de dados
+- **Motivo**: A máscara aplicada em `main` garante que `a` estará no intervalo 0x00-0x0F, tornando o caso `default` do switch em `num_to_lcd` (que retorna 0) inalcançável. O caminho switch_node → end nunca será executado no contexto de integração.
+
+## 4. Caminho Inviável Global por Condição de Loop
+- **Trechos de Código Envolvidos**:
+  - Função main, Linha 34: `for(i=0; i< n; i++)`
+  - Função main, Linha 33: `n = 10;`
+- **Descrição**: Fluxo de controle do loop principal
+- **Motivo**: Condição de loop fixa - `n` é inicializado com valor constante 10 e nunca modificado, tornando impossível qualquer caminho onde `i >= n` antes de completar 10 iterações. A condição de saída do loop só ocorre após exatamente 10 iterações.
+
+## 5. Caminho Inviável por Dependência de Dados Externos
+- **Trechos de Código Envolvidos**:
+  - Linha 24: `volatile unsigned char IN;`
+  - Linha 36: `a = IN;`
+- **Descrição**: Leitura de variável volátil
+- **Motivo**: Dependência externa não controlável - o valor de `IN` é volátil e pode ser modificado externamente a qualquer momento, tornando impossível prever ou garantir a viabilidade de qualquer caminho que dependa de valores específicos desta variável.
+
+**Observação**: A análise identificou que a função `num_to_lcd` está bem estruturada para seu propósito específico (mapeamento para display LCD), mas a integração com `main` revela caminhos potencialmente problemáticos, principalmente relacionados ao tratamento de valores fora do intervalo esperado e à natureza volátil das variáveis de entrada/saída.

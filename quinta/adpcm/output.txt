@@ -1,0 +1,77 @@
+### Análise de Caminhos Inviáveis no Código Fornecido
+
+#### Passo 1: Identificação do Ponto de Entrada
+O ponto de entrada do código é a função `main()`, localizada no final do arquivo `code_clean.txt`, dentro do bloco `#ifndef Seoul_Mate`. Como `Seoul_Mate` não está definido, `main` é o ponto de entrada válido.
+
+---
+
+#### Passo 2: Análise Isolada por Função (Contexto Local)
+
+##### 1. **Função: `my_sin`**
+- **Arquivo:** `my_sin.txt`
+- **Caminho Inviável Local:**
+  - **Descrição:** Nó4 (while rad > 2*PI) → Nó6 (while rad < -2*PI) → Nó1
+  - **Motivo:** Contradição lógica. Os dois loops (Nó4 e Nó6) são mutuamente exclusivos para o mesmo valor de `rad`. Se `rad > 2*PI`, ele não pode ser `< -2*PI` no mesmo fluxo de execução.
+  - **Variáveis Envolvidas:** `rad`
+
+##### 2. **Função: `scalel`**
+- **Arquivo:** `scalel.txt`
+- **Caminho Inviável Local:**
+  - **Descrição:** Nó `invalid_index` (wd1 > 31) → Nó `invalid_access` (ilb_table[wd1] → Invalid)
+  - **Motivo:** Dependência de dados. `wd1` é calculado como `(nbl >> 6) & 31`, resultando em um valor entre 0 e 31. Portanto, `wd1 > 31` é impossível.
+  - **Variáveis Envolvidas:** `wd1`, `ilb_table`
+
+##### 3. **Função: `uppol1`**
+- **Arquivo:** `uppol1.txt`
+- **Caminho Inviável Local:**
+  - **Descrição:** Nó `cond2` (apl1 > wd3) → Nó `adjust_upper` → Nó `cond3` (apl1 < -wd3) → Nó `adjust_lower`
+  - **Motivo:** Contradição lógica. Se `apl1` é ajustado para `wd3` (valor positivo), ele não pode ser menor que `-wd3` (negativo) imediatamente após.
+  - **Variáveis Envolvidas:** `apl1`, `wd3`
+
+---
+
+#### Passo 3: Integração dos Grafos (Contexto Global)
+
+##### 1. **Caminho Inviável Global entre `main` e `my_cos`**
+- **Descrição:** `main` (loop1_body: `test_data[i] = j * my_cos(f*PI*i)`) → `my_cos` → `my_sin` (caminho inviável local)
+- **Motivo:** Dependência de dados. `my_cos` chama `my_sin(PI/2 - rad)`. Se `rad` for grande, `my_sin` tenta normalizá-lo, mas os loops de normalização em `my_sin` são mutuamente exclusivos.
+- **Variáveis Envolvidas:** `rad`, `f`, `PI`
+
+##### 2. **Caminho Inviável Global entre `encode` e `quantl`**
+- **Descrição:** `encode` (chamada a `quantl(el, detl)`) → `quantl` (loop sobre `decis_levl`)
+- **Motivo:** Contradição lógica. `detl` é inicializado como 32 em `reset()`, e `decis_levl` tem valores fixos. Se `el` for muito grande, o loop em `quantl` pode não quebrar, mas `mil` atingirá 30, o que é válido. Nenhum caminho inviável foi identificado aqui.
+
+##### 3. **Caminho Inviável Global entre `decode` e `scalel`**
+- **Descrição:** `decode` (chamada a `scalel(dec_nbl, 8)`) → `scalel` (acesso a `ilb_table`)
+- **Motivo:** Dependência de dados. `dec_nbl` é inicializado em `reset()` e atualizado via `logscl`. O cálculo de `wd1` em `scalel` garante acesso válido a `ilb_table`. Nenhum caminho inviável global foi detectado.
+
+---
+
+#### Passo 4: Consolidação dos Resultados
+
+##### Lista Final de Caminhos Inviáveis:
+
+1. **Caminho Inviável Local em `my_sin`**
+   - **Descrição:** Nó4 → Nó6 → Nó1
+   - **Motivo:** Contradição lógica entre condições mutuamente exclusivas.
+   - **Localização:** Função `my_sin`
+
+2. **Caminho Inviável Local em `scalel`**
+   - **Descrição:** Nó `invalid_index` → Nó `invalid_access`
+   - **Motivo:** Dependência de dados (índice inválido impossível).
+   - **Localização:** Função `scalel`
+
+3. **Caminho Inviável Local em `uppol1`**
+   - **Descrição:** Nó `cond2` → Nó `adjust_upper` → Nó `cond3` → Nó `adjust_lower`
+   - **Motivo:** Contradição lógica sequencial.
+   - **Localização:** Função `uppol1`
+
+4. **Caminho Inviável Global entre `main` e `my_sin` via `my_cos`**
+   - **Descrição:** `main` → `my_cos` → `my_sin` (caminho inviável local)
+   - **Motivo:** Propagação de dependência de dados e contradição lógica.
+   - **Localização:** Funções `main`, `my_cos`, `my_sin`
+
+---
+
+### Conclusão
+A análise identificou **3 caminhos inviáveis locais** e **1 caminho inviável global**. Os critérios de contradição lógica e dependência de dados foram os principais fatores. Recomenda-se revisar as funções `my_sin`, `scalel` e `uppol1` para corrigir ou documentar esses comportamentos.

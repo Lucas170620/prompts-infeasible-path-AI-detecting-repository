@@ -1,2 +1,4 @@
 __MACOSX/
 ToDoS.md
+venv/
+config.json

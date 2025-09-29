@@ -1,0 +1,51 @@
+```dot
+digraph encode {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="Return(il | (ih << 6))", shape=ellipse];
+    
+    // Blocos principais
+    init [label="Inicializa ponteiros e variáveis"];
+    loop1 [label="Loop i=0 to 10:\nxa += tqmf*h; xb += tqmf*h"];
+    post_loop1 [label="xa += tqmf*h; xb += tqmf*h"];
+    loop2 [label="Loop i=0 to 22:\nAtualiza tqmf"];
+    store_input [label="*tqmf_ptr-- = xin1; *tqmf_ptr = xin2"];
+    calc_xl_xh [label="xl = (xa+xb)>>15\nxh = (xa-xb)>>15"];
+    low_band [label="szl=filtez()\nspl=filtep()\nsl=szl+spl\nel=xl-sl\nil=quantl()\ndlt=detl*qq4_table[]>>15\nnbl=logscl()\ndetl=scalel()\nplt=dlt+szl\nupzero()\nal2=uppol2()\nal1=uppol1()\nrlt=sl+dlt\nAtualiza rlt1,rlt2,plt1,plt2"];
+    high_band [label="szh=filtez()\nsph=filtep()\nsh=sph+szh\neh=xh-sh"];
+    cond_eh [label="if (eh >= 0)", shape=diamond];
+    set_ih3 [label="ih = 3"];
+    set_ih1 [label="ih = 1"];
+    calc_decis [label="decis = (564L*deth) >> 12L"];
+    cond_abs [label="if (my_abs(eh) > decis)", shape=diamond];
+    dec_ih [label="ih--"];
+    calc_dh [label="dh = (deth*qq2_table[ih]) >> 15L\nnbh=logsch()\ndeth=scalel()\nph=dh+szh\nupzero()\nah2=uppol2()\nah1=uppol1()\nyh=sh+dh\nAtualiza rh1,rh2,ph1,ph2"];
+
+    // Conexões normais
+    start -> init;
+    init -> loop1;
+    loop1 -> post_loop1;
+    post_loop1 -> loop2;
+    loop2 -> store_input;
+    store_input -> calc_xl_xh;
+    calc_xl_xh -> low_band;
+    low_band -> high_band;
+    high_band -> cond_eh;
+    cond_eh -> set_ih3 [label="True"];
+    cond_eh -> set_ih1 [label="False"];
+    set_ih3 -> calc_decis;
+    set_ih1 -> calc_decis;
+    calc_decis -> cond_abs;
+    cond_abs -> dec_ih [label="True"];
+    cond_abs -> calc_dh [label="False"];
+    dec_ih -> calc_dh;
+    calc_dh -> end;
+
+    // Caminhos inviáveis identificados
+    // Nenhum caminho inviável foi identificado na função encode
+    // com base na análise estática do código fornecido
+}
+```

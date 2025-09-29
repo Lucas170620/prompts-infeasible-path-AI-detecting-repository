@@ -1,0 +1,12 @@
+digraph int_disable {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    empty_function [label="Empty function body"];
+
+    start -> empty_function;
+    empty_function -> end;
+}
