@@ -1,0 +1,51 @@
+```dot
+digraph main {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="main() Start", shape=ellipse];
+    end [label="main() End", shape=ellipse];
+    node1 [label="int a;"];
+    node2 [label="a = 30;"];
+    node3 [label="fib(a);"];
+    node4 [label="return a;"];
+    cond1 [label="for (i = 2; i <= 30 && i <= n; i++)", shape=diamond];
+    cond2 [label="i <= 30", shape=diamond];
+    cond3 [label="i <= n", shape=diamond];
+    node5 [label="temp = Fnew;\nFnew = Fnew + Fold;\nFold = temp;"];
+    node6 [label="i++"];
+    node7 [label="ans = Fnew;"];
+    node8 [label="return ans;"];
+    fib_start [label="fib() Start", shape=ellipse];
+    fib_end [label="fib() End", shape=ellipse];
+    fib_init [label="Fnew = 1;\nFold = 0;"];
+    fib_call [label="fib(a) call"];
+
+    start -> node1;
+    node1 -> node2;
+    node2 -> fib_call;
+    fib_call -> fib_start;
+    fib_start -> fib_init;
+    fib_init -> cond1;
+    cond1 -> cond2;
+    cond2 -> cond3 [label="True"];
+    cond2 -> node7 [label="False"];
+    cond3 -> node5 [label="True"];
+    cond3 -> node7 [label="False"];
+    node5 -> node6;
+    node6 -> cond1;
+    node7 -> node8;
+    node8 -> fib_end;
+    fib_end -> node3;
+    node3 -> node4;
+    node4 -> end;
+
+    // Infeasible paths due to fixed value a=30
+    cond3 -> node5 [label="True", color=red, fontcolor=red];
+    cond1 -> cond2 [color=red, fontcolor=red];
+    cond2 -> cond3 [label="True", color=red, fontcolor=red];
+    node5 -> node6 [color=red, fontcolor=red];
+    node6 -> cond1 [color=red, fontcolor=red];
+}
+```

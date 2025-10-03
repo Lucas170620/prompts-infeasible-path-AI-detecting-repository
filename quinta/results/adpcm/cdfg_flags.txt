@@ -1,0 +1,19 @@
+```dot
+digraph flags {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="flags()", shape=ellipse];
+    end [label="return", shape=ellipse];
+    
+    node1 [label="int flags(int)"];
+    node2 [label="// Função vazia - sem implementação"];
+    node3 [label="return 0;", color=red, fontcolor=red];
+
+    start -> node1;
+    node1 -> node2;
+    node2 -> node3 [color=red, fontcolor=red];
+    node3 -> end [color=red, fontcolor=red];
+}
+```

@@ -1,0 +1,39 @@
+digraph logsch {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="logsch Start", shape=ellipse];
+    end [label="logsch End", shape=ellipse];
+    
+    node_def_nbh [label="def: nbh\nuse: nbh"];
+    node_def_ih [label="def: ih\nuse: ih"];
+    node_def_wd [label="def: wd"];
+    
+    calc_wd [label="wd = ((long)nbh * 127L) >> 7L"];
+    calc_nbh [label="nbh = wd + wh_code_table[ih]"];
+    cond_nbh_lt0 [label="if (nbh < 0)", shape=diamond];
+    cond_nbh_gt22528 [label="if (nbh > 22528)", shape=diamond];
+    set_nbh_0 [label="nbh = 0"];
+    set_nbh_22528 [label="nbh = 22528"];
+    return_nbh [label="return nbh"];
+
+    start -> node_def_nbh;
+    node_def_nbh -> node_def_ih;
+    node_def_ih -> calc_wd;
+    calc_wd -> calc_nbh;
+    calc_nbh -> cond_nbh_lt0;
+    
+    cond_nbh_lt0 -> set_nbh_0 [label="True"];
+    cond_nbh_lt0 -> cond_nbh_gt22528 [label="False"];
+    
+    set_nbh_0 -> cond_nbh_gt22528;
+    cond_nbh_gt22528 -> set_nbh_22528 [label="True"];
+    cond_nbh_gt22528 -> return_nbh [label="False"];
+    
+    set_nbh_22528 -> return_nbh;
+    return_nbh -> end;
+
+    cond_nbh_lt0 -> cond_nbh_gt22528 [label="False", color=red, fontcolor=red];
+    cond_nbh_gt22528 -> return_nbh [label="False", color=red, fontcolor=red];
+}

@@ -3,10 +3,8 @@ digraph int_enable {
     node [shape=box, fontname=Arial];
     edge [fontname=Arial];
 
-    start [label="int_enable() Start", shape=ellipse];
-    end [label="int_enable() End", shape=ellipse];
-    empty_body [label="Empty function body"];
-
-    start -> empty_body;
-    empty_body -> end;
+    start [label="int_enable()", shape=ellipse];
+    end [label="Return", shape=ellipse];
+    
+    start -> end [color=red, fontcolor=red];
 }

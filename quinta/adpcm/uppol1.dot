@@ -1,0 +1,31 @@
+digraph uppol1 {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    cond1 [label="if (plt * plt1 >= 0)", shape=diamond];
+    block1 [label="wd2 = (al1 * 255) >> 8\napl1 = wd2 + 192"];
+    block2 [label="wd2 = (al1 * 255) >> 8\napl1 = wd2 - 192"];
+    cond2 [label="if (apl1 > wd3)", shape=diamond];
+    cond3 [label="if (apl1 < -wd3)", shape=diamond];
+    block3 [label="apl1 = wd3"];
+    block4 [label="apl1 = -wd3"];
+    block5 [label="wd3 = 15360 - apl2"];
+    block6 [label="return apl1"];
+
+    start -> block5;
+    block5 -> cond1;
+    cond1 -> block1 [label="True"];
+    cond1 -> block2 [label="False"];
+    block1 -> cond2;
+    block2 -> cond2;
+    cond2 -> block3 [label="True"];
+    cond2 -> cond3 [label="False"];
+    block3 -> cond3;
+    cond3 -> block4 [label="True"];
+    cond3 -> block6 [label="False"];
+    block4 -> block6;
+    block6 -> end;
+}

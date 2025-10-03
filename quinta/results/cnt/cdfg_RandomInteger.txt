@@ -1,0 +1,16 @@
+```dot
+digraph RandomInteger {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="RandomInteger Start", shape=ellipse];
+    end [label="RandomInteger End", shape=ellipse];
+    computation [label="Seed = ((Seed * 133) + 81) % 8095"];
+    return [label="return Seed"];
+
+    start -> computation;
+    computation -> return;
+    return -> end;
+}
+```

@@ -5,8 +5,8 @@ digraph getinput {
 
     start [label="getinput Start", shape=ellipse];
     end [label="getinput End", shape=ellipse];
+    error_node [label="Function getinput not found", color=red, fontcolor=red];
     
-    node1 [label="return flags(0)"];
-    start -> node1;
-    node1 -> end;
+    start -> error_node;
+    error_node -> end;
 }

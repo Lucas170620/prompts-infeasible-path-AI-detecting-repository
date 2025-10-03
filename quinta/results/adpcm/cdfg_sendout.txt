@@ -1,0 +1,27 @@
+```dot
+digraph sendout {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    node1 [label="sendout(int output)"];
+    node2 [label="Setup codec"];
+    cond1 [label="if (output & 0x8000)", shape=diamond];
+    node3 [label="output = -output"];
+    node4 [label="Send output high byte"];
+    node5 [label="Send output low byte"];
+    node6 [label="Flush output"];
+
+    start -> node1;
+    node1 -> node2;
+    node2 -> cond1;
+    cond1 -> node3 [label="True"];
+    cond1 -> node4 [label="False"];
+    node3 -> node4;
+    node4 -> node5;
+    node5 -> node6;
+    node6 -> end;
+}
+```

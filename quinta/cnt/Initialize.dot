@@ -1,0 +1,28 @@
+digraph Initialize {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start\nInitialize(matrix Array)", shape=ellipse];
+    end [label="End\nreturn 0", shape=ellipse];
+    outer_init [label="OuterIndex = 0"];
+    outer_cond [label="OuterIndex < MAXSIZE", shape=diamond];
+    inner_init [label="InnerIndex = 0"];
+    inner_cond [label="InnerIndex < MAXSIZE", shape=diamond];
+    assign [label="Array[OuterIndex][InnerIndex] = RandomInteger()"];
+    inner_inc [label="InnerIndex++"];
+    outer_inc [label="OuterIndex++"];
+    return [label="return 0"];
+
+    start -> outer_init;
+    outer_init -> outer_cond;
+    outer_cond -> inner_init [label="True"];
+    outer_cond -> return [label="False"];
+    inner_init -> inner_cond;
+    inner_cond -> assign [label="True"];
+    inner_cond -> outer_inc [label="False"];
+    assign -> inner_inc;
+    inner_inc -> inner_cond;
+    outer_inc -> outer_cond;
+    return -> end;
+}

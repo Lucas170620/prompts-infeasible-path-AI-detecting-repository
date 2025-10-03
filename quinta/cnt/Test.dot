@@ -1,0 +1,26 @@
+digraph Test {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Test Start", shape=ellipse];
+    end [label="Test End", shape=ellipse];
+    init_array [label="Initialize(Array)"];
+    start_time [label="StartTime = 1000.0"];
+    sum_array [label="Sum(Array)"];
+    stop_time [label="StopTime = 1500.0"];
+    total_time [label="TotalTime = (StopTime - StartTime) / 1000.0"];
+    return_0 [label="return 0"];
+
+    start -> init_array;
+    init_array -> start_time;
+    start_time -> sum_array;
+    sum_array -> stop_time;
+    stop_time -> total_time;
+    total_time -> return_0;
+    return_0 -> end;
+
+    // Infeasible paths due to unreachable code after return
+    total_time -> return_0 [color=red, fontcolor=red];
+    return_0 -> end [color=red, fontcolor=red];
+}

@@ -1,0 +1,23 @@
+```dot
+digraph filtep {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start filtep(rlt1, al1, rlt2, al2)", shape=ellipse];
+    end [label="Return pl", shape=ellipse];
+    
+    node1 [label="pl = 2 * rlt1"];
+    node2 [label="pl = al1 * pl"];
+    node3 [label="pl2 = 2 * rlt2"];
+    node4 [label="pl += al2 * pl2"];
+    node5 [label="return (int)(pl >> 15)"];
+    
+    start -> node1;
+    node1 -> node2;
+    node2 -> node3;
+    node3 -> node4;
+    node4 -> node5;
+    node5 -> end;
+}
+```

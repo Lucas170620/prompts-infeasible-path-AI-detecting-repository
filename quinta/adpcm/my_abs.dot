@@ -5,15 +5,15 @@ digraph my_abs {
 
     start [label="Start", shape=ellipse];
     end [label="End", shape=ellipse];
-    cond1 [label="if (n >= 0)", shape=diamond];
-    assign1 [label="m = n"];
-    assign2 [label="m = -n"];
+    cond [label="if (n >= 0)", shape=diamond];
+    assign_pos [label="m = n"];
+    assign_neg [label="m = -n"];
     return_stmt [label="return m"];
 
-    start -> cond1;
-    cond1 -> assign1 [label="True"];
-    cond1 -> assign2 [label="False"];
-    assign1 -> return_stmt;
-    assign2 -> return_stmt;
+    start -> cond;
+    cond -> assign_pos [label="True"];
+    cond -> assign_neg [label="False"];
+    assign_pos -> return_stmt;
+    assign_neg -> return_stmt;
     return_stmt -> end;
 }

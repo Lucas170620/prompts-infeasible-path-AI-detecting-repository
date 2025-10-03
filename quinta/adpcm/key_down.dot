@@ -3,8 +3,8 @@ digraph key_down {
     node [shape=box, fontname=Arial];
     edge [fontname=Arial];
 
-    start [label="key_down() Start", shape=ellipse];
-    end [label="key_down() End", shape=ellipse];
+    start [label="key_down()", shape=ellipse];
+    end [label="End", shape=ellipse];
     
     start -> end [label="Empty function", color=red, fontcolor=red];
 }

@@ -1,0 +1,24 @@
+digraph logscl {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="logscl(int il, int nbl)", shape=ellipse];
+    end [label="return nbl", shape=ellipse];
+    compute_wd [label="wd = ((long)nbl * 127L) >> 7L"];
+    update_nbl [label="nbl = (int)wd + wl_code_table[il >> 2]"];
+    cond1 [label="if (nbl < 0)", shape=diamond];
+    set_zero [label="nbl = 0"];
+    cond2 [label="if (nbl > 18432)", shape=diamond];
+    set_max [label="nbl = 18432"];
+
+    start -> compute_wd;
+    compute_wd -> update_nbl;
+    update_nbl -> cond1;
+    cond1 -> set_zero [label="True"];
+    cond1 -> cond2 [label="False"];
+    set_zero -> cond2;
+    cond2 -> set_max [label="True"];
+    cond2 -> end [label="False"];
+    set_max -> end;
+}

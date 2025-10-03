@@ -3,27 +3,15 @@ digraph fft {
     node [shape=box, fontname=Arial];
     edge [fontname=Arial];
 
-    start [label="Start", shape=ellipse];
-    end [label="End", shape=ellipse];
-    cond_rad_gt_2pi [label="while (rad > 2*PI)", shape=diamond];
-    cond_rad_lt_neg2pi [label="while (rad < -2*PI)", shape=diamond];
-    init_diff [label="diff = rad\napp = diff"];
-    compute_diff [label="diff = (diff * (-(rad*rad))) / ((2 * inc) * (2 * inc + 1))"];
-    update_app [label="app = app + diff"];
-    inc_increment [label="inc++"];
-    cond_diff_abs [label="while(my_fabs(diff) >= 1)", shape=diamond];
-    return_app [label="return app"];
-
-    start -> cond_rad_gt_2pi;
-    cond_rad_gt_2pi -> cond_rad_gt_2pi [label="True", color=red, fontcolor=red];
-    cond_rad_gt_2pi -> cond_rad_lt_neg2pi [label="False"];
-    cond_rad_lt_neg2pi -> cond_rad_lt_neg2pi [label="True", color=red, fontcolor=red];
-    cond_rad_lt_neg2pi -> init_diff [label="False"];
-    init_diff -> compute_diff;
-    compute_diff -> update_app;
-    update_app -> inc_increment;
-    inc_increment -> cond_diff_abs;
-    cond_diff_abs -> compute_diff [label="True"];
-    cond_diff_abs -> return_app [label="False"];
-    return_app -> end;
+    start [label="fft Start", shape=ellipse];
+    end [label="fft End", shape=ellipse];
+    
+    node_1 [label="COMPLEX *; int"];
+    node_2 [label="Function parameters received"];
+    node_3 [label="Empty function body", color=red, fontcolor=red];
+    
+    start -> node_1;
+    node_1 -> node_2;
+    node_2 -> node_3 [color=red, fontcolor=red];
+    node_3 -> end [color=red, fontcolor=red];
 }

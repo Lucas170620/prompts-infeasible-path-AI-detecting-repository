@@ -1,0 +1,25 @@
+digraph fib {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    decl [label="int i, Fnew, Fold, temp, ans"];
+    init1 [label="Fnew = 1"];
+    init2 [label="Fold = 0"];
+    for_cond [label="for (i = 2; i <= 30 && i <= n; i++)", shape=diamond];
+    loop_body [label="temp = Fnew\nFnew = Fnew + Fold\nFold = temp"];
+    assign_ans [label="ans = Fnew"];
+    return_stmt [label="return ans"];
+
+    start -> decl;
+    decl -> init1;
+    init1 -> init2;
+    init2 -> for_cond;
+    for_cond -> loop_body [label="True"];
+    for_cond -> assign_ans [label="False"];
+    loop_body -> for_cond;
+    assign_ans -> return_stmt;
+    return_stmt -> end;
+}

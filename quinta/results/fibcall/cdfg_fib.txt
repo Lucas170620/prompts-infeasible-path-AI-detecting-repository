@@ -1,0 +1,36 @@
+```dot
+digraph fib {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start fib(n)", shape=ellipse];
+    end [label="End return ans", shape=ellipse];
+    decl [label="int i, Fnew, Fold, temp, ans"];
+    init1 [label="Fnew = 1"];
+    init2 [label="Fold = 0"];
+    for_init [label="i = 2"];
+    for_cond [label="i <= 30 && i <= n", shape=diamond];
+    loop_body [label="temp = Fnew\nFnew = Fnew + Fold\nFold = temp"];
+    incr [label="i++"];
+    assign_ans [label="ans = Fnew"];
+    return [label="return ans"];
+
+    start -> decl;
+    decl -> init1;
+    init1 -> init2;
+    init2 -> for_init;
+    for_init -> for_cond;
+    for_cond -> loop_body [label="True"];
+    for_cond -> assign_ans [label="False"];
+    loop_body -> incr;
+    incr -> for_cond;
+    assign_ans -> return;
+    return -> end;
+
+    // Infeasible paths devido ao loop limitado a i <= 30
+    for_cond -> loop_body [label="True", color=red, fontcolor=red];
+    loop_body -> incr [color=red, fontcolor=red];
+    incr -> for_cond [color=red, fontcolor=red];
+}
+```

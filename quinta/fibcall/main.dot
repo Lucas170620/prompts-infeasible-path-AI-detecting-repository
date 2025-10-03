@@ -1,0 +1,18 @@
+digraph main {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="main() Start", shape=ellipse];
+    end [label="main() End", shape=ellipse];
+    node1 [label="int a;"];
+    node2 [label="a = 30;"];
+    node3 [label="fib(a);"];
+    node4 [label="return a;"];
+
+    start -> node1;
+    node1 -> node2;
+    node2 -> node3;
+    node3 -> node4;
+    node4 -> end;
+}

@@ -1,0 +1,31 @@
+Analisando o código fornecido e seus grafos n-CDFG, identifiquei os seguintes caminhos inviáveis:
+
+## 1. Caminho Inviável Local em `fib`
+- **Trechos de Código Envolvidos**:
+  - Linha 4: `for (i = 2; i <= 30 && i <= n; i++)`
+  - Linha 5-9: Corpo do loop (cálculo de Fibonacci)
+- **Descrição do Caminho**: for_cond → loop_body → incr → for_cond
+- **Motivo**: Contradição lógica entre as condições do loop. A condição `i <= 30` sempre será falsa quando `i > 30`, mas o loop está limitado a executar apenas até `i = 30`. O caminho vermelho indica tentativas de execução além do limite estabelecido pela condição `i <= 30`.
+
+## 2. Caminho Inviável Local em `main` (Integração com `fib`)
+- **Trechos de Código Envolvidos**:
+  - Linha 22: `a = 30;`
+  - Linha 4: `for (i = 2; i <= 30 && i <= n; i++)` (em `fib`)
+- **Descrição do Caminho**: cond3 → node5 (corpo do loop)
+- **Motivo**: Dependência de dados com valor fixo. Como `a = 30` é fixo em `main` e passado como `n` para `fib`, a condição `i <= n` será sempre verdadeira quando `i <= 30`. Portanto, o caminho que tenta executar o corpo do loop quando `i <= n` é falso é inviável, pois com `n = 30` esta condição será sempre verdadeira quando `i <= 30`.
+
+## 3. Caminho Inviável Global entre `main` e `fib`
+- **Trechos de Código Envolvidos**:
+  - Função main, Linha 22: `a = 30;`
+  - Função fib, Linha 4: `for (i = 2; i <= 30 && i <= n; i++)`
+- **Descrição**: Fluxo interfunções com conflito de condições
+- **Motivo**: Valor definido na linha 22 (`a = 30`) torna a segunda parte da condição (`i <= n`) redundante e sempre verdadeira quando a primeira parte (`i <= 30`) é verdadeira. Isso cria uma situação onde a condição composta `i <= 30 && i <= n` é equivalente a apenas `i <= 30`, tornando inviáveis os caminhos que consideram `i <= n` como falso.
+
+## 4. Caminho Inviável Estrutural em `fib`
+- **Trechos de Código Envolvidos**:
+  - Linha 4: Condição do loop `i <= 30 && i <= n`
+  - Linha 13: `ans = Fnew`
+- **Descrição do Caminho**: Tentativa de execução do loop além de i=30
+- **Motivo**: A estrutura do loop é limitada por design a `i <= 30`, tornando fisicamente impossível que `i` exceda este valor durante a execução normal do loop. Qualquer caminho que assuma `i > 30` dentro do contexto do loop é estruturalmente inviável.
+
+**Observação adicional**: O código também apresenta um **problema de lógica de programa** - a função `main` chama `fib(a)` mas ignora o valor retornado, sempre retornando 30. Porém, isto não configura um caminho inviável, mas sim um erro de lógica de programação.

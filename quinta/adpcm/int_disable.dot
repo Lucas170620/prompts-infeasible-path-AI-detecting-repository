@@ -5,8 +5,8 @@ digraph int_disable {
 
     start [label="Start", shape=ellipse];
     end [label="End", shape=ellipse];
-    empty_function [label="Empty function body"];
+    disable_int [label="Disable interrupts", shape=box];
 
-    start -> empty_function;
-    empty_function -> end;
+    start -> disable_int;
+    disable_int -> end;
 }

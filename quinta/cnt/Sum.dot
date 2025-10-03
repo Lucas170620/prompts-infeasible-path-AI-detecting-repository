@@ -1,0 +1,35 @@
+digraph Sum {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Sum(matrix Array)", shape=ellipse];
+    end [label="End", shape=ellipse];
+    init_vars [label="Ptotal = 0\nNtotal = 0\nPcnt = 0\nNcnt = 0"];
+    outer_loop_init [label="Outer = 0"];
+    outer_cond [label="Outer < MAXSIZE", shape=diamond];
+    inner_loop_init [label="Inner = 0"];
+    inner_cond [label="Inner < MAXSIZE", shape=diamond];
+    array_check [label="Array[Outer][Inner] < 0", shape=diamond];
+    positive_case [label="Ptotal += Array[Outer][Inner]\nPcnt++"];
+    negative_case [label="Ntotal += Array[Outer][Inner]\nNcnt++"];
+    inner_increment [label="Inner++"];
+    outer_increment [label="Outer++"];
+    assign_results [label="Postotal = Ptotal\nPoscnt = Pcnt\nNegtotal = Ntotal\nNegcnt = Ncnt"];
+
+    start -> init_vars;
+    init_vars -> outer_loop_init;
+    outer_loop_init -> outer_cond;
+    outer_cond -> inner_loop_init [label="True"];
+    outer_cond -> assign_results [label="False"];
+    inner_loop_init -> inner_cond;
+    inner_cond -> array_check [label="True"];
+    inner_cond -> outer_increment [label="False"];
+    array_check -> negative_case [label="True"];
+    array_check -> positive_case [label="False"];
+    positive_case -> inner_increment;
+    negative_case -> inner_increment;
+    inner_increment -> inner_cond;
+    outer_increment -> outer_cond;
+    assign_results -> end;
+}

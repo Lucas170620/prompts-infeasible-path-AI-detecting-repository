@@ -1,0 +1,6 @@
+Nesta versão foi atualizado:
+
+- Mudanças na Pipeline
+- Adaptações dos grafos
+- Salvamento do reasoning
+- Adaptação do prompt

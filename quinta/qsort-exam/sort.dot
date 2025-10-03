@@ -1,0 +1,66 @@
+digraph sort {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start\nunsigned long i,ir=n,j,k,l=1\nint jstack=0\nint flag\nfloat a,temp\nflag=0", shape=ellipse];
+    end [label="End", shape=ellipse];
+    cond1 [label="for (;;)", shape=diamond];
+    cond2 [label="if (ir-l < M)", shape=diamond];
+    block1 [label="j=l+1\nj<=ir?\na=arr[j]\ni=j-1\ni>=l?\nif (arr[i] <= a) break\narr[i+1]=arr[i]\ni--\narr[i+1]=a\nj++"];
+    cond3 [label="if (jstack == 0)", shape=diamond];
+    block2 [label="ir=istack[jstack--]\nl=istack[jstack--]"];
+    block3 [label="k=(l+ir) >> 1\nSWAP(arr[k],arr[l+1])"];
+    cond4 [label="if (arr[l] > arr[ir])", shape=diamond];
+    block4 [label="SWAP(arr[l],arr[ir])"];
+    cond5 [label="if (arr[l+1] > arr[ir])", shape=diamond];
+    block5 [label="SWAP(arr[l+1],arr[ir])"];
+    cond6 [label="if (arr[l] > arr[l+1])", shape=diamond];
+    block6 [label="SWAP(arr[l],arr[l+1])"];
+    block7 [label="i=l+1\nj=ir\na=arr[l+1]"];
+    cond7 [label="for (;;)", shape=diamond];
+    block8 [label="i++\nwhile (arr[i] < a) i++\nj--\nwhile (arr[j] > a) j--"];
+    cond8 [label="if (j < i)", shape=diamond];
+    block9 [label="SWAP(arr[i],arr[j])"];
+    block10 [label="arr[l+1]=arr[j]\narr[j]=a\njstack += 2"];
+    cond9 [label="if (ir-i+1 >= j-l)", shape=diamond];
+    block11 [label="istack[jstack]=ir\nistack[jstack-1]=i\nir=j-1"];
+    block12 [label="istack[jstack]=j-1\nistack[jstack-1]=l\nl=i"];
+
+    start -> cond1;
+    cond1 -> cond2;
+    cond2 -> block1 [label="True"];
+    cond2 -> block3 [label="False"];
+    block1 -> cond3;
+    cond3 -> end [label="True"];
+    cond3 -> block2 [label="False"];
+    block2 -> cond1;
+    block3 -> cond4;
+    cond4 -> block4 [label="True"];
+    cond4 -> cond5 [label="False"];
+    block4 -> cond5;
+    cond5 -> block5 [label="True"];
+    cond5 -> cond6 [label="False"];
+    block5 -> cond6;
+    cond6 -> block6 [label="True"];
+    cond6 -> block7 [label="False"];
+    block6 -> block7;
+    block7 -> cond7;
+    cond7 -> block8;
+    block8 -> cond8;
+    cond8 -> block9 [label="False"];
+    cond8 -> block10 [label="True"];
+    block9 -> cond7;
+    block10 -> cond9;
+    cond9 -> block11 [label="True"];
+    cond9 -> block12 [label="False"];
+    block11 -> cond1;
+    block12 -> cond1;
+
+    // Infeasible paths devido a contradicoes logicas
+    cond4 -> block4 [label="True", color=red, fontcolor=red];
+    cond5 -> block5 [label="True", color=red, fontcolor=red];
+    cond6 -> block6 [label="True", color=red, fontcolor=red];
+    cond8 -> block9 [label="False", color=red, fontcolor=red];
+    cond9 -> block11 [label="True", color=red, fontcolor=red];
+}

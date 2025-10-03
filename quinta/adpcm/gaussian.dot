@@ -3,12 +3,8 @@ digraph gaussian {
     node [shape=box, fontname=Arial];
     edge [fontname=Arial];
 
-    start [label="Start", shape=ellipse];
-    end [label="End", shape=ellipse];
-    node1 [label="gaussian()"];
-    node2 [label="return 0"];
-
-    start -> node1;
-    node1 -> node2 [color=red, fontcolor=red];
-    node2 -> end;
+    start [label="gaussian()", shape=ellipse];
+    end [label="return", shape=ellipse, color=red, fontcolor=red];
+    
+    start -> end [color=red, fontcolor=red];
 }

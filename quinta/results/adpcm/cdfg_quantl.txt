@@ -1,0 +1,35 @@
+```dot
+digraph quantl {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    node1 [label="wd = my_abs(el)"];
+    node2 [label="mil = 0"];
+    node3 [label="mil < 30", shape=diamond];
+    node4 [label="decis = (decis_levl[mil]*(long)detl) >> 15L"];
+    node5 [label="wd <= decis", shape=diamond];
+    node6 [label="mil++"];
+    node7 [label="el >= 0", shape=diamond];
+    node8 [label="ril = quant26bt_pos[mil]"];
+    node9 [label="ril = quant26bt_neg[mil]"];
+    node10 [label="return ril"];
+
+    start -> node1;
+    node1 -> node2;
+    node2 -> node3;
+    node3 -> node4 [label="True"];
+    node3 -> node7 [label="False"];
+    node4 -> node5;
+    node5 -> node6 [label="False"];
+    node5 -> node7 [label="True"];
+    node6 -> node3;
+    node7 -> node8 [label="True"];
+    node7 -> node9 [label="False"];
+    node8 -> node10;
+    node9 -> node10;
+    node10 -> end;
+}
+```

@@ -1,0 +1,73 @@
+```c
+typedef int matrix [MAXSIZE][MAXSIZE];
+int main(void);
+int Test(matrix);
+int Initialize(matrix);
+int InitSeed(void);
+void Sum(matrix);
+int RandomInteger(void);
+int Seed;
+matrix Array;
+int Postotal, Negtotal, Poscnt, Negcnt;
+int main (void)
+{
+   InitSeed();
+   Test(Array);
+   return 1;
+}
+int Test(matrix Array)
+{
+   long StartTime, StopTime;
+   float TotalTime;
+   Initialize(Array);
+   StartTime = 1000.0;
+   Sum(Array);
+   StopTime = 1500.0;
+   TotalTime = (StopTime - StartTime) / 1000.0;
+   return 0;
+}
+int Initialize(matrix Array)
+{
+   register int OuterIndex, InnerIndex;
+   for (OuterIndex = 0; OuterIndex < MAXSIZE; OuterIndex++)
+      for (InnerIndex = 0; InnerIndex < MAXSIZE; InnerIndex++)
+         Array[OuterIndex][InnerIndex] = RandomInteger();
+   return 0;
+}
+int InitSeed (void)
+{
+   Seed = 0;
+   return 0;
+}
+void Sum(matrix Array)
+{
+  register int Outer, Inner;
+  int Ptotal = 0;
+  int Ntotal = 0;
+  int Pcnt = 0;
+  int Ncnt = 0;
+  for (Outer = 0; Outer < MAXSIZE; Outer++)
+    for (Inner = 0; Inner < MAXSIZE; Inner++)
+#ifdef WORSTCASE
+      if (Array[Outer][Inner] >= 0) {
+#else
+	if (Array[Outer][Inner] < 0) {
+#endif
+	  Ptotal += Array[Outer][Inner];
+	  Pcnt++;
+	}
+	else {
+	  Ntotal += Array[Outer][Inner];
+	  Ncnt++;
+	}
+  Postotal = Ptotal;
+  Poscnt = Pcnt;
+  Negtotal = Ntotal;
+  Negcnt = Ncnt;
+}
+int RandomInteger(void)
+{
+   Seed = ((Seed * 133) + 81) % 8095;
+   return Seed;
+}
+```

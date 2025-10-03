@@ -1,0 +1,35 @@
+```dot
+digraph my_sin {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start", shape=ellipse];
+    end [label="End", shape=ellipse];
+    node1 [label="int diff;\nint app=0;\nint inc = 1;"];
+    node2 [label="while (rad > 2*PI)\nrad -= 2*PI;"];
+    node3 [label="while (rad < -2*PI)\nrad += 2*PI;"];
+    node4 [label="diff = rad;\napp = diff;"];
+    node5 [label="diff = (diff * (-(rad*rad))) / ((2 * inc) * (2 * inc + 1));"];
+    node6 [label="app = app + diff;\ninc++;"];
+    node7 [label="while(my_fabs(diff) >= 1)"];
+    node8 [label="diff = (diff * (-(rad*rad))) / ((2 * inc) * (2 * inc + 1));"];
+    node9 [label="app = app + diff;\ninc++;"];
+    node10 [label="return app;"];
+
+    start -> node1;
+    node1 -> node2;
+    node2 -> node3 [label="False"];
+    node2 -> node2 [label="True"];
+    node3 -> node4 [label="False"];
+    node3 -> node3 [label="True"];
+    node4 -> node5;
+    node5 -> node6;
+    node6 -> node7;
+    node7 -> node8 [label="True"];
+    node7 -> node10 [label="False"];
+    node8 -> node9;
+    node9 -> node7;
+    node10 -> end;
+}
+```

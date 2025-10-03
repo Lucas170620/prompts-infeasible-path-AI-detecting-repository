@@ -1,0 +1,57 @@
+digraph uppol2 {
+    rankdir=TB;
+    node [shape=box, fontname=Arial];
+    edge [fontname=Arial];
+
+    start [label="Start uppol2", shape=ellipse];
+    end [label="End", shape=ellipse];
+    
+    def_al1 [label="def al1"];
+    def_al2 [label="def al2"];
+    def_plt [label="def plt"];
+    def_plt1 [label="def plt1"];
+    def_plt2 [label="def plt2"];
+    
+    calc_wd2 [label="wd2 = 4L*(long)al1", shape=box];
+    cond1 [label="if (plt*plt1 >= 0)", shape=diamond];
+    neg_wd2 [label="wd2 = -wd2", shape=box];
+    shift_wd2 [label="wd2 = wd2 >> 7", shape=box];
+    cond2 [label="if (plt*plt2 >= 0)", shape=diamond];
+    add_128 [label="wd4 = wd2 + 128", shape=box];
+    sub_128 [label="wd4 = wd2 - 128", shape=box];
+    calc_apl2 [label="apl2 = wd4 + (127L*(long)al2 >> 7L)", shape=box];
+    cond3 [label="if (apl2 > 12288)", shape=diamond];
+    set_max [label="apl2 = 12288", shape=box];
+    cond4 [label="if (apl2 < -12288)", shape=diamond];
+    set_min [label="apl2 = -12288", shape=box];
+    return_apl2 [label="return apl2", shape=box];
+    
+    start -> def_al1;
+    def_al1 -> def_al2;
+    def_al2 -> def_plt;
+    def_plt -> def_plt1;
+    def_plt1 -> def_plt2;
+    def_plt2 -> calc_wd2;
+    calc_wd2 -> cond1;
+    
+    cond1 -> neg_wd2 [label="True"];
+    cond1 -> shift_wd2 [label="False"];
+    neg_wd2 -> shift_wd2;
+    shift_wd2 -> cond2;
+    
+    cond2 -> add_128 [label="True"];
+    cond2 -> sub_128 [label="False"];
+    add_128 -> calc_apl2;
+    sub_128 -> calc_apl2;
+    
+    calc_apl2 -> cond3;
+    cond3 -> set_max [label="True"];
+    cond3 -> cond4 [label="False"];
+    set_max -> cond4;
+    
+    cond4 -> set_min [label="True"];
+    cond4 -> return_apl2 [label="False"];
+    set_min -> return_apl2;
+    
+    return_apl2 -> end;
+}

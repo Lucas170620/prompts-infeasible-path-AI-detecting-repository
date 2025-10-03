@@ -3,17 +3,15 @@ digraph flags {
     node [shape=box, fontname=Arial];
     edge [fontname=Arial];
 
-    start [label="flags() start", shape=ellipse];
-    end [label="flags() end", shape=ellipse];
-    cond1 [label="if (n >= 0)", shape=diamond];
-    block1 [label="m = n"];
-    block2 [label="m = -n"];
-    return [label="return m"];
+    start [label="flags()", shape=ellipse];
+    end [label="return", shape=ellipse];
+    
+    node1 [label="int flags(int)"];
+    node2 [label="// Funcao vazia - sem implementacao"];
+    node3 [label="return 0;", color=red, fontcolor=red];
 
-    start -> cond1;
-    cond1 -> block1 [label="True"];
-    cond1 -> block2 [label="False"];
-    block1 -> return;
-    block2 -> return;
-    return -> end;
+    start -> node1;
+    node1 -> node2;
+    node2 -> node3 [color=red, fontcolor=red];
+    node3 -> end [color=red, fontcolor=red];
 }
