@@ -15,7 +15,7 @@ digraph G {
     11 [label="11"];
     12 [label="12"];
     
-    // Arestas com rótulos
+    // Arestas com rotulos
     1 -> 2 [label="p-uso=s"];
     1 -> 8 [label="p-uso=s"];
     2 -> 3 [label="p-uso=s"];
@@ -33,7 +33,7 @@ digraph G {
     10 -> 12 [label="p-uso=s"];
     10 -> 11 [label="p-uso=s"];
     
-    // Estilo de nós finais
+    // Estilo de nos finais
     11 [shape=doublecircle];
     12 [shape=doublecircle];
 }

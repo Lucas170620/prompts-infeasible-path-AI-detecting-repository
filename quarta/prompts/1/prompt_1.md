@@ -122,9 +122,9 @@ Para esta análise, um caminho é considerado inviável se:
 ```java
 public class Order {
     public void applyDiscount(Customer customer, Product product) {
-        boolean isPremium = customer.isPremiumMember(); // Condição 1
-        boolean isEligibleForDiscount = product.getPrice() > 100.00; // Condição 2
-        boolean isOnClearance = product.isOnClearance(); // Condição 3
+        boolean isPremium = customer.isPremiumMember();
+        boolean isEligibleForDiscount = product.getPrice() > 100.00;
+        boolean isOnClearance = product.isOnClearance();
         
         if (isPremium && isEligibleForDiscount) {
             System.out.println("Desconto Premium aplicado.");
@@ -132,10 +132,7 @@ public class Order {
 
         if (isOnClearance) {
             System.out.println("Item em liquidação.");
-            // A política da empresa impede que produtos em liquidação (isOnClearance) 
-            // sejam elegíveis para descontos (isEligibleForDiscount).
-            // Portanto, isEligibleForDiscount seria 'false' se isOnClearance for 'true'.
-            if (isPremium && isEligibleForDiscount) { // Caminho Inviável
+            if (isPremium && isEligibleForDiscount) {
                 System.out.println("Super Desconto para Premium em Liquidação!");
             }
         }

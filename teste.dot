@@ -1,0 +1,31 @@
+digraph CDFG {
+    rankdir=TB;
+    node [shape=circle];
+    
+    // Nos com labels separadas
+    1 [label="1", xlabel="Def: isPremium, isEligibleForDiscount, isOnClearance\nC-Use: customer, product"];
+    2 [label="2", xlabel="P-Use: isPremium, isEligibleForDiscount"];
+    3 [label="3", xlabel="C-Use: System.out"];
+    4 [label="4", xlabel="P-Use: isOnClearance"];
+    5 [label="5", xlabel="C-Use: System.out"];
+    6 [label="6", xlabel="P-Use: isPremium, isEligibleForDiscount"];
+    7 [label="7", xlabel="C-Use: System.out"];
+    
+    // No 8 nao precisa de xlabel pois nao tem texto extra
+    8 [label="8"];
+    
+    // Arestas de controle (fluxo de execucao)
+    1 -> 2 ;
+    2 -> 3 [label="True\n(isPremium && isEligibleForDiscount)"];
+    2 -> 4 [label="False"];
+    3 -> 4 ;
+    4 -> 5 [label="True\n(isOnClearance)"];
+    4 -> 8 [label="False"];
+    5 -> 6 ;
+    6 -> 7 [label="True"];
+    6 -> 8 [label="False"];
+    7 -> 8 ;
+    
+    // Estilo para nos finais
+    8 [shape=doublecircle];
+}

@@ -1,0 +1,33 @@
+digraph CDFG {
+    rankdir=TB;
+    node [shape=rectangle];
+    
+    1 [label="1\nDef: isPremium, isEligibleForDiscount, isOnClearance\nC-Use: customer, product"];
+    2 [label="2\nP-Use: isPremium, isEligibleForDiscount"];
+    3 [label="3\nC-Use: System.out"];
+    4 [label="4\nP-Use: isOnClearance"];
+    5 [label="5\nC-Use: System.out"];
+    6 [label="6\nP-Use: isPremium, isEligibleForDiscount"];
+    7 [label="7\nC-Use: System.out"];
+    8 [label="8\nExit"];
+    
+    // Arestas de controle (fluxo de execução)
+    1 -> 2 [label="Controle"];
+    2 -> 3 [label="True\n(isPremium && isEligibleForDiscount)"];
+    2 -> 4 [label="False"];
+    3 -> 4 [label="Controle"];
+    4 -> 5 [label="True\n(isOnClearance)"];
+    4 -> 8 [label="False"];
+    5 -> 6 [label="Controle"];
+    6 -> 7 [label="True"];
+    6 -> 8 [label="False"];
+    7 -> 8 [label="Controle"];
+    
+    // Arestas de dados (def-use chains) - tracejadas
+    1 -> 2 [style=dashed, label="Dado: isPremium, isEligibleForDiscount"];
+    1 -> 4 [style=dashed, label="Dado: isOnClearance"];
+    1 -> 6 [style=dashed, label="Dado: isPremium, isEligibleForDiscount"];
+    
+    // Estilo para nós finais
+    8 [shape=doublecircle];
+}

@@ -204,7 +204,7 @@ def prompt_detecting_all_infeasible_paths(cdfg: list, entrypoint: str, code_clea
     print("Finalizado: prompt_detecting_all_infeasible_paths")
     return out if out else "No infeasible paths detected"
 
-def main():
+def main(code: str):
     import argparse
 
     print("Iniciando: main")
@@ -216,7 +216,7 @@ def main():
                         help='Modo de execução: "parallel" (padrão) usa ThreadPool; "serial" executa em série')
     args = parser.parse_args()
 
-    path = os.path.join('codes', 'fibcall.c')
+    path = os.path.join('codes', code)
     processed = process_code(path)
     cleaned = prompt_code_cleaning(processed)
     code_name = os.path.splitext(os.path.basename(path))[0]
@@ -306,4 +306,4 @@ def main():
     print("Finalizado: main")
         
 if __name__ == "__main__":
-    main()
+    main("fibcall.c")
