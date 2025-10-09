@@ -35,7 +35,6 @@
 <title>3</title>
 <ellipse fill="none" stroke="black" cx="293.5" cy="-438.5" rx="18" ry="18"/>
 <text xml:space="preserve" text-anchor="middle" x="293.5" y="-433.45" font-family="Times New Roman,serif" font-size="14.00">3</text>
-<text xml:space="preserve" text-anchor="middle" x="223.75" y="-459.7" font-family="Times New Roman,serif" font-size="14.00">C&#45;Use: System.out</text>
 </g>
 <!-- 2&#45;&gt;3 -->
 <g id="edge2" class="edge">
@@ -70,7 +69,6 @@
 <title>5</title>
 <ellipse fill="none" stroke="black" cx="312.5" cy="-260.5" rx="18" ry="18"/>
 <text xml:space="preserve" text-anchor="middle" x="312.5" y="-255.45" font-family="Times New Roman,serif" font-size="14.00">5</text>
-<text xml:space="preserve" text-anchor="middle" x="242.75" y="-281.7" font-family="Times New Roman,serif" font-size="14.00">C&#45;Use: System.out</text>
 </g>
 <!-- 4&#45;&gt;5 -->
 <g id="edge5" class="edge">
@@ -112,7 +110,6 @@
 <title>7</title>
 <ellipse fill="none" stroke="black" cx="305.5" cy="-99" rx="18" ry="18"/>
 <text xml:space="preserve" text-anchor="middle" x="305.5" y="-93.95" font-family="Times New Roman,serif" font-size="14.00">7</text>
-<text xml:space="preserve" text-anchor="middle" x="235.75" y="-120.2" font-family="Times New Roman,serif" font-size="14.00">C&#45;Use: System.out</text>
 </g>
 <!-- 6&#45;&gt;7 -->
 <g id="edge8" class="edge">

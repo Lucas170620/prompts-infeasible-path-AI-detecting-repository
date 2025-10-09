@@ -1,0 +1,235 @@
+Okay, I need to create a CDFG for the given C code function 'main'. Let me first understand what the code does.
+
+Looking at the main function:
+- It declares an integer variable 'a'.
+- Assigns 30 to 'a'.
+- Calls fib(a).
+- Returns 'a'.
+
+The fib function is another part of the code, but since the task is about the 'main' function, I'll focus on that.
+
+So, breaking down main():
+1. Line 1: int a; → declares variable a.
+2. Line 2: a = 30; → assigns value to a.
+3. Line 3: fib(a); → calls fib with a's value (30).
+4. Line 4: return a; → returns the value of a.
+
+For CDFG, I need to represent each basic block as nodes and control/data flows as edges.
+
+Each node will have:
+- A label representing the code in that block.
+- Definitions (def) of variables created there.
+- Uses (use) of variables.
+
+Let's identify each part:
+
+Node 1: int a; → declares 'a' but doesn't define it yet. So, no def here, just a declaration. But in terms of CDFG, I think the variable is used later, so maybe this node has uses for 'a'.
+
+Wait, actually, the assignment to 'a' happens in line 2. So perhaps each statement is a separate node.
+
+But let's consider the structure:
+
+1. Declaration of a: int a;
+   - This is just a declaration; no def yet.
+   - Uses? Not until it's assigned or used elsewhere.
+
+2. a = 30;
+   - Assigns value to 'a'. So, this node defines 'a'.
+   - Also uses the constant 30 and assigns to 'a'.
+
+3. fib(a);
+   - Calls fib function with 'a' as argument.
+   - Uses 'a' here.
+
+4. return a;
+   - Returns the value of 'a'.
+   - Uses 'a'.
+
+So, breaking into nodes:
+
+Node 1: int a; → just declaration, maybe no def or use yet? Or perhaps it's considered a definition because the variable is being declared and used later.
+
+Wait, in terms of data flow, variables are defined when they get values. So:
+
+- Node 2 (a=30) defines 'a'.
+- Node 3 uses 'a' as an argument.
+- Node 4 uses 'a' again.
+
+But what about the declaration? Maybe it's part of the initial setup but doesn't contribute to data flow except for initializing the variable. So perhaps node 1 just declares 'a', and then node 2 defines it.
+
+Alternatively, each statement is a separate node:
+
+Node 1: int a; → declaration (no def yet)
+Node 2: a=30; → def of a
+Node 3: fib(a); → use of a
+Node 4: return a; → use of a
+
+But in the example provided, nodes have both defs and uses. So I think each node can represent a statement that may have both.
+
+So:
+
+- Node 1 (int a;) has no def but may have a declaration. Not sure if it's part of data flow, as 'a' isn't used until later.
+
+But in the context of CDFG, variables are defined when assigned. So perhaps node 2 is where 'a' is defined.
+
+Wait, maybe I should model each statement as a node:
+
+Node 1: int a; → just declaration (no def yet)
+Node 2: a =30 → defines a
+Node 3: fib(a) → uses a
+Node 4: return a → uses a
+
+But the problem is that in code, variables are declared before use. So node 1 declares 'a', but it's not until node 2 that it's defined.
+
+Hmm, perhaps each statement is a separate block. Let me structure the nodes accordingly.
+
+Nodes:
+
+1. int a; → declares variable a. No def yet.
+   - Uses: None
+   - Defs: None (but declaration)
+2. a =30; → defines a=30
+   - Uses: 30 (constant), assigns to a.
+3. fib(a); → uses a as argument.
+4. return a; → uses a.
+
+But the first line 'int a;' doesn't do anything except declare, so in terms of data flow, perhaps it's not part of the graph because there are no def or use here except for possible future assignments.
+
+Alternatively, maybe all lines are nodes, including declarations.
+
+So each line is a node:
+
+Node 1: int a;
+Node 2: a =30;
+Node 3: fib(a);
+Node4: return a;
+
+Now, for each node:
+
+- Node 1:
+   - Defs: none (a is declared but not defined)
+   - Uses: none
+- Node 2:
+   - Defs: a=30
+   - Uses: 30 (constant)
+- Node3:
+   - Uses: a
+- Node4:
+   - Uses: a
+
+So the control flow is sequential:
+
+1 → 2 →3→4.
+
+Additionally, in terms of data flow:
+
+From node2 to node3 and node4, because 'a' is used there.
+
+Now, considering CDFG construction:
+
+Each node represents a basic block. Here, each statement is a single line, so each is a separate node.
+
+Edges for control flow: 1→2→3→4.
+
+For data flow:
+
+- Node2 defines 'a', which is used in node3 and node4.
+
+So edges from node2 to node3 (def-use) and node2 to node4 (def-use).
+
+In the example provided, such def-use chains are represented as edges between nodes.
+
+Additionally, for control flow, each node flows to the next unless there's a condition. But here it's sequential.
+
+So in the CDFG:
+
+Nodes 1-4 connected by control edges.
+
+Also, data edges from node2 to node3 and node2 to node4.
+
+But wait, what about node1? It declares 'a', but doesn't define it until node2. So perhaps node1 has a def for 'a'? Or is it just a declaration without a value?
+
+In CDFG, variables are defined when assigned values. So the declaration (node1) doesn't contribute to data flow unless it's initialized. Therefore, node2 defines 'a', which is used in nodes3 and 4.
+
+So, the nodes:
+
+Node 1: int a; → no def or use
+Node2: a=30; → def a=30
+Node3: fib(a); → c-use of a
+Node4: return a; → c-use of a
+
+Wait, but in node3 and node4, 'a' is used. So the edges are control flow from 1→2→3→4, plus data edges (def-use) from node2 to 3 and 4.
+
+Now, let's think about how this translates into Graphviz:
+
+Each node will be a box, with label showing the code line. Also, in the xlabel or as part of the label, we can show defs and uses.
+
+For example, node1 has no def/uses, so just the code.
+
+Node2: defines 'a', uses 30.
+
+So in the graph:
+
+node [shape=box];
+
+n1 [label="int a;"];
+n2 [label="a = 30;", xlabel="Def: a; Use: 30"];
+n3 [label="fib(a);", xlabel="C-Use: a; P-Use: none"];
+n4 [label="return a;", xlabel="C-Use: a"];
+
+Edges:
+
+Control flow:
+n1 -> n2;
+n2 -> n3;
+n3 -> n4;
+
+Data flow (def-use):
+n2 -> n3 [label="a"];
+n2 -> n4 [label="a"];
+
+But in the example provided, data edges are represented as edges between nodes with labels indicating the variable.
+
+So putting it all together:
+
+digraph main {
+    rankdir=TB;
+    node [shape=box];
+    
+    // Nodes
+    n1 [label="int a;"];
+    n2 [label="a = 30;", xlabel="Def: a\nUse: 30"];
+    n3 [label="fib(a);", xlabel="C-Use: a"];
+    n4 [label="return a;", xlabel="C-Use: a"];
+
+    // Control Flow Edges
+    n1 -> n2;
+    n2 -> n3;
+    n3 -> n4;
+
+    // Data Flow Edges (def-use)
+    n2 -> n3 [label="a"];
+    n2 -> n4 [label="a"];
+}
+
+Wait, but in the example provided, data edges are shown as separate edges. So perhaps each def-use is represented by an edge from the node where it's defined to where it's used.
+
+Alternatively, maybe for each use of a variable, there's a chain starting from its definition.
+
+In this case, 'a' is defined once in n2 and used twice: in n3 and n4. So edges from n2→n3 (with label "a") and n2→n4 (label "a").
+
+Now, the CDFG will have both control and data flow edges.
+
+But wait, for the fib function call, does it create any def-use chains beyond 'a'? Since fib is a different function, perhaps in this main function's CDFG, we don't include the internal workings of fib. So only focus on 'a' being passed to fib but not tracking inside fib.
+
+So the data flow for 'main' would be as described.
+
+Additionally, let's think about possible test coverage criteria:
+
+- All-Nodes: each node (n1, n2, n3, n4) must be visited by tests. But in this case, since it's a simple function, any test that runs main will hit all nodes.
+
+- All-Edges: control and data edges. For example, the path where 'a' is assigned and then passed to fib and returned should cover all edges.
+
+But perhaps for more complex code with branches, there would be more paths, but in this case, it's straightforward.
+
+So the final CDFG includes four nodes connected by control flow, plus data edges from n2 to n3 and n4.

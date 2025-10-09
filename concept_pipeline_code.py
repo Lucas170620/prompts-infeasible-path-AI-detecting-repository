@@ -68,24 +68,27 @@ def process_code(path: str) -> str:
     return text
 
 def prompt_code_cleaning(code: str) -> str:
-    caminho_prompt = "quinta/clean_code.md"
+    caminho_prompt = "sexta/clean_code.md"
     print("Iniciando: prompt_code_cleaning")
     conteudo_markdown = load_markdown_file(caminho_prompt)
     prompt = conteudo_markdown + "\n[code]\n" + code
-    out = ia_integration.fetch_response(prompt)
+    reasoning, resposta = ia_integration.fetch_response(prompt)
+    
     with open('code_clean.txt', 'w', encoding='utf-8') as f:
-        f.write(out)
+        f.write(resposta)
+    with open('reasoning_code_clean.txt', 'w', encoding='utf-8') as f:
+        f.write(reasoning if reasoning else "No reasoning provided")
     print("Finalizado: prompt_code_cleaning")
-    return out
+    return resposta
 
 def prompt_fetch_all_functions(code: str) -> list:
-    caminho_prompt = "quinta/fetch_all_functions.md"
+    caminho_prompt = "sexta/fetch_all_functions.md"
     print("Iniciando: prompt_fetch_all_functions")
     conteudo_markdown = load_markdown_file(caminho_prompt)
     prompt = conteudo_markdown + "\n[code]\n" + code
-    out = ia_integration.fetch_response(prompt)
+    reasoning, response = ia_integration.fetch_response(prompt)
     try:
-        functions = [func.strip() for func in out.split('\n') if func.strip()]
+        functions = [func.strip() for func in response.split('\n') if func.strip()]
     except Exception as e:
         print(f"Erro ao parsear lista de funções: {e}")
         print("Finalizado (com erro): prompt_fetch_all_functions")
@@ -93,11 +96,11 @@ def prompt_fetch_all_functions(code: str) -> list:
     with open('functions_list.txt', 'w', encoding='utf-8') as f:
         for func in functions:
             f.write(func + '\n')
+    with open('reasoning_fetch_all_functions.txt', 'w', encoding='utf-8') as f:
+        f.write(reasoning if reasoning else "No reasoning provided")
     print("Finalizado: prompt_fetch_all_functions -> {} funções encontradas".format(len(functions)))
     return functions
-
-def prompt_generate_entrypoint(code: str) -> str:
-    caminho_prompt = "quinta/fetch_input_code.md"
+    caminho_prompt = "sexta/fetch_input_code.md"
     print("Iniciando: prompt_generate_entrypoint")
     conteudo_markdown = load_markdown_file(caminho_prompt)
     prompt = conteudo_markdown + "\n[code]\n" + code
@@ -108,18 +111,21 @@ def prompt_generate_entrypoint(code: str) -> str:
     return out
 
 def prompt_generate_cdfg(function: str, code: str) -> str:
-    caminho_prompt = "quinta/generate_cdfg.md"
+    caminho_prompt = "sexta/generate_cdfg.md"
     print(f"Iniciando: prompt_generate_cdfg -> {function}")
     conteudo_markdown = load_markdown_file(caminho_prompt)
     prompt = conteudo_markdown.replace("{substitua aqui o nome da funcao}", function) + "\n[code]\n" + code
-    out = ia_integration.fetch_response(prompt)
+    resoning, response = ia_integration.fetch_response(prompt)
     try:
         with open(f'cdfg_{function}.txt', 'w', encoding='utf-8') as f:
-            f.write(out)
+            f.write(response)
+        
+        with open(f'reasoning_cdfg_{function}.txt', 'w', encoding='utf-8') as f:
+            f.write(resoning if resoning else "No reasoning provided")
     except Exception as e:
         print(f"Erro ao salvar cdfg_{function}.txt: {e}")
     print(f"Finalizado: prompt_generate_cdfg -> {function}")
-    return out
+    return response
 
 def extrair_todos_os_digraphs(conteudo: str) -> list:
     print("Iniciando: extrair_todos_os_digraphs")
@@ -167,7 +173,6 @@ def extrair_todos_os_digraphs(conteudo: str) -> list:
     print("Finalizado: extrair_todos_os_digraphs -> {} digraphs encontrados".format(len(digraphs_encontrados)))
     return digraphs_encontrados
 
-
 def save_cdfg_output(code_name: str, func_name: str, conteudo: str) -> None:
     print(f"Iniciando: save_cdfg_output -> {code_name} / {func_name}")
     out_dir = os.path.join('quinta', code_name)
@@ -193,8 +198,9 @@ def save_cdfg_output(code_name: str, func_name: str, conteudo: str) -> None:
             logging.getLogger(__name__).exception("Failed to write dot file %s: %s", caminho, e)
     print(f"Finalizado: save_cdfg_output -> {code_name} / {func_name}")
 
-def prompt_detecting_all_infeasible_paths(cdfg: list, entrypoint: str, code_cleaned: str) -> str:
-    caminho_prompt = "quinta/detecting_all_infeasible_paths.md"
+def prompt_detecting_all_infeasible_paths(cdfg: list, code_cleaned: str) -> str:
+    """
+    caminho_prompt = "sexta/detecting_all_infeasible_paths.md"
     print("Iniciando: prompt_detecting_all_infeasible_paths")
     conteudo_markdown = load_markdown_file(caminho_prompt)
     prompt = conteudo_markdown + "\n[code]\n" + code_cleaned + "\n[entrypoint]\n" + entrypoint + "\n[cdfg]\n" + '\n'.join([c for c in cdfg if c])
@@ -203,6 +209,8 @@ def prompt_detecting_all_infeasible_paths(cdfg: list, entrypoint: str, code_clea
         f.write(out)
     print("Finalizado: prompt_detecting_all_infeasible_paths")
     return out if out else "No infeasible paths detected"
+    """
+    return
 
 def main(code: str):
     import argparse
@@ -230,7 +238,6 @@ def main(code: str):
         # comportamento anterior: paraleliza a busca de funções, entrypoint e geração de CDFGs
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future_functions = executor.submit(prompt_fetch_all_functions, cleaned)
-            future_entry = executor.submit(prompt_generate_entrypoint, cleaned)
 
             try:
                 functions = future_functions.result()
@@ -245,7 +252,7 @@ def main(code: str):
             for func in functions:
                 cdfg_futures.append(executor.submit(prompt_generate_cdfg, func, cleaned))
 
-            waitables = list(cdfg_futures) + [future_entry]
+            waitables = list(cdfg_futures)
             if waitables:
                 concurrent.futures.wait(waitables, return_when=concurrent.futures.ALL_COMPLETED)
 
@@ -256,11 +263,7 @@ def main(code: str):
                     logger.exception("CDFG generation failed for a function: %s", e)
                     cdfgs.append(None)
 
-            try:
-                entry = future_entry.result()
-            except Exception as e:
-                logger.exception("Entry generation failed: %s", e)
-                entry = None
+            
 
     else:  # serial
         # executar tudo de forma sequencial (sem threads)
@@ -281,11 +284,6 @@ def main(code: str):
                 logger.exception("CDFG generation failed for function %s (serial): %s", func, e)
                 cdfgs.append(None)
 
-        try:
-            entry = prompt_generate_entrypoint(cleaned)
-        except Exception as e:
-            logger.exception("Entry generation failed (serial): %s", e)
-            entry = None
 
     # salvar saídas dos CDFGs (ambos os modos)
     try:
@@ -298,7 +296,7 @@ def main(code: str):
         logger.exception("Failed while saving CDFG outputs: %s", e)
 
     try:
-        infeasible_paths = prompt_detecting_all_infeasible_paths(cdfgs, entry, cleaned)
+        infeasible_paths = prompt_detecting_all_infeasible_paths(cdfgs, cleaned)
     except Exception as e:
         logger.exception("Infeasible path detection failed: %s", e)
         infeasible_paths = None

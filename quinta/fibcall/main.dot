@@ -1,18 +1,1 @@
-digraph main {
-    rankdir=TB;
-    node [shape=box, fontname=Arial];
-    edge [fontname=Arial];
-
-    start [label="main() Start", shape=ellipse];
-    end [label="main() End", shape=ellipse];
-    node1 [label="int a;"];
-    node2 [label="a = 30;"];
-    node3 [label="fib(a);"];
-    node4 [label="return a;"];
-
-    start -> node1;
-    node1 -> node2;
-    node2 -> node3;
-    node3 -> node4;
-    node4 -> end;
-}
+digraph main { rankdir=TB; node [shape=circle]; // Nodes n1 [label="int a;"]; n2 [label="a = 30;", xlabel="Def: a\nUse: 30"]; n3 [label="fib(a);", xlabel="C-Use: a"]; n4 [label="return a;", xlabel="C-Use: a"]; // Control Flow Edges n1 -> n2; n2 -> n3; n3 -> n4; // Data Flow Edges (def-use) n2 -> n3 [label="a"]; n2 -> n4 [label="a"]; }

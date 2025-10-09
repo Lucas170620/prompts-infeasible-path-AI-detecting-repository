@@ -1,0 +1,60 @@
+Okay, I need to process this code according to the given instructions. Let me see what needs to be done.
+
+First, remove comments. The code has block comments and inline comments. So I'll go through each line and delete any comment lines or parts of lines that are comments.
+
+Looking at the first part:
+int fib(int n)
+{
+  int  i, Fnew, Fold, temp,ans;
+
+    Fnew = 1;  Fold = 0;
+    for ( i = 2;
+	  i <= 30 && i <= n;          /* apsim_loop 1 0 */
+	  i++ )
+I see a block comment here. I'll remove the comment line.
+
+Next, in main(), there's no comments except maybe inline ones, but looking at it, it seems there are none after processing.
+
+Second step: Remove redundant whitespace and excess blank lines. The code has multiple spaces and some empty lines. For example, between Fnew =1; Fold=0; and the for loop, there's a line with only /*...*/ which I removed. Now, in the cleaned code, I need to ensure that each statement is on its own line without unnecessary spaces.
+
+Looking at variable declarations, they have multiple spaces after commas. I'll correct that by making it one space or removing extra.
+
+For example:
+int  i, Fnew, Fold, temp,ans;
+The double space between int and i becomes single.
+
+Also, in the for loop condition, there's a lot of whitespace around &&. I'll reduce it to just one space on each side if necessary, but maybe even no space since it's an operator.
+
+Third step: Preserve code structure, so I won't change function declarations, control structures like if/for/while, expressions, assignments, or function calls.
+
+Fourth step: Maintain original indentation for readability. So the structure should stay as is, just cleaned up in terms of comments and whitespace.
+
+Putting it all together:
+
+- Remove all comment lines.
+- Clean up variable declarations by removing extra spaces between variables.
+- Ensure each statement is on its own line without unnecessary empty lines in between.
+- Keep the functions and control structures intact with proper indentation.
+
+Now, let's go through each part step by step.
+
+Starting with the fib function:
+Original code has comments inside the for loop. I'll remove those.
+
+Then, in main(), after a=30; there's a call to fib(a); followed by return a;. That seems okay.
+
+Wait, looking at the original code again:
+
+In the fib function, after the declarations, Fnew and Fold are assigned on the same line but separated by spaces. I'll leave that as is because it's part of the expression.
+
+Also, in the for loop initialization, there's i=2; Then inside, i increments correctly.
+
+So, processing each line:
+
+1. int fib(int n) { ... } remains.
+2. Remove comments from lines like /* apsim_loop 1 0 */.
+3. Ensure that between statements, only necessary whitespace is kept. For example, in the for loop's condition part, remove extra spaces around &&.
+
+So after processing, the code should look clean without any comments and minimal whitespace.
+
+I think I've covered all steps now. Let me write out the cleaned code accordingly.

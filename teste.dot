@@ -5,11 +5,11 @@ digraph CDFG {
     // Nos com labels separadas
     1 [label="1", xlabel="Def: isPremium, isEligibleForDiscount, isOnClearance\nC-Use: customer, product"];
     2 [label="2", xlabel="P-Use: isPremium, isEligibleForDiscount"];
-    3 [label="3", xlabel="C-Use: System.out"];
+    3 [label="3"];
     4 [label="4", xlabel="P-Use: isOnClearance"];
-    5 [label="5", xlabel="C-Use: System.out"];
+    5 [label="5"];
     6 [label="6", xlabel="P-Use: isPremium, isEligibleForDiscount"];
-    7 [label="7", xlabel="C-Use: System.out"];
+    7 [label="7"];
     
     // No 8 nao precisa de xlabel pois nao tem texto extra
     8 [label="8"];
