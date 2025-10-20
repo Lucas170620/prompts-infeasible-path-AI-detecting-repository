@@ -1,0 +1,42 @@
+Okay, I need to generate a CDFG (Control and Data Flow Graph) in Graphviz DOT format for the function RandomInteger. Let me start by understanding what this function does.
+
+Looking at the code:
+
+int RandomInteger(void)
+{
+   Seed = ((Seed * 133) + 81) % 8095;
+   return (Seed);
+}
+
+So, the function takes no arguments and returns an int. It modifies the global variable Seed by performing some calculations and then returns the new value of Seed.
+
+First, I'll break down each step in the function to identify basic blocks and data flow.
+
+1. The first line is Seed = ((Seed * 133) + 81) % 8095;
+   - This redefines Seed based on its previous value.
+2. Then it returns Seed.
+
+I notice there are no conditionals or loops here, so the function has a single basic block with two statements.
+
+Now, for the CDFG:
+
+- Nodes represent basic blocks.
+- Each node will have labels indicating data definitions (def) and uses (use).
+- Since this is a simple function without control flow changes, it's straightforward.
+
+I'll number each statement as separate nodes. The first node handles updating Seed, and the second returns the value.
+
+The edges will show the flow between these nodes. Since there are no conditionals or jumps, it's a linear flow: Node 1 -> Node 2 -> Node 3 (exit).
+
+Each node's label should describe what happens and any data involved.
+
+Let me structure the DOT code:
+
+- Start with digraph RandomInteger.
+- Set rankdir=TB for top-to-bottom layout.
+- Each node has shape=circle.
+- Node labels include definitions and uses.
+
+For the mapping part, each node corresponds to a line of code. I'll explain what each node represents in terms of code snippets.
+
+I think that's it. Now, I'll put this together into the required format.

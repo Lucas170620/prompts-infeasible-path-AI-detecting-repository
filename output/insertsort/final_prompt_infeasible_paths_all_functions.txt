@@ -1,0 +1,238 @@
+[code]
+/* $Id: insertsort.c,v 1.2 2005/04/04 11:34:58 csg Exp $ */
+
+/*************************************************************************/
+/*                                                                       */
+/*   SNU-RT Benchmark Suite for Worst Case Timing Analysis               */
+/*   =====================================================               */
+/*                              Collected and Modified by S.-S. Lim      */
+/*                                           sslim@archi.snu.ac.kr       */
+/*                                         Real-Time Research Group      */
+/*                                        Seoul National University      */
+/*                                                                       */
+/*                                                                       */
+/*        < Features > - restrictions for our experimental environment   */
+/*                                                                       */
+/*          1. Completely structured.                                    */
+/*               - There are no unconditional jumps.                     */
+/*               - There are no exit from loop bodies.                   */
+/*                 (There are no 'break' or 'return' in loop bodies)     */
+/*          2. No 'switch' statements.                                   */
+/*          3. No 'do..while' statements.                                */
+/*          4. Expressions are restricted.                               */
+/*               - There are no multiple expressions joined by 'or',     */
+/*                'and' operations.                                      */
+/*          5. No library calls.                                         */
+/*               - All the functions needed are implemented in the       */
+/*                 source file.                                          */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+/*                                                                       */
+/*  FILE: insertsort.c                                                   */
+/*  SOURCE : Public Domain Code                                          */
+/*                                                                       */
+/*  DESCRIPTION :                                                        */
+/*                                                                       */
+/*     Insertion sort for 10 integer numbers.                            */
+/*     The integer array a[] is initialized in main function.            */
+/*                                                                       */
+/*  REMARK :                                                             */
+/*                                                                       */
+/*  EXECUTION TIME :                                                     */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+
+
+
+#ifdef DEBUG
+int cnt1, cnt2;
+#endif
+
+unsigned int a[11];
+
+int main()
+{
+  int  i,j, temp;
+
+  a[0] = 0;   /* assume all data is positive */
+  a[1] = 11; a[2]=10;a[3]=9; a[4]=8; a[5]=7; a[6]=6; a[7]=5;
+  a[8] =4; a[9]=3; a[10]=2;
+  i = 2;
+  while(i <= 10){
+#ifdef DEBUG
+      cnt1++;
+#endif
+      j = i;
+#ifdef DEBUG
+	cnt2=0;
+#endif
+      while (a[j] < a[j-1])
+      {
+#ifdef DEBUG
+	cnt2++;
+#endif
+	temp = a[j];
+	a[j] = a[j-1];
+	a[j-1] = temp;
+	j--;
+      }
+#ifdef DEBUG
+	printf("Inner Loop Counts: %d\n", cnt2);
+#endif
+      i++;
+    }
+#ifdef DEBUG
+    printf("Outer Loop : %d ,  Inner Loop : %d\n", cnt1, cnt2);
+#endif
+    return 1;
+}
+
+---
+
+---
+[cdfg main]
+
+```dot
+digraph insertsort_main {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: i=2\nUse: a"];
+    2 [label="2", xlabel="P-Use: i <=10"];
+    3 [label="3", xlabel="Def: j=i\nC-Use: i"];
+    4 [label="4", xlabel="P-Use: a[j] < a[j-1]"];
+    5 [label="5", xlabel="Def: temp=a[j]\n Use: a[j], a[j-1]"];
+    6 [label="6", xlabel="Use: temp, a[j], a[j-1]"];
+    7 [label="7", xlabel="P-Use: a[j] < a[j-1]"];
+    8 [label="8", xlabel="Def: j=j-1\nC-Use: j"];
+    9 [label="9", xlabel="P-Use: i <=10"];
+    10 [label="10", xlabel="Def: i=i+1\nC-Use: i"];
+    11 [label="11", shape=doublecircle];
+    
+    1 -> 2;
+    2 -> 3 [label="True\ni <=10"];
+    2 -> 11 [label="False"];
+    3 -> 4;
+    4 -> 5 [label="True\na[j] < a[j-1]"];
+    4 -> 3 [label="False"];
+    5 -> 6;
+    6 -> 7;
+    7 -> 8 [label="True\na[j] < a[j-1]"];
+    7 -> 3 [label="False"];
+    8 -> 9;
+    9 -> 10 [label="True\ni <=10"];
+    9 -> 11 [label="False"];
+    10 -> 2;
+}
+```
+
+<codigos - insertsort_main>
+Node 1:
+a[0] = 0;   /* assume all data is positive */
+a[1] = 11; a[2]=10;a[3]=9; a[4]=8; a[5]=7; a[6]=6; a[7]=5;
+a[8] =4; a[9]=3; a[10]=2;
+i = 2;
+---
+Node 2:
+while(i <= 10)
+{
+---
+Node 3:
+j = i;
+---
+Node 4:
+while (a[j] < a[j-1])
+{
+---
+Node 5:
+temp = a[j];
+a[j] = a[j-1];
+a[j-1] = temp;
+j--;
+}
+---
+Node 6:
+;
+---
+Node 7:
+while(i <=10)
+{
+j = i;
+while (a[j] < a[j-1]) {
+    ...
+}
+...
+i++;
+}
+---
+Node 8:
+return 1;
+</codigos>
+---
+
+---
+[analise infeasible_paths main]
+
+Nenhum caminho inviável foi identificado.
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+Nenhum caminho inviável foi identificado.
+```
+---
+
+---
+**Análise de Caminhos Inviáveis em Código - Especialista em Testes Estruturais**
+
+**Instruções de Entrada:**  
+Forneça:  
+1. O código-fonte a ser analisado  
+2. Para cada função no código, inclua:  
+   - O **CDFG (Control Data Flow Graph)** correspondente, representando todos os nós (operações/blocos básicos) e arestas (fluxos de controle)  
+   - Uma **análise preliminar** indicando possíveis *infeasible paths* identificados  
+
+---
+
+**Processo de Análise (Executado Automaticamente):**  
+
+**1. Mapeamento CDFG-Função**  
+Para cada função no código:  
+- Identificar nós críticos (ex: branches com condições dependentes de dados)  
+- Mapear arestas do CDFG para trechos de código correspondentes  
+
+**2. Detecção de Infeasible Paths**  
+Analisar cada caminho do CDFG considerando:  
+- **Dependências de Dados:** Caminhos onde variáveis têm estados conflitantes  
+- **Constraints Lógicas:** Condições mutualmente exclusivas (ex: `(x > 0 && x < 0)`)  
+- **Invariantes de Loop:** Caminhos que violam condições de saída de loops  
+- **Dead Code:** Blocos inalcançáveis identificados no CDFG  
+
+**3. Classificação de Inviabilidade**  
+Categorizar cada caminho inviável como:  
+- **Estaticamente Inviável:** Inviável em todas as execuções (ex: lógica contraditória)  
+- **Dinamicamente Inviável:** Inviável sob condições específicas de entrada  
+
+**4. Relatório Consolidado**  
+Gerar para cada função:  
+- Lista de caminhos inviáveis com localização no código  
+- Justificativa técnica baseada no CDFG  
+- Impacto na cobertura de testes estruturais  
+- Recomendações para refinamento do CDFG/código  
+
+---
+
+**Exemplo de Saída Esperada:**  
+```  
+Função: calculate_grade  
+- Caminho Inviável #1: Nós [A3→B5→C7]  
+  Motivo: Condição "score > 100 && score < 50" é logicamente impossível  
+  Efeito: Dead code detectado no bloco C7  
+- Caminho Inviável #2: Nós [A3→D9]  
+  Motivo: Variável 'initialized' deve ser false em A3 mas true em D9  
+```  
+
+**Nota Técnica:** Esta análise assume que o CDFG fornecido reflete fielmente o fluxo de controle e dados. Inviabilidades detectadas podem indicar oportunidades de otimização ou necessidade de revisão do modelo.
+---

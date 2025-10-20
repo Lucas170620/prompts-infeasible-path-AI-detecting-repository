@@ -1,0 +1,32 @@
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph log {
+    rankdir=TB;
+    
+    1 [label="Entrada da função", shape=box];
+    2 [label="return(4.5);", shape=box, xlabel="Retorna valor constante"];
+    3 [shape=doublecircle, label="Saída"];
+    
+    1 -> 2;
+    2 -> 3;
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós (em tags):**
+
+```codigos - log
+Node 1:
+static double log(double n)
+{
+---
+Node 2:
+return(4.5);
+---
+Node 3:
+}
+</codigos>
+```
+
+Este CDFG representa a função `log` de forma simplificada, mostrando a sequência de execução linear sem bifurcações ou loops, com entrada, processamento e saída claras.

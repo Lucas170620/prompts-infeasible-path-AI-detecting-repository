@@ -1,0 +1,324 @@
+[code]
+/* $Id: duff.c,v 1.2 2005/04/04 11:34:58 csg Exp $ */
+
+
+
+/*----------------------------------------------------------------------
+
+ *  WCET Benchmark created by Jakob Engblom, Uppsala university,
+
+ *  February 2000.
+
+ *
+
+ *  The purpose of this benchmark is to force the compiler to emit an
+
+ *  unstructured loop, which is usually problematic for WCET tools to
+
+ *  handle.
+
+ *
+
+ *  The execution time should be constant.
+
+ *
+
+ *  The original code is "Duff's Device", see the Jargon File, e.g. at
+
+ *  http://www.tf.hut.fi/cgi-bin/jargon.  Created in the early 1980s
+
+ *  as a way to express loop unrolling in C.
+
+ *
+
+ *----------------------------------------------------------------------*/
+
+
+
+#define ARRAYSIZE  100
+
+#define INVOCATION_COUNT 43	/* exec time depends on this one! */
+
+
+
+
+
+void duffcopy( char *to, char *from, int count)
+
+{
+
+  int n=(count+7)/8;
+
+  switch(count%8){
+
+  case 0: do{     *to++ = *from++;
+
+  case 7:         *to++ = *from++;
+
+  case 6:         *to++ = *from++;
+
+  case 5:         *to++ = *from++;
+
+  case 4:         *to++ = *from++;
+
+  case 3:         *to++ = *from++;
+
+  case 2:         *to++ = *from++;
+
+  case 1:         *to++ = *from++;
+
+  } while(--n>0);
+
+  }
+
+}
+
+
+
+
+
+void initialize( char *arr, int length)
+
+{
+
+  int i;
+
+  for(i=0;i<length;i++)
+
+    {
+
+      arr[i] = length-i;
+
+    }
+
+}
+
+
+
+
+
+char source[ARRAYSIZE];
+
+char target[ARRAYSIZE];
+
+
+
+void main(void)
+
+{
+
+  initialize( source, ARRAYSIZE );
+
+  duffcopy( source, target, INVOCATION_COUNT );
+
+}
+
+
+
+
+
+/*------------------------------------------------------------
+
+ * $Id: duff.c,v 1.2 2005/04/04 11:34:58 csg Exp $
+
+ *------------------------------------------------------------
+
+ * $Log: duff.c,v $
+ * Revision 1.2  2005/04/04 11:34:58  csg
+ * again
+ *
+
+ * Revision 1.1  2005/03/29 09:34:13  jgn
+
+ * New file.
+
+ *
+
+ * Revision 1.8  2000/10/16 07:48:15  jakob
+
+ * *** empty log message ***
+
+ *
+
+ * Revision 1.7  2000/05/22 11:02:18  jakob
+
+ * Fixed minor errors.
+
+ *
+
+ * Revision 1.6  2000/02/27 16:56:52  jakob
+
+ * *** empty log message ***
+
+ *
+
+ * Revision 1.5  2000/02/15 14:09:24  jakob
+
+ * no message
+
+ *
+
+ * Revision 1.2  2000/02/15 13:32:16  jakob
+
+ * Added duff's device to benchmark suite for LCTES 00 paper.
+
+ *
+
+ *
+
+ *------------------------------------------------------------*/
+
+---
+
+---
+[cdfg duffcopy]
+
+---
+
+---
+[analise infeasible_paths duffcopy]
+
+---
+
+---
+[cdfg initialize]
+
+The hybrid Control Flow Graph (CFG) for the given code combines both control flow and data flow information. Here's a step-by-step explanation of the graph:
+
+1. **Node 1:** Represents the declaration of `int i;`.
+   - Shape: Box
+   - xlabel: Def: i
+
+2. **Node 2:** Represents the start of the for loop, including initialization (`i=0`), condition check (`i < length`), and increment (`i++`).
+   - Shape: Diamond (Decision)
+   -xlabel: Use: length (P-Use in condition), i (C-Use in assignment and condition); Def: i
+   - Edges:
+     - To Node 3 if `i < length` is true.
+     - To Exit node (Node4) if false.
+
+3. **Node 3:** Represents the loop body where `arr[i]` is assigned the value `length - i`.
+   - Shape: Box
+   -xlabel: Use: arr (address), length, i; Def: arr[i]
+   - Edge:
+     - Back to Node2 for the next iteration.
+
+4. **Node 4:** Represents the exit node.
+   - Shape: Doublecircle
+
+### Edges:
+
+- **Edge from Node1 to Node2:** Entry into the loop initialization.
+- **Edge from Node2 to Node3 (labeled "i < length"):** Control flows into the loop body if the condition is true.
+- **Edge from Node2 to Node4 (labeled "!i < length"):** Exits the function when the loop condition fails.
+- **Edge from Node3 back to Node2:** After executing the loop body, control returns to check the condition again.
+
+This graph effectively captures both the flow of execution and the data dependencies within each node.
+---
+
+---
+[analise infeasible_paths initialize]
+
+Nenhum caminho inviável foi identificado.
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+nenhum caminho inviável foi identificado.
+```
+---
+
+---
+[cdfg main]
+
+```dot
+digraph main {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="C-Use: initialize"];
+    2 [label="2"];
+    3 [label="3"];
+    4 [label="4", xlabel="Return"];
+    
+    1 -> 2 ;
+    2 -> 3 [label="Call to initialize"];
+    3 -> 4 [label="Call to duffcopy"];
+}
+```
+
+<codigos - main>
+Node 1:
+void main(void) {
+    initialize( source, ARRAYSIZE );
+---
+Node 2:
+initialize( source, ARRAYSIZE );
+---
+Node 3:
+duffcopy( source, target, INVOCATION_COUNT );
+---
+Node 4:
+return;
+</codigos>
+---
+
+---
+[analise infeasible_paths main]
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+---
+
+---
+**Análise de Caminhos Inviáveis em Código - Especialista em Testes Estruturais**
+
+**Instruções de Entrada:**  
+Forneça:  
+1. O código-fonte a ser analisado  
+2. Para cada função no código, inclua:  
+   - O **CDFG (Control Data Flow Graph)** correspondente, representando todos os nós (operações/blocos básicos) e arestas (fluxos de controle)  
+   - Uma **análise preliminar** indicando possíveis *infeasible paths* identificados  
+
+---
+
+**Processo de Análise (Executado Automaticamente):**  
+
+**1. Mapeamento CDFG-Função**  
+Para cada função no código:  
+- Identificar nós críticos (ex: branches com condições dependentes de dados)  
+- Mapear arestas do CDFG para trechos de código correspondentes  
+
+**2. Detecção de Infeasible Paths**  
+Analisar cada caminho do CDFG considerando:  
+- **Dependências de Dados:** Caminhos onde variáveis têm estados conflitantes  
+- **Constraints Lógicas:** Condições mutualmente exclusivas (ex: `(x > 0 && x < 0)`)  
+- **Invariantes de Loop:** Caminhos que violam condições de saída de loops  
+- **Dead Code:** Blocos inalcançáveis identificados no CDFG  
+
+**3. Classificação de Inviabilidade**  
+Categorizar cada caminho inviável como:  
+- **Estaticamente Inviável:** Inviável em todas as execuções (ex: lógica contraditória)  
+- **Dinamicamente Inviável:** Inviável sob condições específicas de entrada  
+
+**4. Relatório Consolidado**  
+Gerar para cada função:  
+- Lista de caminhos inviáveis com localização no código  
+- Justificativa técnica baseada no CDFG  
+- Impacto na cobertura de testes estruturais  
+- Recomendações para refinamento do CDFG/código  
+
+---
+
+**Exemplo de Saída Esperada:**  
+```  
+Função: calculate_grade  
+- Caminho Inviável #1: Nós [A3→B5→C7]  
+  Motivo: Condição "score > 100 && score < 50" é logicamente impossível  
+  Efeito: Dead code detectado no bloco C7  
+- Caminho Inviável #2: Nós [A3→D9]  
+  Motivo: Variável 'initialized' deve ser false em A3 mas true em D9  
+```  
+
+**Nota Técnica:** Esta análise assume que o CDFG fornecido reflete fielmente o fluxo de controle e dados. Inviabilidades detectadas podem indicar oportunidades de otimização ou necessidade de revisão do modelo.
+---

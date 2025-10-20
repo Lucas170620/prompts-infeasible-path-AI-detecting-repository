@@ -1,0 +1,99 @@
+
+```dot
+digraph fir_filter_int {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: coef_start, coef_len2, in_end, in_ptr, acc_length\nC-Use: coef_len"];
+    2 [label="2", xlabel="P-Use: i < in_len"];
+    3 [label="3"];
+    4 [label="4", xlabel="Def: data_ptr, coef_ptr, acc\nC-Use: in_ptr, coef_start"];
+    5 [label="5", xlabel="Inner loop"];
+    6 [label="6", xlabel="P-Use: in_ptr == in_end"];
+    7 [label="7", xlabel="Adjust acc_length and coef_start"];
+    8 [label="8", xlabel="P-Use: acc_length < coef_len"];
+    9 [label="9", xlabel="Increment in_ptr"];
+    10 [label="10", xlabel="Def: *out\nC-Use: acc, scale"];
+    
+    1 -> 2;
+    2 -> 3 [label="True"]; // Enter loop
+    2 -> 10 [label="False"]; // Exit function
+    
+    3 -> 4;
+    4 -> 5; // Inner accumulation loop
+    5 -> 6; // End of inner loop
+    
+    6 -> 7 [label="True"]; // Update pointers and coef_start
+    6 -> 8 [label="False"]; // Continue processing
+    
+    8 -> 9; // Adjust in_ptr and acc_length
+    9 -> 4; // Back to accumulation
+    
+    10 [shape=doublecircle]; // End of function
+}
+```
+
+<codigos - fir_filter_int>
+Node 1:
+long coef_start = coef;
+long coef_len2 = (coef_len + 1) >> 1;
+
+long in_end = in + in_len - 1;
+long in_ptr = in + coef_len2 - 1;
+
+long acc_length = coef_len2;
+---
+
+Node 2:
+for(i = 0 ; i < in_len ; i++) {
+---
+
+Node 3:
+// Loop body starts
+long *in_ptr,*data_ptr,*coef_start,*coef_ptr,*in_end;
+
+acc = (long)(*coef_ptr++) * (*data_ptr--);
+for(j = 1 ; j < acc_length ; j++)
+    acc += (long)(*coef_ptr++) * (*data_ptr--);
+*out++ = (int)(acc/scale);
+
+if(in_ptr == in_end) {
+    acc_length--;       
+    coef_start++;       
+} else {
+    if(acc_length < coef_len) acc_length++;
+    in_ptr++;
+}
+---
+
+Node 4:
+if (in_ptr == in_end)
+---
+
+Node 5:
+for(j = 1 ; j < acc_length ; j++)
+    acc += (long)(*coef_ptr++) * (*data_ptr--);
+*out++ = (int)(acc/scale);
+
+if(in_ptr == in_end) {
+    acc_length--;       
+    coef_start++;       
+} else {
+    if(acc_length < coef_len) acc_length++;
+    in_ptr++;
+}
+---
+
+Node 6:
+while(1); // Inner loop
+---
+
+Node 7:
+coef_start++;
+in_ptr--;
+acc_length--;
+
+// Continue processing
+...
+
+</codigos>

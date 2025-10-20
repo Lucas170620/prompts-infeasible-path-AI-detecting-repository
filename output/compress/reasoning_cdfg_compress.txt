@@ -1,0 +1,15 @@
+Okay, I need to generate a precise Control and Data Flow Graph (CDFG) in Graphviz DOT format for the `compress` function provided. The user has given specific instructions on how to structure this graph, including using nodes for basic blocks, mapping definitions and uses of variables, and integrating control and data flow.
+
+First, I'll start by understanding the code of the `compress` function. It's written in C, and from a quick glance, it seems to be handling bit manipulation and outputting bytes based on some conditions. The function takes a `code` as input and processes it into a buffer, then writes those bytes out.
+
+I'll need to identify all the basic blocks in this function. A basic block is a sequence of instructions with no jumps or jumps out. So I'll look for sections of code that flow sequentially without any branches or jumps.
+
+Next, I'll map the definitions (def) and uses (c-use/p-use) of each variable. For example, when a variable is assigned a value, it's a def; when it's used in an expression or condition, it's a c-use if it's part of a computation or p-use if it's part of a predicate.
+
+I'll also need to construct the control flow graph, showing how each basic block connects based on control flow structures like if statements, loops, and function calls. Each decision point (like an if statement) will be a node with edges labeled for true and false paths.
+
+The user provided an example where they mapped nodes to specific code sections, so I'll follow that approach. Each node in the DOT file should have a unique ID, a label indicating its position in the code, and an xlabel detailing the defs and uses.
+
+I also need to make sure that loops are represented correctly, with a condition node pointing back to the beginning of the loop body if it's true. Additionally, the final node should be a doublecircle shape to indicate the end of the function.
+
+Finally, I'll generate both parts: the DOT code for the graph and the mapping of each code section to its corresponding node in the graph.

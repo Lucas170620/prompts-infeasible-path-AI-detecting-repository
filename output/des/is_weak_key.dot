@@ -1,0 +1,19 @@
+digraph is_weak_key {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: i, weak_keys\nC-Use: key"];
+    2 [label="2", xlabel="P-Use: i", shape=diamond];
+    3 [label="3", xlabel="P-Use: i, weak_keys[i]\nC-Use: key"];
+    4 [label="4", shape=doublecircle];
+    5 [label="5"];
+    6 [label="6", shape=doublecircle];
+    
+    1 -> 2;
+    2 -> 3 [label="True\ni < 64"];
+    2 -> 6 [label="False"];
+    3 -> 4 [label="True\n memcmp(key, weak_keys[i], sizeof(weak_keys[i])) == 0"];
+    3 -> 5 [label="False"];
+    5 -> 2 [label="i++"];
+    4 -> 6;
+}

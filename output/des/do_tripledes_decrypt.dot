@@ -1,0 +1,10 @@
+digraph do_tripledes_decrypt {
+    rankdir=TB;
+    
+    1 [label="Entrada", shape=circle];
+    2 [label="Chamada tripledes_ecb_decrypt", xlabel="Def: outbuf\nC-Use: ctx, inbuf"];
+    3 [shape=doublecircle, label="Saida"];
+    
+    1 -> 2;
+    2 -> 3;
+}

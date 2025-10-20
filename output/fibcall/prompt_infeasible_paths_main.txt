@@ -1,0 +1,207 @@
+[code]
+int fib(int n)
+{
+  int  i, Fnew, Fold, temp,ans;
+
+    Fnew = 1;  Fold = 0;
+    for ( i = 2;
+	  i <= 30 && i <= n;          /* apsim_loop 1 0 */
+	  i++ )
+    {
+      temp = Fnew;
+      Fnew = Fnew + Fold;
+      Fold = temp;
+    }
+    ans = Fnew;
+  return ans;
+}
+
+int main()
+{
+  int a;
+
+  a = 30;
+  fib(a);
+  return a;
+}
+---
+[cdfg]
+
+To solve this problem, we need to generate a Control Flow and Data Flow Graph (CDFG) for the `main` function of a given C program. The CDFG will help visualize both the control flow (sequence of instructions execution) and data flow (movement of data between variables) within the function.
+
+### Approach
+1. **Understand the Function**: The provided `main` function is straightforward:
+   - Declares an integer variable `a`.
+   - Assigns the value 30 to `a`.
+   - Calls the function `fib(a)` with `a` as an argument.
+   - Returns the value of `a`.
+
+2. **Identify Basic Blocks**: Break down the function into basic blocks, which are sequences of instructions that can be executed in order without any jumps or branches. For this function, each statement is a basic block.
+
+3. **Control Flow Analysis**: Determine the sequence of execution between these basic blocks. Since there are no conditional statements, the control flow is linear.
+
+4. **Data Flow Analysis**: Track how data (specifically the variable `a`) flows through the function:
+   - Assignment: `a = 30` defines `a`.
+   - Function call: `fib(a)` uses `a`.
+   - Return statement: `return a` uses `a`.
+
+5. **Graph Representation**: Represent each basic block as a node in the graph, with edges showing control flow. Use labels to indicate data flow (defs and uses) within each node.
+
+### Solution Code
+```dot
+digraph main {
+    rankdir=TB;
+    
+    0 [shape=diamond];
+    1 [label="a = 30", shape=box];
+    2 [label="fib(a)", shape=box];
+    3 [label="return a", shape=box];
+    exit [shape=doublecircle];
+    
+    0 -> 1;
+    1 -> 2;
+    2 -> 3;
+    3 -> exit;
+}
+
+// Mapping of code to nodes:
+// Node 1: "a = 30;"
+// Node 2: "fib(a);"
+// Node 3: "return a;"
+```
+
+### Explanation
+- **Nodes**:
+  - `0`: Entry point (diamond shape).
+  - `1`: Assignment `a = 30` (box shape, defines `a`).
+  - `2`: Function call `fib(a)` (box shape, uses `a`).
+  - `3`: Return statement `return a` (box shape, uses `a`).
+  - `exit`: Exit point (doublecircle shape).
+
+- **Edges**:
+  - Connects the entry node to the assignment.
+  - Sequentially connects each basic block to the next.
+  - Finally, connects the return statement to the exit.
+
+This CDFG provides a clear visualization of how control flows from one instruction to another and how data (variable `a`) is used throughout the function.
+---
+ Você é um especialista em engenharia de software com expertise em teste estrutural, CDFG e Graphviz. Sua tarefa é analisar um código e seu CDFG para identificar caminhos inviáveis (*infeasible paths*). Siga **rigorosamente** os passos abaixo.
+
+---
+
+#### **1. Contexto Teórico (Resumo)**  
+- **CDFG**: Combina CFG (fluxo de controle) e DFG (fluxo de dados).  
+- **Caminhos Inviáveis**: Sequências de nós/arestas inexequíveis devido a:  
+  - Contradições lógicas (ex: `x > 10` e `x < 5` no mesmo caminho).  
+  - Dependências de dados (ex: variável não inicializada).  
+  - Conflitos em condições sequenciais ou invariantes de programa.  
+
+---
+
+#### **2. Exemplo de Análise**  
+**Função de Exemplo:**  
+```python
+def example(x):
+    if x > 10:     # Nó A
+        y = 5      # Nó B
+    else:
+        y = 0      # Nó C
+    if y < 0:      # Nó D
+        return -1  # Nó E
+    return y       # Nó F
+```
+
+**CDFG (Graphviz DOT):**  
+```dot
+digraph Example {
+  A [label="if x > 10"]
+  B [label="y = 5"]
+  C [label="y = 0"]
+  D [label="if y < 0"]
+  E [label="return -1"]
+  F [label="return y"]
+  A -> B [label="True"]
+  A -> C [label="False"]
+  B -> D; C -> D
+  D -> E [label="True"]
+  D -> F [label="False"]
+}
+```
+
+**Análise:**  
+1. **Passo 1:** Rastrear caminhos no CDFG (ex: A→B→D→E).  
+2. **Passo 2:** Verificar contradições:  
+   - Caminho `A→B→D→E`:  
+     - Em `B`, `y = 5`.  
+     - Em `D`, a condição `y < 0` é **falsa** porque `y = 5`.  
+     - Conclusão: O caminho para `E` é inviável.  
+3. **Saída Formatada:**  
+   ```markdown
+   1. **Caminho Inviável [example]**  
+      - **Trechos de Código**:  
+        - Linha 2: `if x > 10`  
+        - Linha 3: `y = 5`  
+        - Linha 6: `if y < 0`  
+        - Linha 7: `return -1`  
+      - **Descrição**: Nó A → Nó B → Nó D → Nó E  
+      - **Motivo**: Contradição lógica: `y = 5` torna a condição `y < 0` falsa.  
+   ```
+
+---
+
+#### **3. Tarefa Principal**  
+Analise o código e CDFG fornecidos abaixo:
+
+**Função:**  
+```<main>```
+
+**CDFG (Graphviz DOT):**  
+```<INSIRA AQUI O CDFG>```
+
+---
+
+Execute **sequencialmente** estes passos:
+
+**Passo 1: Mapeamento Código-CDFG**  
+- Relacione cada nó/aresta do CDFG com trechos do código.  
+- Exemplo: "Nó A corresponde à linha 5: `if x > 0`".
+
+**Passo 2: Identificação de Caminhos Potenciais**  
+- Liste todos os caminhos possíveis no CDFG (ex: A→B→D, A→C→D).  
+- Use a estrutura do CDFG para evitar omissões.
+
+**Passo 3. Classificação de Inviabilidade**  
+Categorizar cada caminho inviável como:  
+- **Estaticamente Inviável:** Inviável em todas as execuções (ex: lógica contraditória)  
+- **Dinamicamente Inviável:** Inviável sob condições específicas de entrada  
+
+**Passo 4: Análise de Viabilidade por Critério**  
+Para cada caminho:  
+1. **Dados**: Variáveis estão inicializadas? Valores são consistentes?  
+2. **Lógica**: Condições subsequentes se contradizem?  
+3. **Contexto**: Há invariantes (ex: `x ≥ 0`) que bloqueiam o caminho?  
+4. **Loop**: Condições de entrada/saída de loops são satisfeitas?
+
+**Passo 5: Consolidação**  
+- Filtre caminhos que violam **pelo menos um critério** como inviáveis.  
+- Descreva cada um com:  
+  - Trechos de código relevantes.  
+  - Sequência de nós.  
+  - Motivo detalhado (ex: "`x = 5` no nó B contradiz `x != 5` no nó D").
+
+---
+
+#### **5. Formato de Saída Exigido**  
+- Se houver caminhos inviáveis:  
+  ```markdown
+  # Caminhos Inviáveis Identificados
+
+  [Número]. **Caminho Inviável [Nome da Função]**  
+    - **Trechos de Código**:  
+      - Linha [X]: `[código]`  
+      - Linha [Y]: `[código]`  
+    - **Descrição**: [Sequência de nós, ex: A → B → C]  
+    - **Motivo**: [Explicação técnica com base nos critérios]  
+  ```  
+- Caso contrário:  
+  `"Nenhum caminho inviável foi identificado."`

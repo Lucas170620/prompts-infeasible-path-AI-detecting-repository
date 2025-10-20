@@ -1,0 +1,66 @@
+
+```dot
+digraph main {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: signal_amp, noise_amp, arg\nC-Use: sqrt(2.0), sqrt(12.0)"];
+    2 [label="2"];
+    3 [label="3", xlabel="Loop start (k=0)"];
+    4 [label="4", xlabel="P-Use: k < N"];
+    5 [label="5", xlabel="Def: d[k]\nC-Use: signal_amp, arg*k, noise_amp"];
+    6 [label="6"];
+    7 [label="7", xlabel="Loop end"];
+    8 [label="8", xlabel="Def: mu"];
+    9 [label="9", xlabel="Loop start (k=0)"];
+    10[label="10", xlabel="P-Use: k < N"];
+    11[label="11", xlabel="C-Use: x, d[k]"];
+    12[label="12", xlabel="Def: x"];
+    13[label="13", xlabel="Loop end"];
+    14[label="14", shape=doublecircle];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> 4 [label="True\nk < N"];
+    3 -> 7 [label="False"];
+    4 -> 5;
+    5 -> 6;
+    6 -> 4;
+    6 -> 7;
+    7 -> 8;
+    8 -> 9;
+    9 -> 10 [label="True\nk < N"];
+    9 -> 13 [label="False"];
+    10-> 11;
+    11-> 12;
+    12-> 10;
+    12-> 13;
+    13-> 14;
+}
+```
+
+<codigos - main>
+Node 1:
+signal_amp = lms_sqrt(2.0);
+noise_amp = 0.2*lms_sqrt(12.0);
+arg = 2.0*PI/20.0;
+---
+Node 2:
+static float d[N],b[21];
+float signal_amp,noise_amp,arg,x/*,y*/; /* JG */
+int k;
+---
+Node 3:
+for(k = 0 ; k < N ; k++) {
+    d[k] = signal_amp * lms_sin(arg*k) + noise_amp * lms_gaussian();
+}
+---
+Node 4:
+mu = mu / ((float)(N - 1));
+---
+Node 5:
+for(k = 0; k < N; k++) {
+    x = d[k];
+    lms_call(x);
+}
+</codigos>

@@ -1,0 +1,33 @@
+Okay, I need to create a Control and Data Flow Graph (CDFG) for the function minver using Graphviz DOT notation. The function is quite complex with loops, conditionals, and matrix operations. Let me break it down step by step.
+
+First, I'll start by understanding what the minver function does. It looks like it's performing matrix inversion using Gaussian elimination. There are several steps involved: pivoting, row swaps, scaling, and eliminating elements.
+
+I'll begin by identifying all the basic blocks in the function. Each block is a sequence of instructions without any jumps or conditional branches. Then, I need to map the definitions (def) and uses (c-use and p-use) for each variable. Definitions are where variables are assigned new values, while uses are where they're read.
+
+Looking at the code, I notice several loops and conditionals. For example, there's a loop over k from 0 to row-1, inside which there's another loop over i from k to row-1. There are also conditional checks for pivot values and epsilon comparisons.
+
+I'll need to represent each node in the graph with its corresponding code snippet, label it appropriately with definitions and uses, and then connect them with edges based on control flow conditions.
+
+Let me list out the nodes one by one:
+
+1. **Node 1**: The start of the function. Here, work array is initialized, and some initial checks are done.
+2. **Node 2**: Loop starts for k from 0 to row-1.
+3. **Node 3**: Inside the loop, finding the maximum element in column k.
+4. **Node 4**: Check if the pivot is zero or below epsilon.
+5. **Node 5**: If the condition is true, return an error.
+6. **Node 6**: Compute the product of pivots into w1.
+7. **Node 7**: Swap rows if necessary.
+8. **Node 8**: Normalize the pivot row.
+9. **Node 9**: Eliminate elements below and above the pivot.
+10. **Node 10**: Continue with the elimination for other rows.
+11. **Node 11**: After processing all pivots, there's another loop to permute the work array.
+12. **Node 12**: Inside this inner loop, more checks and swaps happen.
+13. **Node 13**: Final part where determinant is set and function returns.
+
+Each node will have labels indicating definitions (def) and computational or predicate uses (c-use/p-use). For example, when a variable is assigned a new value, it's a def; when it's used in a condition, it's a p-use.
+
+Now, I'll connect these nodes with directed edges. Each conditional check will split the flow into two paths: one for true and one for false. Loops will have back edges to their condition checks after each iteration.
+
+I need to make sure that all control flows are accurately represented and that data dependencies are clear in the graph. This includes tracking how variables like 'work', 'a', and 'w1' are used across different parts of the function.
+
+Finally, I'll compile all this information into a DOT file structure, ensuring nodes are correctly shaped (like boxes for processing steps and diamonds for decisions), edges have appropriate labels, and the layout is set to vertical with rankdir=TB.

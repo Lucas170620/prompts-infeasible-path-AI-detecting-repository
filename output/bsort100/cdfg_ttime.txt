@@ -1,0 +1,52 @@
+
+To solve this problem, we need to construct a Control Flow Graph (CFG) for the given function `ttime()`. The CFG will help visualize the flow of control and data within the function. The function is defined as follows:
+
+```c
+int ttime()
+{
+    struct tms buffer;
+    int utime;
+
+    /* times(&buffer); */
+    utime = (buffer.tms_utime / 60.0) * 1000.0;
+    return(utime);
+}
+```
+
+### Approach
+The approach involves breaking down the function into basic blocks and analyzing both control flow and data flow between these blocks.
+
+1. **Basic Blocks Identification**: 
+   - Each statement in the function is treated as a separate basic block.
+   - The function starts with variable declarations, followed by an assignment, and ends with a return statement.
+
+2. **Control Flow**:
+   - The function has a straightforward control flow: after executing each statement, it proceeds to the next one until it returns.
+
+3. **Data Flow Analysis**:
+   - Identify definitions (def) and uses of variables in each block.
+   - Track how data flows from one block to another.
+
+### Solution Code
+```dot
+digraph ttime {
+    rankdir=TB;
+    
+    1 [label="1", xlabel="Def: buffer, utime"];
+    2 [label="2", xlabel="C-Use: buffer.tms_utime\nDef: utime"];
+    3 [label="3", xlabel="P-Use: utime"];
+    exit [shape=doublecircle];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> exit;
+}
+```
+
+### Explanation
+- **Node 1**: Represents the start of the function and declares two variables `buffer` (struct tms) and `utime` (int). This node defines both variables.
+- **Node 2**: Computes the value of `utime` using `buffer.tms_utime`. It uses `buffer` to access its field `tms_utime` (C-use) and defines `utime`.
+- **Node 3**: Returns the value of `utime`, which is a use of `utime` in a control flow context (P-use).
+- **Exit Node**: Marks the end of the function, represented by a double circle.
+
+The edges between nodes show the sequential execution flow from one statement to the next until the function exits. This graph helps in understanding how data flows through the function and how control is managed.

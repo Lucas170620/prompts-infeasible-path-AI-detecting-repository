@@ -1,0 +1,14 @@
+
+# Análise de Caminhos Inviáveis
+
+## Função: num_to_lcd
+- **Caminho Inviável #1**: Nós [Node 1 → Node X (onde X é 2 a 17) → Node 18]
+  - **Motivo**: Cada caso do switch retorna um valor imediatamente. Portanto, o caminho que chega à instrução `return 0` em Node 18 nunca será alcançado.
+  - **Efeito**: Código morto detectado no bloco de retorno final.
+
+## Função: main
+- **Caminho Inviável #2**: Nenhum caminho inviável identificado.
+  - **Motivo**: O fluxo controlado é lógico e sem contradições, com o loop executando corretamente até i chegar a n=10.
+
+# Resumo
+Apenas a função `num_to_lcd` apresenta um caminho infeásivel, relacionado ao retorno final após os casos do switch. A função `main` não possui caminhos inviáveis identificados.

@@ -1,0 +1,84 @@
+Okay, I need to generate a precise CDFG (Control and Data Flow Graph) for the function `logsch` provided in the given code using Graphviz DOT. Let me start by understanding what the function does.
+
+Looking at the code for `logsch`, it takes two parameters: `ih` and `nbh`. The function computes a new value for `nbh` based on some calculations and condition checks.
+
+Here's the step-by-step breakdown of the function:
+
+1. Compute `wd` as `(long) nbh * 127L >> 7L;`
+2. Add `wh_code_table[ih]` to `wd` and assign it to `nbh`.
+3. Check if `nbh` is less than 0, set it to 0.
+4. Check if `nbh` exceeds 22528, cap it at that value.
+
+So the function has a few basic blocks:
+
+- The initial computation of `wd`.
+- The assignment after adding the table value.
+- Two conditional checks (if statements) for clamping the value.
+
+Next, I need to identify all the basic blocks in this function. Each block will be represented as a node in the CDFG.
+
+I'll start by listing the nodes and their corresponding code snippets:
+
+1. Node 1: Compute `wd` and assign it.
+2. Node 2: Add the table value to compute new `nbh`.
+3. Node 3: Check if `nbh < 0`, branch if true.
+4. Node 4: Assign 0 to `nbh` (if from node 3).
+5. Node 6: Check if `nbh > 22528`, branch if true.
+6. Node 7: Assign 22528 to `nbh` (if from node 6).
+7. Node 8: Return the clamped `nbh`.
+
+Now, mapping each node with their definitions and usages:
+
+- **Node 1**:
+  - Def: `wd`
+  - C-Use: `nbh`, as it's multiplied.
+
+- **Node 2**:
+  - Def: `nbh` (new value)
+  - P-Use: `ih` from the table lookup.
+
+- **Node 3** is an if condition checking `nbh < 0`.
+
+- **Node 4**: Updates `nbh` to 0, so it's a definition for `nbh`.
+
+- **Node 6**: Condition on `nbh > 22528`.
+
+- **Node 7**: Updates `nbh` to 22528.
+
+- **Node 8**: The return statement, which is the end of the function (double circle node).
+
+Now, I'll map each node's code:
+
+1. Node 1: wd = ((long) nbh * 127L) >> 7L;
+2. Node 2: nbh = wd + wh_code_table[ih];
+3. Node 3: if (nbh < 0)
+4. Node 4: nbh = 0
+5. Node 6: if (nbh > 22528)
+6. Node 7: nbh = 22528
+7. Node 8: return nbh;
+
+Next, I'll construct the control flow:
+
+- From node 1 to node 2.
+- After node 2, check condition in node 3. If true, go to node 4; else, proceed.
+- After node 4, check condition in node 6. If true, go to node7; else, proceed.
+- Finally, return at node8.
+
+I'll represent the CDFG with directed edges showing control flow and data dependencies.
+
+Each node will be labeled with its code snippet and have appropriate shapes (rectangle for processing nodes, diamond for conditions). The final node is a double circle as it's the end.
+
+Now, putting this into the Graphviz format:
+
+- Nodes 1,2,4,7 are rectangles.
+- Nodes3 and6 are diamonds (conditions).
+- Node8 is a double circle.
+
+Edges will have labels indicating the condition or flow direction.
+
+For example:
+- Node1 -> node2 with no label (sequential flow).
+- node2 -> node3 (control flow to check nbh <0).
+- node3 -> node4 on true, and continues elsewhere on false.
+
+I'll make sure all nodes are connected correctly and that data dependencies like `nbh` and `ih` are noted in their usages.

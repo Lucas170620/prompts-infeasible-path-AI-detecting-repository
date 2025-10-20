@@ -1,0 +1,13 @@
+Okay, so I need to analyze this code and extract all the user-defined functions or methods. The rules say to list each name per line, exactly as declared, ignoring built-in functions or library functions. Also, I should include all functions, including main.
+
+Looking at the provided code, let me go through it step by step.
+
+First, I see a lot of comments and some preprocessor directives like #define. These can be ignored since they don't define functions.
+
+Then there's the function fdct declared as void fdct(short int *blk, int lx). That's definitely a user-defined function. I'll note that down: fdct.
+
+Next, in the main() function, which is declared as int main(void), and inside it, the function fdct is called with block and 8 as arguments. So, main is another function to list.
+
+I also need to check if there are any other functions defined. Scanning through, I don't see any others. There's a lot of code inside fdct and main, but those are just implementations, not separate functions.
+
+So the user-defined functions are fdct and main.

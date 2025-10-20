@@ -1,0 +1,23 @@
+
+```markdown
+**Relatório de Análise de Caminhos Inviáveis**
+
+**Função: Sum**
+- **Caminho Inviável:** Nenhum caminho inviável identificado.
+  - **Motivo:** As condições são mutuamente exclusivas e cobrem todas as possíveis entradas. Cada elemento da matriz será classificado em um dos dois ramos.
+
+**Função: RandomInteger**
+- **Caminho Inviável:** Nenhum caminho inviável identificado.
+  - **Motivo:** As operações são sequenciais e determinísticas, sem condições ou conflitos que possam levar a caminhos impossíveis.
+
+**Função: InitSeed**
+- **Caminho Inviável:** Nenhum caminho inviável identificado.
+  - **Motivo:** A função é simples e não contém nenhuma condição ou lógica que possa causar um caminho infeásivel.
+
+**Função: Main**
+- **Caminho Inviável:** Nenhum caminho inviável identificado.
+  - **Motivo:** As chamadas de funções são sequenciais e não envolvem condições ou lógica que possam causar caminhos impossíveis.
+
+**Conclusão:**
+Nenhuma função no código apresenta caminhos infeásiveis. Cada função é estruturada de forma que as operações e condições seguem um fluxo lógico consistente e sem contradições.
+```

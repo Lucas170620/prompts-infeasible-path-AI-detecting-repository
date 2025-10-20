@@ -1,0 +1,30 @@
+Okay, so I need to create a Control and Data Flow Graph (CDFG) for the function lms_sqrt in the provided code using Graphviz DOT. Let me start by understanding what lms_sqrt does.
+
+Looking at the code, lms_sqrt is a square root approximation function. It takes a float val as input and returns its square root. The implementation uses an iterative method, similar to Newton-Raphson. 
+
+Let me break down the steps:
+
+1. **Initialization**: x is set to val/10. Then, there's a loop that iterates up to 20 times.
+2. **Iteration**: In each iteration, dx is calculated as (val - x^2)/(2x), and x is updated by adding dx. The loop continues until the difference between val and x² is small enough or until 20 iterations.
+3. **Return**: Finally, x is returned as the square root.
+
+Now, to build the CDFG:
+
+- I'll identify each basic block, which represents a sequence of instructions with no branches.
+- Each node will represent a basic block, showing definitions (def) and uses (c-use/p-use).
+- Control flow edges will show how these blocks connect based on conditions and loops.
+
+I need to label each node with its corresponding code snippet and the dataflow information. Also, I should use appropriate shapes: boxes for processing nodes, diamonds for decision points (like if or loop conditions), and double circles for the end.
+
+Let me outline the main steps in lms_sqrt:
+
+- **Node 1**: Initialize x = val/10.
+- **Node 2**: Check if val is zero. If so, set x to 0.
+- **Node 3**: Start the loop. The loop condition is checked here (i < 20).
+- **Node 4**: Calculate dx and update x.
+- **Node 5**: Compute diff = val - (x*x) and check if its absolute value is within min_tol.
+- **Node 6**: If true, set flag=1; else, continue looping.
+
+I'll map each of these steps into nodes, connecting them based on control flow. Conditions will split the graph with edges labeled by their boolean expressions.
+
+Finally, I need to make sure that all variables' definitions and uses are correctly noted in each node's label. This way, both control and data flows are accurately represented.

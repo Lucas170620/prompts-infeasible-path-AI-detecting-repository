@@ -1,0 +1,14 @@
+
+Based on the analysis of both functions:
+
+- **des() Function:** Several infeasible paths exist due to variable assignments making certain condition branches unreachable. For example, if 'value' is 0, the path through Node 4 becomes dead code.
+
+- **main() Function:** No infeasible paths were identified as it's a straightforward linear sequence without any conditional checks or loops that could lead to unreachable code.
+
+### Final Answer:
+
+For the `des` function:
+\boxed{\text{Infeasible paths exist where variable assignments prevent certain condition branches from being executed.}}
+
+For the `main` function:
+\boxed{\text{No infeasible paths were identified as all control flows are feasible given the linear execution flow.}}

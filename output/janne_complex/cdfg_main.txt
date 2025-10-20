@@ -1,0 +1,30 @@
+
+```dot
+digraph main {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: a, b, answer\nC-Use: complex"];
+    2 [label="2", xlabel="P-Use: a"];
+    3 [label="3", xlabel="Def: answer\nC-Use: complex"];
+    4 [label="4", shape=doublecircle];
+    
+    1 -> 2 [label="Always true"];
+    2 -> 3;
+    3 -> 4;
+}
+```
+
+<codigos - main>
+Node 1:
+int a = 1, b = 1, answer = 0;
+answer = complex(a, b);
+return answer;
+---
+Node 2:
+// This node represents the function call
+answer = complex(a, b);
+---
+Node 3:
+return answer;
+</codigos>

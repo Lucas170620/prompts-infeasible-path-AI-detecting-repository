@@ -1,0 +1,9 @@
+digraph InitSeed {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: Seed\nC-Use: none"];
+    2 [label="2", shape=doublecircle, xlabel="Return"];
+
+    1 -> 2;
+}

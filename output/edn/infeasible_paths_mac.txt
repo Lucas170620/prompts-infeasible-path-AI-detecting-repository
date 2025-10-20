@@ -1,0 +1,9 @@
+
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [mac function]**
+   - **Trechos de Código**:
+     - Linha 3: `short temp_mult = a[i] * b[i];`
+     - Linha 4: `c += temp_mult;`
+   - **Descrição**: Nó 2 → Nó 3 → Nó 4
+   - **Motivo**: Possível overflow no cálculo de `a[i] * b[i]` armazenado em `temp_mult`, resultando em valor incorreto para 'c'.

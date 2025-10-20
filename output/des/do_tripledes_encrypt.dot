@@ -1,0 +1,14 @@
+digraph do_tripledes_encrypt {
+    rankdir=TB;
+    
+    1 [label="Entry", shape=circle];
+    2 [label="Call tripledes_ecb_encrypt", shape=circle];
+    3 [label="Return", shape=doublecircle];
+
+    1 -> 2 [xlabel="Control flow"];
+    2 -> 3 [xlabel="Control flow"];
+
+    /* Data Flow */
+    1 [xlabel="Def: ctx, outbuf, inbuf"];
+    2 [xlabel="Use: ctx, outbuf, inbuf"];
+}

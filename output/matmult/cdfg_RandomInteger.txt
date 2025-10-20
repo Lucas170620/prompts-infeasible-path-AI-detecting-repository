@@ -1,0 +1,26 @@
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph RandomInteger {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: Seed"];
+    2 [label="2", xlabel="Use: Seed"];
+    3 [label="3", shape=doublecircle];
+    
+    1 -> 2 ;
+    2 -> 3 ;
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós (em tags):**
+
+<codigos - RandomInteger>
+Node 1:
+Seed = ((Seed * 133) + 81) % 8095;
+---
+Node 2:
+return Seed;
+</codigos>

@@ -1,9 +1,0 @@
-digraph main_DFG {
-    node [shape=ellipse, style=filled, fillcolor=lightblue];
-    Array_global [label="Array (global)"];
-    node [shape=box];
-    op_call_InitSeed [label="InitSeed()"];
-    op_call_Test [label="Test(Array)"];
-    Array_global -> op_call_Test;
-    op_call_InitSeed -> op_call_Test [style=dashed, color=grey];
-}

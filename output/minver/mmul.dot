@@ -1,0 +1,33 @@
+digraph mmul {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: row_c, col_c\nC-Use: row_a, col_a, row_b, col_b"];
+    2 [label="2", xlabel="P-Use: row_c < 1, row_b < 1, col_c < 1, col_a != row_b"];
+    3 [label="3", xlabel="Return 999"];
+    4 [label="4", xlabel="Def: i=0\nC-Use: row_c"];
+    5 [label="5", xlabel="P-Use: i < row_c"];
+    6 [label="6", xlabel="Def: j=0\nC-Use: col_c"];
+    7 [label="7", xlabel="P-Use: j < col_c"];
+    8 [label="8", xlabel="Def: w=0.0\nC-Use: row_b, k"];
+    9 [label="9", xlabel="Loop over k from 0 to row_b"];
+    10 [label="10", xlabel="Multiply and accumulate a[i][k] * b[k][j]];
+    11 [label="11", xlabel="Def: c[i][j]=w"];
+    12 [label="12", xlabel="End of j loop"];
+    13 [label="13", xlabel="Return 0"];
+    
+    1 -> 2;
+    2 -> 3 [label="True\nInvalid dimensions"];
+    2 -> 4 [label="False"];
+    4 -> 5 [label="Loop condition"];
+    5 -> 6 [label="Continue"];
+    6 -> 7;
+    7 -> 8 [label="Continue"];
+    8 -> 9;
+    9 -> 10;
+    10 -> 11;
+    11 -> 12;
+    12 -> 13;
+    
+    3, 13 [shape=doublecircle];
+}

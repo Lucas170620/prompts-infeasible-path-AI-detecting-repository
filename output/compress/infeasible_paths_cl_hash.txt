@@ -1,0 +1,2 @@
+
+Nenhum caminho inviável foi identificado na função `cl_hash`.

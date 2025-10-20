@@ -1,0 +1,6 @@
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+
+**Motivo:** O fluxo de controle na função `main` é linear sem nenhuma bifurcação ou condições que possam levar a caminhos inviáveis. Cada nó é executado sequencialmente, e não há contradições lógicas ou dependências de dados inconsistentes no contexto fornecido.

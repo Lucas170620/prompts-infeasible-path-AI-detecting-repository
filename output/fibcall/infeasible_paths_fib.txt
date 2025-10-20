@@ -1,0 +1,12 @@
+
+# Caminhos Inviáveis Identificados
+
+Nenhum caminho inviável foi identificado.
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+
+**Explicação:**
+
+Após analisar o código e seu CDFG, não foram encontrados quaisquer caminhos inviáveis. O loop é executado corretamente de `i=2` até `i=30`, atualizando as variáveis adequadamente sem contradições lógicas ou problemas de dados. Portanto, todos os caminhos possíveis são viáveis em todas as condições relevantes para a entrada fornecida (`n = 30`).

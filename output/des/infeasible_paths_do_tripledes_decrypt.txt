@@ -1,0 +1,13 @@
+
+# Caminhos Inviáveis Identificados
+
+Nenhum caminho inviável foi identificado.
+
+```markdown
+1. **Caminho único possível na função do_tripledes_decrypt**  
+   - **Trechos de código**:  
+     - Linha 1: `static void do_tripledes_decrypt( struct _tripledes_ctx *ctx, byte *outbuf, byte *inbuf )`  
+     - Linha 2: `triplesec_ecb_decrypt ( ctx, inbuf, outbuf );`  
+   - **Descrição**: O caminho é único e linear: entrada dos parâmetros -> chamada da função de descriptografia -> saída.  
+   - **Motivo**: Não há condições ou branches que possam tornar o caminho inviável. A execução é determinística e sequencial.
+```

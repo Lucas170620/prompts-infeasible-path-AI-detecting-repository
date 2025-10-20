@@ -1,0 +1,12 @@
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [num_to_lcd]**
+   - **Trechos de Código**:  
+     - Linha [1]: `function num_to_lcd`  
+     - Linha [2-17]: Cada caso do switch (0x00 a 0x0F)  
+     - Linha [18]: `return 0`  
+   - **Descrição**: Sequência de nós como Node 1 → Node X (X: 2-17) → Node 18  
+   - **Motivo**: Contradição lógica - Após um caso do switch retornar, o código não pode chegar à instrução `return 0` em Node 18. Cada caminho que inclui Node 18 após um nó de caso é inalcançável.
+```

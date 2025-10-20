@@ -1,0 +1,22 @@
+digraph scalel_graph {
+    // Nodes definition
+    node1 [label="Compute wd = ((long)nbh * 127L) >>7", shape=rectangle];
+    node2 [label="if (wd > 15359)", shape=rectangle];
+    nodeA [label="wd = 15359", shape=rectangle];
+    node3 [label="if (wd < -15360)", shape=rectangle];
+    nodeB [label="wd = -15360", shape=rectangle];
+    node4 [label="return wd << 3", shape=rectangle];
+
+    // Edges definition
+    node1 -> node2;
+    
+    node2 -> nodeA [label="true"];
+    node2 -> node3 [label="false"];
+
+    nodeA -> node3;
+
+    node3 -> nodeB [label="true"];
+    node3 -> node4 [label="false"];
+
+    nodeB -> node4;
+}

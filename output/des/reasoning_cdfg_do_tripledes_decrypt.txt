@@ -1,0 +1,15 @@
+Okay, I need to analyze the provided code and generate a precise Control and Data Flow Graph (CDFG) in Graphviz DOT format for the function do_tripledes_decrypt. Let me start by understanding what this function does.
+
+Looking at the code, do_tripledes_decrypt is a static void function that takes a struct _tripledes_ctx *ctx, byte *outbuf, and byte *inbuf as parameters. The function calls tripledes_ecb_decrypt with these pointers. 
+
+The function's implementation is straightforward—it doesn't have any conditionals or loops. It simply passes the context and buffers to another function. So, there are no decision points or control flow changes here.
+
+Next, I need to identify all the basic blocks. Since this function has only one statement, it forms a single basic block. Each basic block will be represented as a node in the CDFG.
+
+Now, considering data flow: The function uses the ctx and inbuf parameters, which are inputs, so they have C-uses (computational uses) because they're used in computations or passed to another function. outbuf is defined in this function, so it has a def (definition). 
+
+For control flow, since there's only one statement, there are no edges except the entry and exit nodes.
+
+I'll number each node sequentially. The first node will represent the start of the function, and the second will be the single operation inside the function. The exit node will be a double circle to denote the end.
+
+Putting it all together, I'll create two nodes: one for the entry with data uses, and another for the decrypt call with def and uses. Then, connect them appropriately.

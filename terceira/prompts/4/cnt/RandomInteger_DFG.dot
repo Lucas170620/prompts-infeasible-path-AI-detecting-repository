@@ -1,7 +1,0 @@
-digraph RandomInteger_DFG {
-    node [shape=ellipse];
-    Seed [label="Seed"];
-    node [shape=box];
-    ComputeSeed [label="= ((Seed * 133) + 81) % 8095"];
-    ComputeSeed -> Seed;
-}

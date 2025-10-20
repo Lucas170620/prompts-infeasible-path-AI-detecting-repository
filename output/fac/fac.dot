@@ -1,0 +1,15 @@
+digraph fac {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Entrada"];
+    2 [label="2", xlabel="P-Use: n\nC-Use: n"];
+    3 [label="3", xlabel="Def: return 1"];
+    4 [label="4", xlabel="C-Use: n\nDef: fac(n-1)"];
+    5 [label="5", xlabel="Return: n * fac(n-1)"];
+    
+    1 -> 2;
+    2 -> 3 [label="n == 0"];
+    2 -> 4 [label="False"];
+    4 -> 5;
+}

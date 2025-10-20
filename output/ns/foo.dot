@@ -1,0 +1,23 @@
+digraph foo {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Entrada"];
+    2 [label="2", xlabel="Início de loops"];
+    3 [label="3", xlabel="Loop i"];
+    4 [label="4", xlabel="Loop j"];
+    5 [label="5", xlabel="Loop k"];
+    6 [label="6", xlabel="Loop l"];
+    7 [label="7", xlabel="Condição: keys[i][j][k][l] == x"];
+    8 [label="8", xlabel="Retorno com valor"];
+    9 [label="9", xlabel="Fim de loops, retorno -1"];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> 4;
+    4 -> 5;
+    5 -> 6;
+    6 -> 7;
+    7 -> 8 [label="True\n(keys[i][j][k][l] == x)"];
+    7 -> 9 [label="False"];
+}

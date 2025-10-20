@@ -15,11 +15,25 @@ def extrair_reasoning(resposta):
     
     start_index = resposta.find(start_tag)
     end_index = resposta.find(end_tag)
-    
+
     if start_index != -1 and end_index != -1 and start_index < end_index:
-        reasoning = resposta[start_index + len(start_tag):end_index].strip()
-        restante_resposta = (resposta[:start_index] + resposta[end_index + len(end_tag):]).strip()
-        restante_resposta = ' '.join(restante_resposta.split())
+        # extrai o conteúdo entre as tags, preservando quebras de linha internas
+        reasoning_raw = resposta[start_index + len(start_tag):end_index]
+        # normaliza CRLF/CR para LF e remove espaços nas extremidades
+        reasoning = reasoning_raw.replace('\r\n', '\n').replace('\r', '\n').strip()
+
+        # parte antes e depois das tags
+        prefix = resposta[:start_index]
+        suffix = resposta[end_index + len(end_tag):]
+
+        # remover APENAS uma quebra de linha imediatamente após </think>
+        if suffix.startswith('\r\n'):
+            suffix = suffix[2:]
+        elif suffix.startswith('\n') or suffix.startswith('\r'):
+            suffix = suffix[1:]
+
+        restante_resposta = prefix + suffix
+
         return reasoning, restante_resposta
     else:
         return None, resposta
@@ -66,11 +80,19 @@ class IAIntegration:
         headers = self.get_headers()
         payload = self.get_payload(prompt)
         response = requests.post(self.API_URL, headers=headers, json=payload)
+        max_retries = 3
         if response.status_code == 200:
             self.response = response.json()
-            return extrair_reasoning(self.response['choices'][0]['message']['content'])
+            extract_reasoning, resposta = extrair_reasoning(self.response['choices'][0]['message']['content'])
+            return extract_reasoning, resposta
         else:
-            raise Exception(f"Request failed with status code {response.status_code}: {response.text}")
+            for retry in range(max_retries):
+                print(f"Retry {retry + 1}/{max_retries} after failure with status code {response.status_code}")
+                response = requests.post(self.API_URL, headers=headers, json=payload)
+                if response.status_code == 200:
+                    self.response = response.json()
+                    extract_reasoning, resposta = extrair_reasoning(self.response['choices'][0]['message']['content'])
+                    return extract_reasoning, resposta
         
 
 

@@ -1,0 +1,31 @@
+digraph Initialize {
+    rankdir=TB;
+    
+    1 [label="1", xlabel="Def: OuterIndex, InnerIndex\nC-Use: none"];
+    2 [label="2", xlabel="P-Use: OuterIndex"];
+    3 [label="3", shape=diamond];
+    4 [label="4", shape=box];
+    5 [label="5", shape=diamond];
+    6 [label="6", shape=box];
+    7 [label="7", shape=diamond];
+    8 [label="8"];
+    9 [label="9", shape=diamond];
+    10 [label="10"];
+    11 [label="11", shape=doublecircle];
+    
+    1 -> 2;
+    2 -> 3 [label="True\n(OuterIndex < UPPERLIMIT)"];
+    2 -> 8 [label="False"];
+    3 -> 4 [label="True"];
+    4 -> 5 [label="Def: OuterIndex++"];
+    5 -> 6 [label="P-Use: InnerIndex"];
+    6 -> 7 [label="Def: Array[Outer][Inner] = RandomInteger()"];
+    7 -> 9 [label="True\n(InnerIndex < UPPERLIMIT)"];
+    7 -> 8 [label="False"];
+    8 -> 10;
+    10 -> 2;
+    
+    /* Legend */
+    node [shape=box, label="Processamento", xlabel="Operações básicas"];
+    node [shape=diamond, label="Condição", xlabel="If/While"];
+}

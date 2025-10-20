@@ -1,0 +1,9 @@
+digraph putbyte {
+    rankdir=TB;
+    
+    node [shape=circle];
+    1 [shape=box, label="", xlabel="Def: OutBuff\nC-Use: c"];
+    2 [label="", shape=doublecircle];
+    
+    1 -> 2;
+}

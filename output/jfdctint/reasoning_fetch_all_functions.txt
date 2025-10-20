@@ -1,0 +1,17 @@
+Okay, I need to analyze the given code and extract only the names of all user-defined functions or methods. I should ignore built-in or library functions. The output should list each function name on a new line exactly as declared, without any additional formatting like bullets or numbers.
+
+Looking at the provided code, I start by identifying the functions. The first function I notice is `jpeg_fdct_islow()`. It's defined with the declaration `void jpeg_fdct_islow(void) { ... }`.
+
+Next, there's a `main()` function. It's standard in C programs, but since it's user-defined, it should be included.
+
+I also see some preprocessor directives like `#define`, `#if`, and others, but these don't define functions; they're macros or conditional编译 directives.
+
+Within the code, there are loops and other statements, but no function definitions except for `jpeg_fdct_islow` and `main`.
+
+Wait, in the code provided, I see that `jpeg_fdct_islow()` is defined inside an `#if DCT_ISLOW_SUPPORTED` block. So it's conditionally compiled, but regardless, it's a user-defined function.
+
+So, the two functions to list are `jpeg_fdct_islow` and `main`.
+
+I should make sure there are no other functions. Scanning through the code again, I don't see any other function declarations like `void something() { ... }`.
+
+Therefore, the final list of function names is just these two.

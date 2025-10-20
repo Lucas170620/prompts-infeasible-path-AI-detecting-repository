@@ -1,0 +1,6 @@
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+
+**Razão:** O código é estruturado de forma que todas as condições e loops são lógicos e consistentes. Não há contradições ou dependências de dados que possam tornar um caminho infeásivel.

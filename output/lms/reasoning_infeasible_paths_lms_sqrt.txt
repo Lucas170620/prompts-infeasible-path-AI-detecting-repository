@@ -1,0 +1,176 @@
+Okay, so I'm trying to figure out how to analyze the given code and its CDFG to identify infeasible paths. The function provided is lms_sqrt, which computes the square root of a value using an iterative method. Let's start by understanding both the code and the CDFG.
+
+First, looking at the code for lms_sqrt:
+
+```c
+static float lms_sqrt(val)
+float val;
+{
+  float x = val/10;
+
+  float dx;
+
+  double diff;
+  double min_tol = 0.00001;
+
+  int i, flag;
+
+  flag = 0;
+  if (val == 0 ) x = 0;
+  else {
+    for (i=1;i<20;i++)
+      {
+	if (!flag) {
+	  dx = (val - (x*x)) / (2.0 * x);
+	  x = x + dx;
+	  diff = val - (x*x);
+	  if (lms_fabs(diff) <= min_tol) {
+		flag = 1;
+	      }
+	}
+      }
+  }
+  return x;
+}
+```
+
+The function initializes `x` as `val/10`. If `val` is zero, it sets `x` to zero. Otherwise, it enters a loop where it iteratively refines the value of `x` until the difference between `val` and `x²` is within a tolerance.
+
+Now, looking at the provided CDFG for lms_sqrt:
+
+```dot
+digraph lms_sqrt {
+  1 [label="float x = val/10;"]
+  2 [label="if (val == 0)"]
+  3 [label="x = 0;"]
+  4 [label="flag = 0;"]
+  5 [label="for (i=1; i<20; i++)"]
+  6 [label="if (!flag)"]
+  7 [label="dx = (val - x²)/(2x);"]
+  8 [label="x = x + dx;"]
+  9 [label="diff = val - x²;"]
+  10 [label="if (|diff| <= min_tol)"]
+  11 [label="flag = 1;"]
+  12 [label="return x;"]
+
+  1 -> 2;
+  2 -> 3 [label="True"];
+  2 -> 4 [label="False"];
+  4 -> 5;
+  5 -> 6;
+  6 -> 7 [label="True"];
+  6 -> 8 [label="False"];
+  7 -> 8;
+  8 -> 9;
+  9 -> 10;
+  10 -> 11 [label="True"];
+  10 -> 5 [label="False"];
+  11 -> 12;
+}
+```
+
+Hmm, I need to map each node in the CDFG to the corresponding code lines. Let's go step by step.
+
+Node 1 corresponds to line where x is initialized as val/10.
+Nodes 2-3: If val is zero, set x to zero.
+Nodes 4: Initialize flag to 0.
+Then enters a loop (node5), and within it, checks if flag is not set (node6). 
+
+I think I have the mappings right. Now, let's look for potential infeasible paths.
+
+Looking at node2, which is the condition `if (val == 0)`. If true, we go to node3; else, to node4.
+
+Now, considering possible execution paths:
+
+1. **Path when val == 0:**
+   - Node1 -> Node2 (True)
+   - Node2 -> Node3
+   - Then proceed to other nodes? Wait, after setting x=0 in node3, the function would continue. But wait, looking at the code, after initializing x and the else block, there's a for loop that runs regardless.
+
+Wait, no: In the code, if val is 0, it sets x=0 and then skips the else block? Or does it still enter the loop?
+
+No, in the code, if val ==0, x is set to 0. Then after that, outside the else, there's an else block which contains the for loop. So, for val==0, after node3, we would proceed beyond the else block and enter the for loop.
+
+Wait, but looking at the CDFG, from node2 (val ==0 condition), if true, it goes to node3, then where? The CDFG shows that node4 is after node2 in both branches. Wait, maybe I'm misunderstanding the CDFG structure.
+
+Alternatively, perhaps the CDFG is structured such that after node2's else branch leads to node4, which initializes flag=0, and then proceeds into the loop.
+
+But regardless, let's consider possible paths:
+
+**Path 1: val ==0**
+
+- Node1 -> Node2 (True)
+- Node2 -> Node3
+- Then, from node3, what's next? The code after setting x to zero would proceed to the else block. Wait no, in the code:
+
+if (val ==0) {x=0} else { ... }
+
+So, if val is 0, it skips the else block and proceeds beyond the if statement.
+
+Wait, so after node3, which sets x=0, what happens next? The for loop starts executing because that's outside the else. So in this case:
+
+After setting x=0 (node3), we go to initializing flag=0 (node4). Then enter the for loop (node5).
+
+In the first iteration of the loop, i=1, check if !flag: since flag is 0, true.
+
+Then compute dx as (val -x²)/(2x). But wait, val is zero and x was set to zero. So we have division by zero here! That's a problem.
+
+So, in this path:
+
+Node3 sets x=0. Then node4 sets flag=0. Enter loop: i starts at 1.
+
+In the first iteration, !flag is true (since flag=0). So compute dx = (val -x²)/(2x) which would be (0 -0)/0 → division by zero. This is undefined and thus an error. Therefore, this path is infeasible because it leads to a runtime error.
+
+Wait, but the function may not handle that. So perhaps the code assumes val >=0, and when val=0, x is correctly set to 0 and then no further iterations are done? Or does the loop proceed regardless?
+
+Looking back at the code: after setting x=0 in node3 (val==0), the else block is skipped, but the for loop is outside. So yes, it would still enter the for loop.
+
+In that case, this path leads to division by zero, which is an error, making the entire path invalid or infeasible because it can't execute without crashing.
+
+So Path1: val==0 → x=0 → enters loop → dx = 0/(2*0) → undefined. Therefore, this path is inviable due to a runtime error.
+
+**Path 2: val !=0**
+
+In this case:
+
+- Node1 -> Node2 (False)
+- Node2 -> Node4
+- Then node5 (loop starts)
+- Inside loop, i runs from 1 to less than 20.
+- For each iteration, if !flag (node6), compute dx and update x.
+
+After each update, check the difference between val and x². If within tolerance, set flag=1.
+
+Once flag is set, subsequent iterations skip computing dx because !flag is false.
+
+This path seems feasible as it doesn't lead to any logical contradictions or undefined behavior.
+
+Another possible path could be when after setting x = x + dx (node8), the difference becomes negative? Let's see:
+
+diff = val -x². If diff <= min_tol, set flag=1. But if x is an approximation of sqrt(val), then x² should approach val from below or above depending on convergence.
+
+But as long as the loop converges within 20 iterations, it's okay. If not, perhaps the path isn't taken, but since the code doesn't have a break statement outside the loop, it will always execute 19 times.
+
+Wait, another possible issue: when val is negative. Since sqrt of a negative number isn't real. But in this function, is there any check for val being negative?
+
+Looking at the code, no such checks are present. So if someone calls lms_sqrt with a negative val, it will proceed and likely result in x oscillating or incorrect values.
+
+But that's more of an input constraint rather than a path issue within the function itself.
+
+Wait, but according to the problem statement, we're only analyzing paths based on the CDFG provided. So perhaps negative vals are allowed, leading to different behavior, but not necessarily making any specific path infeasible.
+
+Another point: In node6, if flag is already set (flag=1), then it skips the computation of dx and continues the loop without changing x. This is correct as once the tolerance is met, further iterations don't change x.
+
+Is there any scenario where flag remains 0 after all iterations? For example, if val is such that x doesn't converge within 20 steps. In this case, the function will return an x that may not be accurate, but it's still a feasible path because it's part of the algorithm's possible execution.
+
+But no, since in code, after each iteration, diff is checked and flag is set if condition met. So all paths through the loop eventually exit after i<20.
+
+Now, another thought: when val=0, after setting x=0 (node3), the for loop begins with i=1. Inside, !flag is true because flag was initialized to 0 in node4. Then, compute dx = (val -x²)/(2x) → (0-0)/0 which is division by zero. This will cause a runtime error, making this path inviable.
+
+Therefore, any path where val=0 leads to an undefined behavior, hence it's infeasible.
+
+So summarizing the infeasible paths:
+
+1. The path where val == 0: node2 (True) → node3 → node4 → node5 → node6 (True) → attempt division by zero.
+
+This is a static infeasibility because whenever val=0, this path is executed and leads to an error.

@@ -1,0 +1,59 @@
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph uppol2 {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: wd2\nC-Use: al1"];
+    2 [label="2", xlabel="P-Use: plt, plt1"];
+    3 [label="3", xlabel="Modifica wd2"];
+    4 [label="4", xlabel="Shift right wd2 por 7 bits"];
+    5 [label="5", xlabel="P-Use: plt, plt2"];
+    6 [label="6", xlabel="Modifica wd2"];
+    7 [label="7", xlabel="Def: apl2\nC-Use: al2"];
+    8 [label="8", xlabel="Operação: wd4 = wd2 + (128 ou -128)"];
+    9 [label="9", xlabel="Aplica saturação em wd4"];
+    
+    1 -> 2;
+    2 -> 3 [label="True\n(plt * plt1 >= 0L)"];
+    2 -> 4 [label="False"];
+    3 -> 4;
+    4 -> 5;
+    5 -> 6 [label="True\n(plt * plt2 >= 0L)"];
+    5 -> 8 [label="False"];
+    6 -> 8;
+    8 -> 7;
+    7 -> 9;
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós:**
+
+<codigos - uppol2>
+Node 1:
+long wd2 = 4L * (long)al1;
+---
+Node 2:
+if ((long)plt*plt1 >= 0L)
+---
+Node 3:
+wd2 = -wd2;
+---
+Node 4:
+wd2 >>= 7; // wd2 = wd2 / 128
+---
+Node 5:
+if ((long)plt*plt2 >= 0L)
+---
+Node 6:
+wd4 = wd2 + 128;
+---
+Node 7:
+apl2 = (int)(127L * (long)al2 >> 7L);
+---
+Node 8:
+wd4 += apl2;
+if (wd4 > 12288) wd4 = 12288; else if (wd4 < -12288) wd4 = -12288;
+</codigos>

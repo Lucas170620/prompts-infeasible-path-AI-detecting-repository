@@ -1,0 +1,28 @@
+Okay, I need to analyze the given code and extract all user-defined functions. Let me start by reading through the code carefully.
+
+Looking at the beginning, there's a comment block with some code snippets, but no function definitions there. Then I see the function `is_weak_key` is called, but its definition isn't shown here. Next, in the `selftest()` function, several functions are used like `fprintf`, which are built-in, so they shouldn't be included.
+
+Moving further down, I spot `do_tripledes_setkey`, `do_tripledes_encrypt`, and `do_tripledes_decrypt` as user-defined functions. These are definitely to be listed.
+
+Then there's the function `des_get_info`, which is also defined by the user. It has several parameters but that's okay since we just need the names.
+
+Wait, earlier in the code, I think I missed some functions. Let me go back. Oh yes, inside the `selftest()` function, it calls `is_weak_key` and others, but those are helper functions probably defined elsewhere.
+
+So compiling all the user-defined functions from the provided code:
+
+1. is_weak_key (even though its definition isn't shown here, it's called in do_tripledes_setkey)
+2. selftest
+3. do_tripledes_setkey
+4. do_tripledes_encrypt
+5. do_tripledes_decrypt
+6. des_get_info
+
+Wait, I think `selftest` is a function because it's called with `s = selftest();`. So yes, that should be included.
+
+Let me make sure I didn't miss any. Looking through the code again:
+
+- The functions declared as static are do_tripledes_setkey, do_tripledes_encrypt, and do_tripledes_decrypt.
+- des_get_info is another function.
+- selftest is called but its definition isn't shown here, but since it's used, it must be defined elsewhere in the user's code.
+
+So I'll list all these functions as per the rules.

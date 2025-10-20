@@ -1,0 +1,69 @@
+Okay, I need to analyze the BubbleSort function provided and its Control Flow Data Flow Graph (CDFG) to identify any infeasible paths. Let me start by understanding what an infeasible path is. From the context given, it's a sequence of nodes or edges that can't be executed because of logical contradictions, data dependencies, or program invariants.
+
+First, I should look at the code structure. The BubbleSort function has two loops: an outer loop and an inner nested loop. The outer loop runs from i=1 to NUMELEMS-1, and the inner loop runs Index from 1 to NUMELEMS-1. There are conditions within both loops that can affect control flow.
+
+Looking at the CDFG description provided earlier, I see nodes labeled A through G with specific conditions and data dependencies. Each node represents a basic block in the code.
+
+I need to map each node to the corresponding part of the code. Let's go step by step:
+
+1. Node A: Check if i > NUMELEMS-1. If true, exit; else proceed.
+   - Corresponds to the outer loop condition.
+2. Node B: Enter outer loop body and set Sorted = TRUE.
+3. Node C: Inner loop condition Index <= NUMELEMS-1.
+4. Node D: Check if Index > NUMELEMS - i. If true, break inner loop.
+5. Node E: Compare Array[Index] and Array[Index+1].
+6. Node F: Swap elements and set Sorted = FALSE.
+7. Node G: After inner loop, check if Sorted is TRUE to break outer loop.
+
+Now, I need to identify all possible paths through this CDFG. For example, one path could be A→B→C→D→E→F→C (looping back until a condition breaks). Another might involve taking different edges based on the conditions met or not met.
+
+I should check each potential path for feasibility:
+
+- **Path 1**: A→B→C→D→(break if Index > NUMELEMS - i)
+   - If during the inner loop, Index becomes larger than NUMELEMS - i, this would break out of the inner loop. Is this possible? Yes, as i increases in each iteration of the outer loop, so after some iterations, Index could exceed that value.
+
+- **Path 2**: A→B→C→D→(not breaking)→E→F→C
+   - If elements are swapped, Sorted is set to FALSE. This keeps the loop going until all passes are done or the array is sorted.
+
+- **Path 3**: A→B→C→E→(no swap)→G
+   - If no swap occurs, it proceeds to check if Sorted is TRUE after the inner loop.
+
+Now, checking for infeasible paths. Let's look at possible logical contradictions:
+
+In the BubbleSort algorithm, once a full pass through the array without any swaps is made (Sorted remains TRUE), the outer loop breaks early. So any path that tries to continue unnecessary iterations when the array is already sorted should be considered.
+
+But looking deeper into data dependencies: Are there cases where a condition cannot be met?
+
+For example, in Node D, if Index > NUMELEMS - i, we break out of the inner loop. But given that i starts at 1 and increases by 1 each iteration, and Index goes up to NUMELEMS-1, for larger values of i, say when i approaches NUMELEMS, the condition in Node D might not be satisfied because NUMELEMS - i decreases.
+
+Wait, but in each inner loop, after some iterations, if Index exceeds NUMELEMS -i, it breaks early. That's normal bubble sort optimization.
+
+Another point: The outer loop has Sorted initialized to TRUE at B each iteration. If during the inner loop any swap occurs, Sorted is set to FALSE. So if no swaps happen in a full pass (i.e., all elements are sorted), Sorted remains TRUE and the outer loop breaks.
+
+So, let's consider a scenario where after an outer loop iteration i, the inner loop doesn't find any unsorted elements. Then, the path would be A→B→C→(inner loop without swaps)→G→break outer loop.
+
+Is there a situation where a condition in the CDFG is contradictory?
+
+Looking at Node D: if Index > NUMELEMS -i → break inner loop.
+
+But during each iteration of i, as i increases by 1, the upper bound for Index decreases. So, for example, when i=1, the upper limit is NUMELEMS-1, and when i=NUMELEMS-1, the upper limit is 0 (since NUMELEMS - i would be 0). So during each outer loop iteration, the inner loop's effective range decreases.
+
+But this doesn't cause any contradictions because it's a normal part of the algorithm. It just means that for larger i, the inner loop will terminate early.
+
+Wait, perhaps an issue arises when considering variable initialization. For example, in Node F, Temp is used to swap elements, but is Temp properly initialized?
+
+In the code:
+
+Temp = Array[Index];
+Array[Index] = Array[Index+1];
+Array[Index+1] = Temp;
+
+Here, Temp is assigned a value from Array[Index], so it's properly initialized within this block. So no data dependency issues here.
+
+Another point: The outer loop condition in Node A is i <= NUMELEMS-1. Since i starts at 1 and increments by 1 each time, the maximum i is NUMELEMS-1, which should be correct for sorting an array of size NUMELEMS.
+
+I don't see any logical contradictions that would make a path impossible. For instance, all conditions are based on comparisons that can realistically occur depending on the input data.
+
+Wait, maybe if we consider cases where the inner loop doesn't run at all? Like when i is such that NUMELEMS -i is less than 1, but since Index starts at 1 and increments, it would break immediately. But this is handled correctly.
+
+So after considering all possible paths through the CDFG, I don't see any sequences of nodes that are logically impossible under normal circumstances. Therefore, there might be no infeasible paths identified.

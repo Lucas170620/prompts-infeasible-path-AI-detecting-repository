@@ -1,0 +1,3 @@
+printDate
+calculateTotalDays
+main

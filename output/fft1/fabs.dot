@@ -1,0 +1,16 @@
+digraph fabs {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: f\nC-Use: n"];
+    2 [label="2", xlabel="P-Use: n"];
+    3 [label="3", xlabel="Def: f = n\nC-Use: n"];
+    4 [label="4", xlabel="Def: f = -n\nC-Use: n"];
+    5 [label="5", shape=doublecircle, xlabel="Return f\nC-Use: f"];
+
+    1 -> 2;
+    2 -> 3 [label="True\n(n >= 0)"];
+    2 -> 4 [label="False"];
+    3 -> 5;
+    4 -> 5;
+}

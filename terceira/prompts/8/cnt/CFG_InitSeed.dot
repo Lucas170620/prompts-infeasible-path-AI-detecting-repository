@@ -1,7 +1,0 @@
-digraph CFG_InitSeed {
-    node [shape=box];
-    start [label="Inicio", shape=ellipse];
-    n1 [label="Seed = 0"];
-    end [label="return 0;", shape=ellipse];
-    start -> n1 -> end;
-}

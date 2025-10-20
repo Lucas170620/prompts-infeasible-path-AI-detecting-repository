@@ -1,0 +1,31 @@
+Okay, I need to generate a precise Control and Data Flow Graph (CDFG) in Graphviz DOT format for the provided function `Sum`. Let's start by understanding what the function does.
+
+The function `Sum` is part of a matrix processing code. It initializes two matrices, Array1 and Array2, with random integers. Then, it processes each element to calculate sums of positive and negative numbers separately. 
+
+Looking at the code:
+
+- The function declares local variables Ptotal, Ntotal, Pcnt, Ncnt.
+- It loops through each element of a MAXSIZE x MAXSIZE matrix.
+- For each element, depending on whether WORSTCASE is defined, it either adds positive numbers or processes negatives to Ptotal and positives to Ntotal. 
+- After processing all elements, it assigns the totals to global variables.
+
+I need to construct the CDFG for this function. Let me break down the steps:
+
+1. **Identify Basic Blocks**: The function has a nested loop structure with a conditional inside. Each iteration of the inner loop processes an element.
+
+2. **Data Flow Analysis**:
+   - Variables: Ptotal, Ntotal, Pcnt, Ncnt are defined and used throughout.
+   - Array[Outer][Inner] is accessed in each iteration.
+
+3. **Control Flow**: The loops have control flow based on comparison conditions.
+
+Now, I'll model the CDFG:
+
+- Start node (Node 1): Function entry, initializing local variables.
+- Loop nodes: Outer loop starts, then inner loop starts, and condition checks inside the loop.
+- Conditional branches: Depending on WORSTCASE, the code either processes positive or negative numbers.
+- Update nodes for Ptotal, Ntotal, etc., based on the condition.
+
+I need to assign IDs to each node, track definitions (def) and uses (use), and map them correctly. The graph should show control flow with edges labeled by conditions, and data flow showing variable usages.
+
+Finally, I'll write the DOT code, making sure nodes are numbered sequentially and edges properly labeled. Each node's label includes its operation and dataflow info.

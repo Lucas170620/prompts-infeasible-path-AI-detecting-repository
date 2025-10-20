@@ -1,0 +1,55 @@
+
+```dot
+digraph lms_sqrt {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: x = val/10"];
+    2 [label="2", xlabel="P-Use: val"];
+    3 [label="3", xlabel="Def: flag = 0\nC-Use: val"];
+    4 [label="4", xlabel="P-Use: val"];
+    5 [label="5", xlabel="If (val == 0)"];
+    6 [label="6", xlabel="Def: x = 0"];
+    7 [label="7", xlabel="P-Use: i, flag"];
+    8 [label="8", xlabel="Loop start: for(i=1; i<20; i++)"];
+    9 [label="9", xlabel="C-Use: diff"];
+    10 [label="10", xlabel="Def: dx = (val - x²)/(2x)"];
+    11 [label="11", xlabel="Def: x = x + dx"];
+    12 [label="12", xlabel="Def: diff = val - x²"];
+    13 [label="13", xlabel="P-Use: flag, diff"];
+    14 [label="14", xlabel="If (|diff| <= min_tol)"];
+    15 [label="15", xlabel="Def: flag = 1"];
+    16 [label="16", xlabel="Loop end"];
+    17 [label="17", xlabel="Return x"];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> 4;
+    4 -> 5;
+    5 -> 6 [label="True\n(val == 0)"];
+    5 -> 8 [label="False"];
+    8 -> 9;
+    9 -> 10;
+    10 -> 11;
+    11 -> 12;
+    12 -> 13;
+    13 -> 14;
+    14 -> 15 [label="True\n(|diff| <= min_tol)"];
+    14 -> 8 [label="False"];
+    15 -> 16;
+    16 -> 17;
+    17 [shape=doublecircle];
+}
+```
+
+<codigos - lms_sqrt>
+Node 1:
+float x = val/10;
+---
+Node 2:
+if (val == 0)
+---
+Node 3:
+x = 0;
+...
+</codigos>

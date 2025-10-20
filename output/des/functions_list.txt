@@ -1,0 +1,6 @@
+is_weak_key
+selftest
+do_tripledes_setkey
+do_tripledes_encrypt
+do_tripledes_decrypt
+des_get_info

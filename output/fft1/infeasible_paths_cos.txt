@@ -1,0 +1,9 @@
+
+# Caminhos Inviáveis Identificados
+
+Nenhum caminho inviável foi identificado.
+
+---
+
+**Explicação:**  
+A função `cos` possui um fluxo de controle linear sem ramificações ou loops. O CDFG mostra apenas dois nós conectados diretamente, indicando que não há caminhos alternativos ou condicionais que possam levar a situações inviáveis. Assim, não há sequência de nós que viole critérios de viabilidade.

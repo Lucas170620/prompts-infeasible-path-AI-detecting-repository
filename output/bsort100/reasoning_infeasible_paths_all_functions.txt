@@ -1,0 +1,33 @@
+Ok, vou tentar entender como construir um CFG para a função `ttime()` baseado no que foi explicado anteriormente. Primeiro, lembro que o CFG é uma representação gráfica das blocos básicos e fluxo de controle em um trecho de código.
+
+A função `ttime()` tem as seguintes linhas de código:
+
+```c
+int ttime()
+{
+    struct tms buffer;
+    int utime;
+
+    /* times(&buffer); */
+    utime = (buffer.tms_utime / 60.0) * 1000.0;
+    return(utime);
+}
+```
+
+Vamos quebrá-la em blocos básicos, ou seja, cada instrução ou conjunto mínimo de instruções que não contenha saltos.
+
+Blocos básicos identificados:
+1. Declaração das variáveis `buffer` e `utime`.
+2. Cálculo do valor de `utime` usando a estrutura `buffer`.
+3. Retorna o valor de `utime`.
+
+Agora, vamos analisar o fluxo de controle. Como não há condicionais ou loops, o fluxo é linear: cada bloco é executado sequencialmente.
+
+Para os dados:
+- No primeiro bloco, `buffer` e `utime` são definidos.
+- No segundo bloco, `buffer.tms_utime` é usado para calcular `utime`.
+- No terceiro bloco, `utime` é retornado.
+
+Precisamos identificar se há possíveis caminhos inviáveis. Observo que a função chama `times(&buffer);` mas está comentada. Isso pode ser um problema pois sem essa chamada, os dados de `buffer` não estão inicializados adequadamente. Assim, ao acessar `tms_utime`, estamos lendo memória não inicializada, o que é undefined behavior.
+
+Portanto, um caminho inviável seria executar a função como está, porque ela assume que `times(&buffer)` foi chamada e funcionou corretamente. Como está comentada, estamos em uma situação de dados inconsistentes.

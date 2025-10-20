@@ -1,0 +1,11 @@
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [mmul]**
+   - **Trechos de Código**:  
+     - Linha 2: `if (row_c < 1 || row_b < 1 || col_c < 1 || col_a != row_b)`  
+     - Linha 3: `return 999`  
+   - **Descrição**: Nó 2 → Nó 3  
+   - **Motivo**: Contradição lógica: As condições verificadas em `row_c`, `row_b`, `col_c`, e `col_a` nunca são verdadeiras para matrizes 3x3, tornando este caminho estáticamente inviável.
+```

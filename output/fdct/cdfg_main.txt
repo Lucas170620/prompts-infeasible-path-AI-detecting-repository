@@ -1,0 +1,51 @@
+
+```dot
+digraph main {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="C-Use: block"];
+    2 [label="2", xlabel="Def: i"];
+    3 [label="3", xlabel="P-Use: IO"];
+    4 [label="4", xlabel="C-Use: i, block"];
+    5 [label="5", xlabel="Def: temp"];
+    6 [label="6", xlabel="P-Use: i, j, temp"];
+    7 [label="7", xlabel="Def: temp"];
+    8 [label="8", xlabel="P-Use: IO, block"];
+    9 [label="9", xlabel="C-Use: block"];
+    10 [label="10", xlabel="Def: i"];
+    11 [label="11", xlabel="P-Use: IO"];
+    
+    1 -> 2;
+    2 -> 3 [label="True\n(!defined)"];
+    2 -> 4 [label="False"];
+    3 -> 9;
+    4 -> 5;
+    5 -> 6;
+    6 -> 7;
+    7 -> 8;
+    8 -> 10;
+    10 -> 11 [label="True\n(defined)"];
+    11 [shape=doublecircle];
+}
+```
+
+<codigos - main>
+Node 1:
+int i;
+---
+Node 2:
+fdct (block, 8);
+---
+Node 3:
+#ifdef IO
+---
+Node 4:
+for(i=0; i<8; i++)
+---
+Node 5:
+printf("block[%2d] -> %8d . block[%2d] -> %8d\n",i,block[i],i+1,block[i+1]);
+---
+Node 6:
+return block[0];
+</codigos>

@@ -1,0 +1,111 @@
+
+```dot
+digraph main {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: maxcode, n_bits, InCnt, apsim_InCnt\nC-Use: OutBuff"];
+    2 [label="2"];
+    3 [label="3", xlabel="P-Use: InCnt"];
+    4 [label="4"];
+    5 [label="5", xlabel="Def: r_off, bp\nC-Use: code"];
+    6 [label="6"];
+    7 [label="7"];
+    8 [label="8"];
+    9 [label="9"];
+    10 [label="10"];
+    11 [label="11"];
+    12 [label="12"];
+    13 [label="13", xlabel="P-Use: offset, n_bits"];
+    14 [label="14"];
+    15 [label="15"];
+    16 [label="16"];
+    17 [label="17"];
+    18 [label="18"];
+    
+    1 -> 2 ;
+    2 -> 3 [label="True\n(InCnt > 0)"];
+    2 -> 4 [label="False"];
+    3 -> 5 ;
+    5 -> 6 [label="apsim_InCnt-- > 0"];
+    6 -> 7 ;
+    7 -> 8 ;
+    8 -> 9 ;
+    9 -> 10 ;
+    10 -> 11 ;
+    11 -> 12 ;
+    12 -> 13 [label="offset == (n_bits << 3)"];
+    13 -> 14 ;
+    14 -> 15 ;
+    15 -> 16 ;
+    16 -> 17 ;
+    17 -> 18 [label="free_ent > maxcode || ((clear_flg > 0))"];
+    18 [shape=doublecircle];
+}
+```
+
+<codigos - main>
+Node 1:
+int maxcode, n_bits; int InCnt, apsim_InCnt; char *OutBuff;
+---
+Node 2:
+while(1)
+{
+    if(InCnt > 0 && (apsim_InCnt-- > 0))
+    {
+        InCnt--;
+        return (unsigned int)*InBuff++;
+    } else {
+        return -1;
+    }
+}
+if(InCnt > 0 && (apsim_InCnt-- > 0)) {
+    InCnt--;
+    return( (unsigned int)*InBuff++);
+} else {
+    return -1;
+}
+---
+Node 3:
+*OutBuff++ = c;        
+bp++;
+bits -= 8;
+code >>= 8;
+if(bits) {
+   *bp = code;          
+}
+
+offset += n_bits;
+if(offset == (n_bits << 3)) {
+   bp = buf;
+   bits = n_bits;
+   bytes_out += bits;
+   do {
+      putbyte(*bp++);
+   } while(( --bits)&&((bp - buf < 8)));
+   offset = 0;
+}
+if(free_ent > maxcode || ((clear_flg > 0))) {
+   if(offset) {
+      writebytes(buf, n_bits);
+      bytes_out += n_bits;
+   }
+   offset = 0;
+   if(clear_flg) {
+      maxcode = MAXCODE(n_bits = INIT_BITS);
+      clear_flg = 0;
+   } else {
+      n_bits++;
+      if(n_bits == maxbits)
+         maxcode = maxmaxcode;
+      else
+         maxcode = MAXCODE(n_bits);
+   }
+}
+if(offset > 0) {
+   writebytes(buf, (offset + 7)/8);
+}
+bytes_out += (offset +7)/8;
+offset = 0;
+---
+</codigos>

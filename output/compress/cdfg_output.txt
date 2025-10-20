@@ -1,0 +1,97 @@
+
+```dot
+digraph output {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: r_off, bits; Use: buf"];
+    2 [label="2", xlabel="Use: code"];
+    3 [label="3", xlabel="P-Use: offset"];
+    4 [label="4", xlabel="C-Use: *bp, code"];
+    5 [label="5", xlabel="Def: bp; Use: buf"];
+    6 [label="6", xlabel="Use: bits, r_off, code"];
+    7 [label="7", xlabel="P-Use: offset"];
+    8 [label="8", xlabel="Use: n_bits"];
+    9 [label="9", xlabel="Def: maxcode; Use: n_bits, INIT_BITS"];
+    10[label="10",xlabel="Def: clear_flg; Use: code"];
+    11[label="11",xlabel="Use: offset, buf"];
+    12[label="12",xlabel="P-Use: bits"];
+    13[label="13",xlabel="Def: bytes_out"];
+    14[label="14",xlabel="Def: code; Use: offset"];
+    15[label="15",xlabel="C-Use: buf"];
+    16[label="16",xlabel="P-Use: offset, bits"];
+    17[label="17",xlabel="Def: isEOF"];
+    
+    1 -> 2;
+    2 -> 3 [label="code >= 0"];
+    2 -> 17 [label="code < 0"];
+    3 -> 4 [label="bits == n_bits"];
+    4 -> 5;
+    5 -> 6 [label="bits >= 8"];
+    6 -> 7 [label="bits <= 0"];
+    7 -> 8 [label="bits > 0"];
+    8 -> 9 [label="free_ent > maxcode || (clear_flg)"];
+    9 -> 10;
+    10-> 11 [label="offset > 0"];
+    11-> 12 [label="isEOF"];
+    12-> 13 [label="bits > 0"];
+    13-> 14 [label="offset == 0"];
+    14-> 15;
+    15-> 16;
+    16-> 17;
+    17[shape=doublecircle];
+}
+```
+
+<codigos - output>
+Node 1:
+register int r_off = offset, bits= n_bits;
+register char * bp = buf;
+---
+Node 2:
+if ( code >= 0 ) {
+---
+Node 3:
+bp += (r_off >> 3);
+r_off &= 7;
+bits -= (8 - r_off);
+code >>= 8 - r_off;
+*bp = ((*bp & rmask[r_off]) | (code << r_off)) & lmask[r_off];
+bp++;
+bits -= (8 - r_off);
+if ( bits >= 8 ) {
+---
+Node 4:
+*bp++ = code; 
+code >>= 8;
+bits -= 8;
+if(bits) {
+*bp = code;
+}
+offset += n_bits;
+if ( offset == (n_bits << 3) ) {
+...
+bytes_out += bits;
+do {
+putbyte(*bp++);
+} while(( --bits) && ((bp - buf < BITS)));
+offset = 0;
+}
+if ( free_ent > maxcode || ((clear_flg > 0))) {
+---
+Node 5:
+writebytes( buf, n_bits );
+bytes_out += n_bits;
+offset = 0;
+if ( clear_flg ) {
+maxcode = MAXCODE (n_bits = INIT_BITS);
+clear_flg = 0;
+} else {
+n_bits++;
+...
+}
+}
+...
+return;
+...
+</codigos>

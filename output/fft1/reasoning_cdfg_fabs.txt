@@ -1,0 +1,39 @@
+Okay, I need to generate a hybrid Control and Data Flow Graph (CDFG) in Graphviz DOT format for the `fabs` function provided. The function is written in C and looks like this:
+
+```c
+static double fabs(double n)
+{
+  double f;
+
+  if (n >= 0) f = n;
+  else f = -n;
+  return f;
+}
+```
+
+Let me break down the steps to create the CDFG accurately.
+
+First, I'll identify all basic blocks in the function. The function starts with a declaration of `f`. Then there's an if-else statement which forms two basic blocks: one for the true case and another for the false case.
+
+Each node in the graph should represent a basic block or control flow point. Nodes will be numbered sequentially, starting from 1.
+
+For each node, I need to document the definitions (def) and uses (c-use/p-use). 
+
+- Node 1: The entry of the function where `f` is declared.
+- Node 2: The condition check `n >= 0`.
+- Node 3: The true case where `f = n`.
+- Node 4: The false case where `f = -n`.
+- Node 5: The return statement.
+
+Next, I'll map the control flow. The entry node (Node 1) flows into the condition check (Node 2). Depending on whether the condition is true or false, it proceeds to either Node 3 or Node 4. After processing in each case, both paths converge to the return statement (Node 5), which is the exit point.
+
+For data flow:
+- In Node 1: `f` is defined.
+- In Node 2: The condition uses `n`.
+- In Node 3: Uses `n` and defines `f`.
+- In Node 4: Uses `n`, computes `-n`, and defines `f`.
+- In Node 5: Uses `f` for the return.
+
+I'll structure the graph with nodes as circles, except the start and end which can be double circles if needed. Each edge will have labels indicating conditions or control flow directions.
+
+Now, I'll create the DOT code accordingly.

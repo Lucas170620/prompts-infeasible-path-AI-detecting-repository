@@ -1,0 +1,56 @@
+Okay, I need to generate a precise CDFG for the binary_search function using Graphviz DOT. Let me start by understanding the code.
+
+The function starts with variables fvalue, mid, up, low initialized. Then it enters a while loop with low <= up. Inside the loop, mid is calculated, and there's an if-else structure checking data[mid].key against x.
+
+I should break down each statement into nodes. The initializations are straightforward. Each assignment or condition will be a node. For control flow, I'll represent decisions as diamonds (diamond shape). The loop condition is a key point to model correctly, showing how it connects back.
+
+Variables: low, up start at 0 and 14. mid is computed each time. fvalue is set when found or remains -1. data[mid].key is accessed in conditions.
+
+I need to track def (definition) and use (usage) of variables. For example, low is used and possibly defined inside the loop. Each node will have labels indicating defs and uses, distinguishing C-Use (computational) and P-Use (predicate).
+
+Let me outline the steps:
+
+1. Initialize variables: fvalue = -1, low=0, up=14.
+2. Loop condition: while low <= up.
+3. Compute mid.
+4. Check if data[mid].key == x.
+   a. If true, set fvalue and adjust up.
+   b. Else, check if data[mid].key > x to decide next step.
+
+Each part will be a node with appropriate labels. Edges represent control flow with conditions as labels.
+
+I'll number each node sequentially, starting from 1. The loop structure requires connecting the end back to the condition check.
+
+Potential nodes:
+
+- Node 1: Initialize fvalue, low, up.
+- Node 2: Loop condition (low <= up).
+- Node 3: Compute mid.
+- Node 4: Check if data[mid].key == x.
+- Node 5: If found, set fvalue and move to next.
+- Nodes for the true/false branches of each decision.
+
+Wait, maybe I should split more granularly. Each statement inside the loop is a separate node.
+
+Let me try mapping:
+
+1. Initialization (fvalue=-1; low=0; up=14).
+2. While condition check (low <= up).
+3. Compute mid.
+4. Compare data[mid].key with x.
+5. If equal: set fvalue, adjust up, continue loop.
+6. Else if greater: adjust up.
+7. Else: adjust low.
+
+Each of these steps will be a node, connected appropriately with edges labeled by conditions.
+
+I need to ensure that each decision point has two outgoing edges (true and false), except where one path leads out of the loop.
+
+Also, variables' uses and definitions should be noted in each node's xlabel. For example:
+
+- Node 1: defines fvalue, low, up.
+- Nodes accessing these variables will have p-uses or c-uses accordingly.
+
+Finally, the graph should end with a doublecircle node indicating the return.
+
+I think I've got the structure. Now, I'll translate this into the DOT code, ensuring each node is correctly labeled and connected with proper edges and conditions.

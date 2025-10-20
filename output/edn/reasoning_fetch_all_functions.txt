@@ -1,0 +1,11 @@
+Alright, I need to analyze the provided code and extract only the names of all user-defined functions or methods. I should ignore built-in or library functions.
+
+Looking at the code, I see several function declarations.
+
+First, there's `vec_mpy1`, which is called in the main function. Then, `mac` is another function called with parameters a, b, c, and output. Next, `fir` and `fir_no_red_ld` are also functions called similarly. 
+
+The function `latsynth` is called with parameters a, b, N, and d. Following that, `iir1` is invoked with a, b, &output[100], and output.
+
+There's a call to `codebook`, which takes multiple parameters including e, d, a, c, and others. Lastly, the main function `jpegdct` is declared at the end.
+
+I should list each of these functions exactly as they appear in the code.

@@ -1,0 +1,21 @@
+digraph logsch {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: wd\nC-Use: nbh"];
+    2 [label="2", xlabel="Def: nbh\nP-Use: ih"];
+    3 [label="3", shape=diamond, xlabel="nbh < 0"];
+    4 [label="4", xlabel="nbh = 0"];
+    5 [label="5", shape=diamond, xlabel="nbh > 22528"];
+    6 [label="6", xlabel="nbh = 22528"];
+    7 [label="7", shape=doublecircle];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> 4 [label="True"];
+    3 -> 2 [label="False"];
+    4 -> 5;
+    5 -> 6 [label="True"];
+    5 -> 7 [label="False"];
+    6 -> 7;
+}

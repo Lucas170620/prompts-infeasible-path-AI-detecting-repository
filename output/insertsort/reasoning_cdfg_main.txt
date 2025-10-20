@@ -1,0 +1,26 @@
+Okay, I need to generate a precise Hybrid Control and Data Flow Graph (CDFG) in Graphviz DOT format for the given C code's main function. Let me start by understanding the provided code and the specifications.
+
+First, looking at the code: it's an insertion sort implementation on an array of 11 integers. The array is initialized with a specific order, and then sorted using the insertion sort algorithm. The code has some debug variables, but they can be ignored for the main analysis since they're commented out in production scenarios.
+
+The function `main()` contains loops and conditional checks. My task is to model the control flow and data flow accurately.
+
+I'll start by identifying each basic block. Each basic block will be a node in the CDFG. Then, I need to map definitions (def) and uses (c-use/p-use) of variables for each node. Finally, I'll construct the graph with proper edges representing control and data flows.
+
+Let me outline the steps:
+
+1. **Identify Basic Blocks:**
+   - The code has two loops: an outer `while` loop starting at i=2 and incrementing i until <=10.
+   - Inside this loop, there's an inner `while` loop that runs as long as a[j] < a[j-1], swapping elements.
+
+2. **Annotate Each Basic Block:**
+   I'll go through each line of code in the main function and assign them to nodes. For example:
+   - Node 1 might handle initializing variables.
+   - Nodes will represent each significant step, including condition checks and assignments.
+
+3. **Track Variable Uses and Definitions:**
+   For each node, note which variables are defined (def) and used (c-use or p-use). Variables include i, j, temp, a[], cnt1, cnt2.
+
+4. **Construct Edges with Conditions:**
+   Each control flow change (like if conditions or loop checks) will create edges with the corresponding condition as labels.
+
+Now, I'll start by mapping each code segment to nodes, ensuring that all def and use information is correctly noted.

@@ -1,0 +1,35 @@
+
+**Análise de Caminhos Inviáveis na Função `ludcmp`**
+
+A função `ludcmp` realiza a decomposição LU de uma matriz, permitindo resolver sistemas lineares. Após analisar o código e considerar os padrões de entrada (como `n=5` e `eps=1e-6`), identificamos dois caminhos infeasíveis:
+
+### 1. Caminho Inviável #1: Retorno de 999
+**Trecho de Código:**
+```c
+if (n > 99 || eps <= 0.0)
+    return (999);
+```
+
+**Motivo da Invibilidade:**
+- Com `n=5` e `eps=1e-6`, ambas as condições `n>99` e `eps<=0.0` são falsas.
+- Portanto, este caminho nunca será executado em entradas típicas.
+
+**Classificação:**
+- **Estaticamente Inviável:** A condição jamais será verdadeira para os valores padrão de entrada.
+
+### 2. Caminho Inviável #2: Retorno de 1
+**Trecho de Código:**
+```c
+if (fabs(a[i][i]) <= eps)
+    return (1);
+```
+
+**Motivo da Invibilidade:**
+- Em matrizes bem-condicionadas, os elementos diagonais não serão suficientemente pequenos para satisfazer `fabs(a[i][i]) <= eps`.
+- Portanto, este caminho é inviável em execuções típicas.
+
+**Classificação:**
+- **Dinamicamente Inviável:** Dependente das entradas, mas raramente será executado com dados padrão.
+
+### Conclusão:
+Estes dois caminhos representam situações que não ocorrem com entrada válida, indicando possíveis otimizações ou revisões no código para remover o dead code.

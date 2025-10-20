@@ -1,0 +1,10 @@
+reset
+filtez
+filtep
+quantl
+logscl
+scalel
+upzero
+uppol2
+uppol1
+logsch

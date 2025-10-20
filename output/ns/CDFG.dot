@@ -1,0 +1,11 @@
+digraph CDFG {
+    Entry [shape=circle, label="Entry", xlabel="Uses: 400"];
+    printf_call [shape=box, label="printf(\"result=%d\\n\", foo(400))", xlabel="Uses: result_of_foo, 400"];
+    foo_call [shape=box, label="foo(400)", xlabel="Uses: 400"];
+    Exit [shape=doublecircle, label="Exit"];
+
+    Entry -> printf_call [label="TEST"];
+    Entry -> foo_call [label="!TEST"];
+    printf_call -> Exit;
+    foo_call -> Exit;
+}

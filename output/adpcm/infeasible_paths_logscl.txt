@@ -1,0 +1,12 @@
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [logsch]**
+    - **Trechos de Código**:  
+      - Linha [X]: `nbh = wd + wh_code_table[ih];`  
+      - Linha [Y]: `if (nbh < 0) { nbh = 0; }`  
+      - Linha [Z]: `if (nbh > 22528) { nbh = 22528; }`  
+    - **Descrição**: Entry → node2 → node3 → node4 (true) → node5a → node7 → node8a  
+    - **Motivo**: Contradição lógica: Depois de definir `nbh = 0`, a condição `nbh > 22528` é impossível, tornando o caminho para `node8a` estática e dinamicamente inviável.
+```

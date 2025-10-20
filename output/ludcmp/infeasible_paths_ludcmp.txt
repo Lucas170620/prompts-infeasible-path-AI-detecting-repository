@@ -1,0 +1,18 @@
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [ludcmp]**  
+   - **Trechos de Código**:  
+     - Linha 2: `if (n > 99 || eps <= 0.0)`  
+     - Linha 3: `return 999;`  
+   - **Descrição**: Nó1 → Nó2 → Nó3  
+   - **Motivo**: Contradição lógica: Com `n = 5` e `eps = 1e-6`, a condição `n > 99 || eps <= 0.0` jamais será verdadeira, tornando este caminho estáticamente inviável.
+
+2. **Caminho Inviável [ludcmp]**  
+   - **Trechos de Código**:  
+     - Linha 7: `if (fabs(a[i][i]) <= eps)`  
+     - Linha 8: `return 1;`  
+   - **Descrição**: Nó4 → Nó6 → Nó7  
+   - **Motivo**: Contradição lógica: Se as entradas forem adequadas, os elementos diagonais da matriz não serão suficientemente pequenos para satisfazer `fabs(a[i][i]) <= eps`, tornando este caminho dinamicamente inviável.
+```

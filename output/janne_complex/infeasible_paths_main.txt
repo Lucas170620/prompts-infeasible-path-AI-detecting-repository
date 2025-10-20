@@ -1,0 +1,18 @@
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inválido [main]**
+   - **Trechos de Código**:  
+     - Linha 1: `int a = 1, b = 1, answer = 0;`
+     - Linha 2: `answer = complex(a, b);`
+     - Linha 3: `return answer;`
+   - **Descrição**: Nó 1 → Nó 2 → Nó 3 → Nó 4
+   - **Motivo**: O caminho é totalmente viável como o código não contém condições que possam levar a situações inválidas ou conflitos de dados. As variáveis `a` e `b` são inicializadas adequadamente, e a chamada para `complex()` é sempre realizada.
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```

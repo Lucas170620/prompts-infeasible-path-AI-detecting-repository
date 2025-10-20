@@ -1,0 +1,237 @@
+[code]
+int fib(int n)
+{
+  int  i, Fnew, Fold, temp,ans;
+
+    Fnew = 1;  Fold = 0;
+    for ( i = 2;
+	  i <= 30 && i <= n;          /* apsim_loop 1 0 */
+	  i++ )
+    {
+      temp = Fnew;
+      Fnew = Fnew + Fold;
+      Fold = temp;
+    }
+    ans = Fnew;
+  return ans;
+}
+
+int main()
+{
+  int a;
+
+  a = 30;
+  fib(a);
+  return a;
+}
+---
+
+---
+[cdfg fib]
+
+To model the given code snippet using Control Flow Graph (CFG), we break down each instruction into nodes and establish edges based on control flow. Here's the step-by-step explanation:
+
+1. **Node 1**: Initialize `Fnew` and `Fold`.
+   - Def: `Fnew=1`, `Fold=0`
+   - Use: None
+
+2. **Node 2**: Check condition `i <=30 && i <=n`.
+   - Use: `i`, `30`, `n`
+   - If True → Node 3
+   - Else → Node 7
+
+3. **Node 3**: Assign `temp = Fnew`.
+   - Def: `temp`
+   - Use: `Fnew` (C-use)
+
+4. **Node 4**: Compute `Fnew += Fold`.
+   - Def: `Fnew`
+   - Use: `Fnew`, `Fold` (both C-use)
+
+5. **Node 5**: Assign `Fold = temp`.
+   - Def: `Fold`
+   - Use: `temp` (C-use from Node 3)
+
+6. **Back to Node 2**: After Node 5, the loop continues by incrementing `i` and rechecking the condition at Node 2.
+
+7. **Node 7**: Assign `ans = Fnew`.
+   - Def: `ans`
+   - Use: `Fnew` (C-use)
+
+8. **Node 8**: Return `ans`.
+   - Use: `ans`
+
+The control flow transitions are as follows:
+
+- From Node 1 to Node 2.
+- If condition is True at Node 2, proceed through Nodes 3 →4 →5 and back to Node 2.
+- If condition is False at Node 2, proceed to Node 7 and then Node 8.
+
+This structure captures all control dependencies and data usages within the loop.
+
+```code
+int main() {
+    int Fnew = 1;
+    int Fold = 0;
+    int temp;
+    for (int i = 2; i <=30 && i <=n; i++) {
+        temp = Fnew;
+        Fnew += Fold;
+        Fold = temp;
+    }
+    ans = Fnew;
+    return ans;
+}
+```
+
+The corresponding CFG nodes and edges are:
+
+1. **Node 1** → **Node 2**
+2. **Node 2** (if True) → **Node 3**
+   - **Node 3** → **Node 4**
+     - **Node 4** → **Node 5**
+       - **Node 5** → **Node 2**
+3. **Node 2** (if False) → **Node 7**
+   - **Node 7** → **Node 8**
+
+This graph accurately represents the program's control flow and data dependencies.
+---
+
+---
+[analise infeasible_paths fib]
+
+# Caminhos Inviáveis Identificados
+
+Nenhum caminho inviável foi identificado.
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+
+**Explicação:**
+
+Após analisar o código e seu CDFG, não foram encontrados quaisquer caminhos inviáveis. O loop é executado corretamente de `i=2` até `i=30`, atualizando as variáveis adequadamente sem contradições lógicas ou problemas de dados. Portanto, todos os caminhos possíveis são viáveis em todas as condições relevantes para a entrada fornecida (`n = 30`).
+---
+
+---
+[cdfg main]
+
+To solve this problem, we need to generate a Control Flow and Data Flow Graph (CDFG) for the `main` function of a given C program. The CDFG will help visualize both the control flow (sequence of instructions execution) and data flow (movement of data between variables) within the function.
+
+### Approach
+1. **Understand the Function**: The provided `main` function is straightforward:
+   - Declares an integer variable `a`.
+   - Assigns the value 30 to `a`.
+   - Calls the function `fib(a)` with `a` as an argument.
+   - Returns the value of `a`.
+
+2. **Identify Basic Blocks**: Break down the function into basic blocks, which are sequences of instructions that can be executed in order without any jumps or branches. For this function, each statement is a basic block.
+
+3. **Control Flow Analysis**: Determine the sequence of execution between these basic blocks. Since there are no conditional statements, the control flow is linear.
+
+4. **Data Flow Analysis**: Track how data (specifically the variable `a`) flows through the function:
+   - Assignment: `a = 30` defines `a`.
+   - Function call: `fib(a)` uses `a`.
+   - Return statement: `return a` uses `a`.
+
+5. **Graph Representation**: Represent each basic block as a node in the graph, with edges showing control flow. Use labels to indicate data flow (defs and uses) within each node.
+
+### Solution Code
+```dot
+digraph main {
+    rankdir=TB;
+    
+    0 [shape=diamond];
+    1 [label="a = 30", shape=box];
+    2 [label="fib(a)", shape=box];
+    3 [label="return a", shape=box];
+    exit [shape=doublecircle];
+    
+    0 -> 1;
+    1 -> 2;
+    2 -> 3;
+    3 -> exit;
+}
+
+// Mapping of code to nodes:
+// Node 1: "a = 30;"
+// Node 2: "fib(a);"
+// Node 3: "return a;"
+```
+
+### Explanation
+- **Nodes**:
+  - `0`: Entry point (diamond shape).
+  - `1`: Assignment `a = 30` (box shape, defines `a`).
+  - `2`: Function call `fib(a)` (box shape, uses `a`).
+  - `3`: Return statement `return a` (box shape, uses `a`).
+  - `exit`: Exit point (doublecircle shape).
+
+- **Edges**:
+  - Connects the entry node to the assignment.
+  - Sequentially connects each basic block to the next.
+  - Finally, connects the return statement to the exit.
+
+This CDFG provides a clear visualization of how control flows from one instruction to another and how data (variable `a`) is used throughout the function.
+---
+
+---
+[analise infeasible_paths main]
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+---
+
+---
+**Análise de Caminhos Inviáveis em Código - Especialista em Testes Estruturais**
+
+**Instruções de Entrada:**  
+Forneça:  
+1. O código-fonte a ser analisado  
+2. Para cada função no código, inclua:  
+   - O **CDFG (Control Data Flow Graph)** correspondente, representando todos os nós (operações/blocos básicos) e arestas (fluxos de controle)  
+   - Uma **análise preliminar** indicando possíveis *infeasible paths* identificados  
+
+---
+
+**Processo de Análise (Executado Automaticamente):**  
+
+**1. Mapeamento CDFG-Função**  
+Para cada função no código:  
+- Identificar nós críticos (ex: branches com condições dependentes de dados)  
+- Mapear arestas do CDFG para trechos de código correspondentes  
+
+**2. Detecção de Infeasible Paths**  
+Analisar cada caminho do CDFG considerando:  
+- **Dependências de Dados:** Caminhos onde variáveis têm estados conflitantes  
+- **Constraints Lógicas:** Condições mutualmente exclusivas (ex: `(x > 0 && x < 0)`)  
+- **Invariantes de Loop:** Caminhos que violam condições de saída de loops  
+- **Dead Code:** Blocos inalcançáveis identificados no CDFG  
+
+**3. Classificação de Inviabilidade**  
+Categorizar cada caminho inviável como:  
+- **Estaticamente Inviável:** Inviável em todas as execuções (ex: lógica contraditória)  
+- **Dinamicamente Inviável:** Inviável sob condições específicas de entrada  
+
+**4. Relatório Consolidado**  
+Gerar para cada função:  
+- Lista de caminhos inviáveis com localização no código  
+- Justificativa técnica baseada no CDFG  
+- Impacto na cobertura de testes estruturais  
+- Recomendações para refinamento do CDFG/código  
+
+---
+
+**Exemplo de Saída Esperada:**  
+```  
+Função: calculate_grade  
+- Caminho Inviável #1: Nós [A3→B5→C7]  
+  Motivo: Condição "score > 100 && score < 50" é logicamente impossível  
+  Efeito: Dead code detectado no bloco C7  
+- Caminho Inviável #2: Nós [A3→D9]  
+  Motivo: Variável 'initialized' deve ser false em A3 mas true em D9  
+```  
+
+**Nota Técnica:** Esta análise assume que o CDFG fornecido reflete fielmente o fluxo de controle e dados. Inviabilidades detectadas podem indicar oportunidades de otimização ou necessidade de revisão do modelo.
+---

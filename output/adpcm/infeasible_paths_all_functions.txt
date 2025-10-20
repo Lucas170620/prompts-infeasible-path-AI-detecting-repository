@@ -1,0 +1,6 @@
+
+**Final Answer:**
+
+There are no infeasible paths identified in the provided functions based on their respective Control Data Flow Graphs (CDFGs). Each function's structure and conditional logic allow all potential execution paths to be feasible under appropriate input conditions.
+
+\boxed{\text{No infeasible paths exist in the analyzed functions}}

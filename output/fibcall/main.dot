@@ -1,0 +1,14 @@
+digraph main {
+    rankdir=TB;
+    
+    0 [shape=diamond];
+    1 [label="a = 30", shape=box];
+    2 [label="fib(a)", shape=box];
+    3 [label="return a", shape=box];
+    exit [shape=doublecircle];
+    
+    0 -> 1;
+    1 -> 2;
+    2 -> 3;
+    3 -> exit;
+}

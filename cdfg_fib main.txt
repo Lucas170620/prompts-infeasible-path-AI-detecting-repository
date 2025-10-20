@@ -1,1 +1,0 @@
-```dot digraph main { rankdir=TB; node [shape=circle]; // Nodes n1 [label="int a;"]; n2 [label="a = 30;", xlabel="Def: a\nUse: 30"]; n3 [label="fib(a);", xlabel="C-Use: a"]; n4 [label="return a;", xlabel="C-Use: a"]; // Control Flow Edges n1 -> n2; n2 -> n3; n3 -> n4; // Data Flow Edges (def-use) n2 -> n3 [label="a"]; n2 -> n4 [label="a"]; } ```

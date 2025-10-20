@@ -1,0 +1,33 @@
+Okay, so I need to generate a Control and Data Flow Graph (CDFG) for the getbyte function using Graphviz DOT format. Let me start by understanding what getbyte does.
+
+Looking at the code, getbyte is a function that returns an unsigned byte from the input stream. It checks if there are remaining bytes to read; if so, it decrements a counter and returns the next byte. If not, it returns -1.
+
+First, I'll break down the function step by step:
+
+1. The function starts by checking if InCnt is greater than 0 and apsim_InCnt-- > 0.
+2. If true, it decrements InCnt and returns the value of *InBuff++.
+3. If false, it returns -1.
+
+Now, I need to identify all basic blocks in this function. Since there are only two main paths—true or false after the condition—it should have two basic blocks: one for each branch.
+
+Next, I'll map out the definitions (def) and uses (c-use/p-use) of variables. 
+
+In the true case:
+- def: InCnt is decremented, apsim_InCnt is also decremented.
+- c-use: Both InCnt and apsim_InCnt are used in the condition.
+- p-use: The return value depends on the condition.
+
+In the false case:
+- def: None, since it's just returning a constant (-1).
+- c-use: Again, both variables are checked in the condition.
+- p-use: Return value is -1.
+
+Now, I'll structure the CDFG. Each node represents a basic block with its operations and variable usages. The edges will represent control flow based on the condition.
+
+I'll number each node sequentially. Node 1 starts at the top, node 2 for the true path, node 3 for returning the byte, node 4 for the false path, and node 5 as the end with a double circle.
+
+Edges will connect based on the condition: if true, go to node 2; else, go to node 4. Nodes 2 and 4 then point to their respective return nodes (3 and 5). Finally, node 5 is the exit.
+
+I need to make sure each node's label includes definitions and uses appropriately. For example, node 1 has defs for InCnt and apsim_InCnt, and c-uses for both variables.
+
+Finally, I'll write this structure in Graphviz DOT format, ensuring nodes are correctly shaped and edges have labels indicating the condition.

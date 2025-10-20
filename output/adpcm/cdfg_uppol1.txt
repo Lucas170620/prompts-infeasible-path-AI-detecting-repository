@@ -1,0 +1,61 @@
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph uppol1 {
+    rankdir=TB;
+    
+    /* Nós */
+    1 [label="1", xlabel="Def: wd2\nC-Use: al1"];
+    2 [label="2", xlabel="P-Use: plt, plt1"];
+    3 [label="3", xlabel="Def: apl1 (wd2+192)\nC-Use: wd2"];
+    4 [label="4", xlabel="Def: apl1 (wd2-192)\nC-Use: wd2"];
+    5 [label="5", xlabel="Def: wd3\nC-Use: apl2"];
+    6 [label="6", xlabel="P-Use: apl1, wd3"];
+    7 [label="7", xlabel="Def: apl1 (limitado para cima)\nC-Use: apl1, wd3"];
+    8 [label="8", xlabel="Def: apl1 (limitado para baixo)\nC-Use: apl1, wd3"];
+    
+    /* Arestas */
+    1 -> 2;
+    2 -> 3 [label="True\n(plt * plt1 >= 0)"];
+    2 -> 4 [label="False"];
+    3 -> 6;
+    4 -> 6;
+    6 -> 7 [label="True\n(apl1 > wd3)"];
+    6 -> 8 [label="False"];
+    7 -> 5;
+    8 -> 5;
+    
+    /* Último nó */
+    5 [shape=doublecircle];
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós:**
+
+```codigos - uppol1
+Node 1:
+long wd2 = ((long)al1 * 255L) >> 8L;
+---
+Node 2:
+if ((long)plt * plt1 >= 0L)
+---
+Node 3:
+apl1 = (int)wd2 + 192;      /* same sign case */
+---
+Node 4:
+apl1 = (int)wd2 - 192;
+---
+Node 5:
+long wd3 = 15360 - apl2;             /* limit value */
+---
+Node 6:
+if(apl1 > wd3) apl1 = wd3;
+---
+Node 7:
+if(apl1 < -wd3) apl1 = -wd3;
+---
+Node 8:
+return apl1;
+</codigos>
+```

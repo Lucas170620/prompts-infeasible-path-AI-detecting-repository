@@ -1,0 +1,51 @@
+digraph fft1 {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: iter = log(n)/log(2)\nC-Use: n"];
+    2 [label="2", xlabel="Def: j = 1\nC-Use: iter"];
+    3 [label="3", xlabel="Def: j *= 2\nC-Use: j"];
+    4 [label="4", xlabel="P-Use: n, j"];
+    5 [label="5", xlabel="Def: return(1)\nC-Use: n, j"];
+    6 [label="6", xlabel="Def: sign = (flag == 1 ? 1.0 : -1.0)"];
+    7 [label="7", xlabel="Def: xp2 = n\nC-Use: n"];
+    8 [label="8", xlabel="Def: w = PI / xp2"];
+    9 [label="9", xlabel="P-Use: k, arg"];
+    10 [label="10", xlabel="Def: wr = cos(arg)\nDef: wi = sign * sin(arg)"];
+    11 [label="11", xlabel="C-Use: j, i, xp2"];
+    12 [label="12", xlabel="P-Use: j, xp"];
+    13 [label="13", xlabel="Def: ar[j1] = dr1 + dr2\nDef: ai[j1] = di1 + di2"];
+    14 [label="14", xlabel="Def: ar[j2] = tr * wr - ti * wi\nDef: ai[j2] = ti * wr + tr * wi"];
+    15 [label="15", xlabel="P-Use: j, xp"];
+    16 [label="16", xlabel="Def: j += k"];
+    17 [label="17", xlabel="C-Use: i, ar, ai"];
+    18 [label="18", xlabel="P-Use: ar[j-1], ai[j-1]"];
+    19 [label="19", xlabel="Def: tr = ar[j-1]\nDef: ti = ai[j-1]"];
+    20 [label="20", xlabel="C-Use: j, k, ar, ai"];
+    21 [label="21", xlabel="P-Use: flag, n"];
+    22 [label="22", xlabel="Def: ar[i] /= w\nDef: ai[i] /= w"];
+    
+    1 -> 2;
+    2 -> 3 [label="iter >=0"];
+    3 -> 4;
+    4 -> 5 [label="n != j"];
+    5 -> 6;
+    6 -> 7;
+    7 -> 8;
+    8 -> 9;
+    9 ->10;
+    10->11;
+    11->12;
+    12->13;
+    13->14;
+    14->15;
+    15->16;
+    16->17;
+    17->18;
+    18->19;
+    19->20;
+    20->21;
+    21->22 [label="flag ==0"];
+    
+    22 [shape=doublecircle];
+}

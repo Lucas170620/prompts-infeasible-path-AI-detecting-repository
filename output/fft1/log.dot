@@ -1,0 +1,10 @@
+digraph log {
+    rankdir=TB;
+    
+    1 [label="Entrada da função", shape=box];
+    2 [label="return(4.5);", shape=box, xlabel="Retorna valor constante"];
+    3 [shape=doublecircle, label="Saída"];
+    
+    1 -> 2;
+    2 -> 3;
+}

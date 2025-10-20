@@ -1,0 +1,685 @@
+[code]
+/*************************************************************************/
+/*                                                                       */
+/*   SNU-RT Benchmark Suite for Worst Case Timing Analysis               */
+/*   =====================================================               */
+/*                              Collected and Modified by S.-S. Lim      */
+/*                                           sslim@archi.snu.ac.kr       */
+/*                                         Real-Time Research Group      */
+/*                                        Seoul National University      */
+/*                                                                       */
+/*                                                                       */
+/*        < Features > - restrictions for our experimental environment   */
+/*                                                                       */
+/*          1. Completely structured.                                    */
+/*               - There are no unconditional jumps.                     */
+/*               - There are no exit from loop bodies.                   */
+/*                 (There are no 'break' or 'return' in loop bodies)     */
+/*          2. No 'switch' statements.                                   */
+/*          3. No 'do..while' statements.                                */
+/*          4. Expressions are restricted.                               */
+/*               - There are no multiple expressions joined by 'or',     */
+/*                'and' operations.                                      */
+/*          5. No library calls.                                         */
+/*               - All the functions needed are implemented in the       */
+/*                 source file.                                          */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+/*                                                                       */
+/*  FILE: fft1.c                                                         */
+/*  SOURCE : Turbo C Programming for Engineering by Hyun Soon Ahn        */
+/*                                                                       */
+/*  DESCRIPTION :                                                        */
+/*                                                                       */
+/*     FFT using Cooly-Turkey algorithm.                                 */
+/*     There are two inputs, ar[] and ai[]. ar[] is real number parts    */
+/*     of input array and the ai[] is imaginary number parts of input.   */
+/*     The function fft1 process FFT or inverse FFT according to the    .*/
+/*     parameter flag. (FFT with flag=0, inverse FFT with flag=1).       */
+/*                                                                       */
+/*                                                                       */
+/*  REMARK :                                                             */
+/*                                                                       */
+/*  EXECUTION TIME :                                                     */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+
+
+#define PI 3.14159
+#define M_PI 3.14159
+
+double ar[8];
+double ai[8] = {0.,  };
+
+int fft1(int n, int flag);
+
+
+static double fabs(double n)
+{
+  double f;
+
+  if (n >= 0) f = n;
+  else f = -n;
+  return f;
+}
+
+static double log(double n)
+{
+  return(4.5);
+}
+
+
+static double sin(rad)
+double rad;
+{
+  double app;
+
+  double diff;
+  int inc = 1;
+
+  while (rad > 2*PI)
+	rad -= 2*PI;
+  while (rad < -2*PI)
+    rad += 2*PI;
+  app = diff = rad;
+   diff = (diff * (-(rad*rad))) /
+      ((2.0 * inc) * (2.0 * inc + 1.0));
+    app = app + diff;
+    inc++;
+  while(fabs(diff) >= 0.00001) {
+    diff = (diff * (-(rad*rad))) /
+      ((2.0 * inc) * (2.0 * inc + 1.0));
+    app = app + diff;
+    inc++;
+  }
+
+  return(app);
+}
+
+
+static double cos(double rad)
+{
+  double sin();
+
+  return (sin (PI / 2.0 - rad));
+}
+
+
+void main()
+{
+
+	int  i, n = 8, flag, chkerr;
+
+
+	/* ar  */
+	for(i = 0; i < n; i++)
+	  ar[i] = cos(2*M_PI*i/n);
+
+	/* forward fft */
+	flag = 0;
+	chkerr = fft1(n, flag);
+
+	/* inverse fft */
+	flag = 1;
+	chkerr = fft1(n, flag);
+
+}
+
+
+
+int fft1(int n, int flag)
+{
+
+	 int i, j, k, it, xp, xp2, j1, j2, iter;
+	 double sign, w, wr, wi, dr1, dr2, di1, di2, tr, ti, arg;
+
+	 if(n < 2) return(999);
+	 iter = log((double)n)/log(2.0);
+	 j = 1;
+#ifdef DEBUG
+	printf("iter=%d\n",iter);
+#endif
+	 for(i = 0; i < iter; i++)
+	   j *= 2;
+	 if(fabs(n-j) > 1.0e-6)
+	   return(1);
+
+	 /*  Main FFT Loops  */
+	 sign = ((flag == 1) ? 1.0 : -1.0);
+	 xp2 = n;
+	 for(it = 0; it < iter; it++)
+	 {
+			 xp = xp2;
+			 xp2 /= 2;
+			 w = PI / xp2;
+#ifdef DEBUG
+	printf("xp2=%d\n",xp2);
+#endif
+			 for(k = 0; k < xp2; k++)
+			 {
+					 arg = k * w;
+					 wr = cos(arg);
+					 wi = sign * sin(arg);
+					 i = k - xp;
+					 for(j = xp; j <= n; j += xp)
+					 {
+							 j1 = j + i;
+							 j2 = j1 + xp2;
+							 dr1 = ar[j1];
+							 dr2 = ar[j2];
+							 di1 = ai[j1];
+							 di2 = ai[j2];
+							 tr = dr1 - dr2;
+							 ti = di1 - di2;
+							 ar[j1] = dr1 + dr2;
+							 ai[j1] = di1 + di2;
+							 ar[j2] = tr * wr - ti * wi;
+							 ai[j2] = ti * wr + tr * wi;
+					 }
+			 }
+	 }
+
+	 /*  Digit Reverse Counter  */
+
+	 j1 = n / 2;
+	 j2 = n - 1;
+	 j = 1;
+#ifdef DEBUG
+	printf("j2=%d\n",j2);
+#endif
+	 for(i = 1; i <= j2; i++)
+	 {
+			 if(i < j)
+			 {
+					tr = ar[j-1];
+					ti = ai[j-1];
+					ar[j-1] = ar[i-1];
+					ai[j-1] = ai[i-1];
+					ar[i-1] = tr;
+					ai[i-1] = ti;
+			 }
+			 k = j1;
+			 while(k < j)
+			 {
+					j -= k;
+					k /= 2;
+			 }
+			 j += k;
+	 }
+	 if(flag == 0) return(0);
+	 w = n;
+	 for(i = 0; i < n; i++)
+	 {
+			 ar[i] /= w;
+			 ai[i] /= w;
+	 }
+	 return(0);
+}
+
+---
+
+---
+[cdfg main]
+
+```dot
+digraph main {
+    rankdir = TB;
+    node [shape = circle];
+    
+    1 [label="1", xlabel="Def: n, i\nC-Use:"];
+    2 [label="2", xlabel="Def: ar[i]\nC-Use: cos(2*M_PI*i/n), i"];
+    3 [label="3", xlabel="P-Use: n"];
+    4 [label="4", xlabel="Def: flag\nC-Use: 0"];
+    5 [label="5", xlabel="Def: chkerr, ar[], ai[]\nC-Use: fft1(n, flag=0)"];
+    6 [label="6", xlabel="Def: flag\nC-Use: 1"];
+    7 [label="7", xlabel="P-Use: n"];
+    8 [label="8", xlabel="Def: chkerr, ar[], ai[]\nC-Use: fft1(n, flag=1)"];
+    
+    1 -> 2;
+    2 -> 3 [label="True\n(i < n)"];
+    3 -> 2;
+    2 -> 3 [label="Loop"];
+    3 -> 5;
+    5 -> 6;
+    6 -> 7 [label="True\n(n >= 0)"];
+    7 -> 8;
+    8 [shape = doublecircle];
+}
+```
+
+<codigos - main>
+Node 1:
+for(i = 0; i < n; i++)
+---
+Node 2:
+ar[i] = cos(2*M_PI*i/n)
+---
+Node 3:
+chkerr = fft1(n, flag=0)
+---
+Node 4:
+flag = 1
+---
+Node 5:
+chkerr = fft1(n, flag=1)
+</codigos>
+---
+
+---
+[analise infeasible_paths main]
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+---
+
+---
+[cdfg fabs]
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph fabs {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: f\nC-Use: n"];
+    2 [label="2", xlabel="P-Use: n"];
+    3 [label="3", xlabel="Def: f = n\nC-Use: n"];
+    4 [label="4", xlabel="Def: f = -n\nC-Use: n"];
+    5 [label="5", shape=doublecircle, xlabel="Return f\nC-Use: f"];
+
+    1 -> 2;
+    2 -> 3 [label="True\n(n >= 0)"];
+    2 -> 4 [label="False"];
+    3 -> 5;
+    4 -> 5;
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós (em tags):**
+
+```codigos - fabs
+Node 1:
+double f;
+
+---
+
+Node 2:
+if (n >= 0)
+
+---
+
+Node 3:
+f = n
+
+---
+
+Node 4:
+f = -n
+
+---
+
+Node 5:
+return f
+```
+---
+
+---
+[analise infeasible_paths fabs]
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [fabs]**
+   - **Trechos de Código**:  
+     - Linha 2: `if (n >= 0)`
+     - Linha 3: `f = n`
+     - Linha 4: `f = -n`
+     - Linha 5: `return f`
+   - **Descrição**: Nós 1 → 2 → 3 → 5
+   - **Motivo**: O caminho é inviável porque, após a condição `if (n >=0)`, o valor de `f` é definido corretamente em cada ramificação. Não há nenhuma contradição ou impossibilidade na execução.
+
+2. **Caminho Inviável [fabs]**
+   - **Trechos de Código**:  
+     - Linha 2: `if (n >=0)`
+     - Linha 3: `f = n`
+     - Linha 4: `f = -n`
+     - Linha 5: `return f`
+   - **Descrição**: Nós 1 → 2 → 4 → 5
+   - **Motivo**: Similar ao acima, o caminho é inviável porque a condição `if (n >=0)` determina corretamente qual ramificação será executada.
+
+Nenhum caminho inviável foi identificado.
+```
+---
+
+---
+[cdfg log]
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph log {
+    rankdir=TB;
+    
+    1 [label="Entrada da função", shape=box];
+    2 [label="return(4.5);", shape=box, xlabel="Retorna valor constante"];
+    3 [shape=doublecircle, label="Saída"];
+    
+    1 -> 2;
+    2 -> 3;
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós (em tags):**
+
+```codigos - log
+Node 1:
+static double log(double n)
+{
+---
+Node 2:
+return(4.5);
+---
+Node 3:
+}
+</codigos>
+```
+
+Este CDFG representa a função `log` de forma simplificada, mostrando a sequência de execução linear sem bifurcações ou loops, com entrada, processamento e saída claras.
+---
+
+---
+[analise infeasible_paths log]
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [log]**
+   - **Trechos de Código**:  
+     - Linha 1: `static double log(double n)`
+     - Linha 2: `{`
+     - Linha 3: `return(4.5);`
+     - Linha 4: `}`
+   - **Descrição**: Node 1 → Node 2 → Node 3
+   - **Motivo**: O caminho é estáticamente viável, não há contradições ou dependências de dados que o tornem inviável.
+```
+
+**Conclusão:** Nenhum caminho inviável foi identificado na função `log`.
+---
+
+---
+[cdfg sin]
+
+```dot
+digraph sin {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: app, diff, inc\nC-Use: rad"];
+    2 [label="2", xlabel="P-Use: rad"];
+    3 [label="3", xlabel="Def: rad\nC-Use: rad"];
+    4 [label="4", xlabel="P-Use: rad"];
+    5 [label="5", xlabel="Def: app, diff, inc\nC-Use: rad"];
+    6 [label="6", xlabel="P-Use: diff"];
+    7 [label="7", xlabel="Def: app, diff, inc\nC-Use: rad, diff"];
+    8 [label="8", xlabel="P-Use: diff"];
+    9 [label="9", xlabel="Return: app"];
+    
+    1 -> 2;
+    2 -> 3 [label="True\n(rad > 2*PI)"];
+    2 -> 4 [label="False"];
+    3 -> 5;
+    4 -> 5;
+    5 -> 6 [label="True\n(rad < -2*PI)"];
+    5 -> 7 [label="False"];
+    6 -> 7;
+    7 -> 8 [label="True\n(fabs(diff) >= 0.00001)"];
+    7 -> 9 [label="False"];
+    8 -> 9;
+}
+```
+
+<codigos - sin>
+Node 1:
+static double sin(rad)
+double rad;
+{
+    double app;
+
+    double diff;
+    int inc = 1;
+
+    while (rad > 2*PI) {
+        rad -= 2*PI;
+    }
+    while (rad < -2*PI) {
+        rad += 2*PI;
+    }
+    app = diff = rad;
+    diff = (diff * (-(rad*rad))) /
+        ((2.0 * inc) * (2.0 * inc + 1.0));
+    app = app + diff;
+    inc++;
+    
+Node 2:
+while (rad > 2*PI)
+    rad -= 2*PI;
+
+Node 3:
+while (rad < -2*PI)
+    rad += 2*PI;
+
+Node 4:
+app = diff = rad;
+
+Node 5:
+diff = (diff * (-(rad*rad))) /
+    ((2.0 * inc) * (2.0 * inc + 1.0));
+app = app + diff;
+inc++;
+
+Node 6:
+while(fabs(diff) >= 0.00001) {
+
+Node 7:
+diff = (diff * (-(rad*rad))) /
+    ((2.0 * inc) * (2.0 * inc + 1.0));
+app = app + diff;
+inc++;
+}
+</codigos>
+---
+
+---
+[analise infeasible_paths sin]
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+---
+
+---
+[cdfg cos]
+
+```
+digraph cos {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="Entry", xlabel="C-Use: rad"];
+    2 [label="Return sin(PI/2 - rad)", xlabel="C-Use: rad"];
+    2 [shape=doublecircle];
+    
+    1 -> 2;
+}
+```
+
+<codigos - cos>
+Node 1:
+The function begins.
+---
+Node 2:
+return sin(M_PI / 2.0 - rad);
+</codigos>
+---
+
+---
+[analise infeasible_paths cos]
+
+# Caminhos Inviáveis Identificados
+
+Nenhum caminho inviável foi identificado.
+
+---
+
+**Explicação:**  
+A função `cos` possui um fluxo de controle linear sem ramificações ou loops. O CDFG mostra apenas dois nós conectados diretamente, indicando que não há caminhos alternativos ou condicionais que possam levar a situações inviáveis. Assim, não há sequência de nós que viole critérios de viabilidade.
+---
+
+---
+[cdfg fft1]
+
+```dot
+digraph fft1 {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: iter = log(n)/log(2)\nC-Use: n"];
+    2 [label="2", xlabel="Def: j = 1\nC-Use: iter"];
+    3 [label="3", xlabel="Def: j *= 2\nC-Use: j"];
+    4 [label="4", xlabel="P-Use: n, j"];
+    5 [label="5", xlabel="Def: return(1)\nC-Use: n, j"];
+    6 [label="6", xlabel="Def: sign = (flag == 1 ? 1.0 : -1.0)"];
+    7 [label="7", xlabel="Def: xp2 = n\nC-Use: n"];
+    8 [label="8", xlabel="Def: w = PI / xp2"];
+    9 [label="9", xlabel="P-Use: k, arg"];
+    10 [label="10", xlabel="Def: wr = cos(arg)\nDef: wi = sign * sin(arg)"];
+    11 [label="11", xlabel="C-Use: j, i, xp2"];
+    12 [label="12", xlabel="P-Use: j, xp"];
+    13 [label="13", xlabel="Def: ar[j1] = dr1 + dr2\nDef: ai[j1] = di1 + di2"];
+    14 [label="14", xlabel="Def: ar[j2] = tr * wr - ti * wi\nDef: ai[j2] = ti * wr + tr * wi"];
+    15 [label="15", xlabel="P-Use: j, xp"];
+    16 [label="16", xlabel="Def: j += k"];
+    17 [label="17", xlabel="C-Use: i, ar, ai"];
+    18 [label="18", xlabel="P-Use: ar[j-1], ai[j-1]"];
+    19 [label="19", xlabel="Def: tr = ar[j-1]\nDef: ti = ai[j-1]"];
+    20 [label="20", xlabel="C-Use: j, k, ar, ai"];
+    21 [label="21", xlabel="P-Use: flag, n"];
+    22 [label="22", xlabel="Def: ar[i] /= w\nDef: ai[i] /= w"];
+    
+    1 -> 2;
+    2 -> 3 [label="iter >=0"];
+    3 -> 4;
+    4 -> 5 [label="n != j"];
+    5 -> 6;
+    6 -> 7;
+    7 -> 8;
+    8 -> 9;
+    9 ->10;
+    10->11;
+    11->12;
+    12->13;
+    13->14;
+    14->15;
+    15->16;
+    16->17;
+    17->18;
+    18->19;
+    19->20;
+    20->21;
+    21->22 [label="flag ==0"];
+    
+    22 [shape=doublecircle];
+}
+```
+
+<codigos - fft1>
+Node 1:
+int iter = log((double)n)/log(2.0);
+---
+Node 2:
+int j = 1;
+j *= 2;
+if (fabs(n-j) > 1e-6)
+    return(1);
+...
+</codigos>
+---
+
+---
+[analise infeasible_paths fft1]
+
+The function computes iter as log2(n), then checks if j equals n after doubling. If not, returns 1. For valid FFT inputs (n is power of two), the main path proceeds correctly. However, an edge from node5 to node6 in the CDFG incorrectly suggests continuing after return, which is impossible.
+
+Step-by-step explanation:
+
+1. The function starts by calculating iter = log2(n).
+2. It initializes j=1 and doubles it until j exceeds iter.
+3. If n isn't equal to j (i.e., not a power of two), returns 1 at node5.
+4. If n is correct, proceeds with FFT computations.
+5. The CDFG incorrectly connects node5 to node6, implying code continues after return, which is impossible.
+
+Thus, any path through node5 → node6 is static infeasibility.
+
+Answer:
+
+The infeasible paths are those attempting to proceed past a return statement. In the provided control flow graph, such a situation occurs if the edge from node5 to node6 exists, as it's impossible to continue after returning. This creates a static infeasible path.
+
+\boxed{\text{There are no static infeasible paths beyond the early return condition. However, the CDFG incorrectly suggests continuing past a return statement, making that specific edge an example of dynamic infeasibility when n is not a power of two.}}
+---
+
+---
+**Análise de Caminhos Inviáveis em Código - Especialista em Testes Estruturais**
+
+**Instruções de Entrada:**  
+Forneça:  
+1. O código-fonte a ser analisado  
+2. Para cada função no código, inclua:  
+   - O **CDFG (Control Data Flow Graph)** correspondente, representando todos os nós (operações/blocos básicos) e arestas (fluxos de controle)  
+   - Uma **análise preliminar** indicando possíveis *infeasible paths* identificados  
+
+---
+
+**Processo de Análise (Executado Automaticamente):**  
+
+**1. Mapeamento CDFG-Função**  
+Para cada função no código:  
+- Identificar nós críticos (ex: branches com condições dependentes de dados)  
+- Mapear arestas do CDFG para trechos de código correspondentes  
+
+**2. Detecção de Infeasible Paths**  
+Analisar cada caminho do CDFG considerando:  
+- **Dependências de Dados:** Caminhos onde variáveis têm estados conflitantes  
+- **Constraints Lógicas:** Condições mutualmente exclusivas (ex: `(x > 0 && x < 0)`)  
+- **Invariantes de Loop:** Caminhos que violam condições de saída de loops  
+- **Dead Code:** Blocos inalcançáveis identificados no CDFG  
+
+**3. Classificação de Inviabilidade**  
+Categorizar cada caminho inviável como:  
+- **Estaticamente Inviável:** Inviável em todas as execuções (ex: lógica contraditória)  
+- **Dinamicamente Inviável:** Inviável sob condições específicas de entrada  
+
+**4. Relatório Consolidado**  
+Gerar para cada função:  
+- Lista de caminhos inviáveis com localização no código  
+- Justificativa técnica baseada no CDFG  
+- Impacto na cobertura de testes estruturais  
+- Recomendações para refinamento do CDFG/código  
+
+---
+
+**Exemplo de Saída Esperada:**  
+```  
+Função: calculate_grade  
+- Caminho Inviável #1: Nós [A3→B5→C7]  
+  Motivo: Condição "score > 100 && score < 50" é logicamente impossível  
+  Efeito: Dead code detectado no bloco C7  
+- Caminho Inviável #2: Nós [A3→D9]  
+  Motivo: Variável 'initialized' deve ser false em A3 mas true em D9  
+```  
+
+**Nota Técnica:** Esta análise assume que o CDFG fornecido reflete fielmente o fluxo de controle e dados. Inviabilidades detectadas podem indicar oportunidades de otimização ou necessidade de revisão do modelo.
+---

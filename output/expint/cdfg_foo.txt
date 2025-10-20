@@ -1,0 +1,38 @@
+
+To generate a precise Control and Data Flow Graph (CDFG) for the function `foo`, we break down each operation and represent data flow between them. Here's the structured CDFG in both the DOT notation and code mapping.
+
+### CDFG Structure:
+- **Nodes**:
+  - Node 1: Compute `a = x * x`
+  - Node 2: Compute `b = 8 * x`
+  - Node 3: Compute `c = b << (4 - x)`
+  - Node 4: Compute `result = a + c`
+
+- **Edges**:
+  - Node 1 → Node 4 (data flow for `a`)
+  - Node 2 → Node 3 (data flow for `b`)
+  - Node 3 → Node 4 (data flow for `c`)
+
+### DOT Notation:
+```dot
+digraph CDFG {
+    node1 [label="Compute a = x * x"];
+    node2 [label="Compute b = 8 * x"];
+    node3 [label="Compute c = b << (4 - x)"];
+    node4 [label="Compute result = a + c"];
+    
+    node1 -> node4;
+    node2 -> node3;
+    node3 -> node4;
+}
+```
+
+### Code Mapping:
+```codemapping
+Node 1: Compute a = x * x
+Node 2: Compute b = 8 * x
+Node 3: Compute c = b << (4 - x)
+Node 4: Compute result = a + c; return result
+```
+
+This CDFG precisely captures the data flow and control flow of the `foo` function, showing how each operation contributes to the final result.

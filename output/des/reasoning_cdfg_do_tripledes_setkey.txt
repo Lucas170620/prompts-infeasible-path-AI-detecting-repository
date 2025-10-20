@@ -1,0 +1,260 @@
+Okay, I need to create a CDFG (Control and Data Flow Graph) in Graphviz DOT format for the function do_tripledes_setkey provided. Let me go through this step by step.
+
+First, I'll look at the function do_tripledes_setkey:
+
+static int
+do_tripledes_setkey ( struct _tripledes_ctx *ctx, byte *key, unsigned keylen )
+{
+    if( selftest_failed )
+	return G10ERR_SELFTEST_FAILED;
+    if( keylen != 24 )
+	return G10ERR_WRONG_KEYLEN;
+
+    tripledes_set3keys ( ctx, key, key+8, key+16);
+
+    if( is_weak_key( key ) || is_weak_key( key+8 ) || is_weak_key( key+16 ) )
+	return G10ERR_WEAK_KEY;
+
+    return 0;
+}
+
+Let me break it down into basic blocks.
+
+The function starts with two conditional checks. The first check returns an error if selftest_failed is true. Then, the second check verifies if keylen is 24; if not, returns an error. If both conditions pass, it proceeds to call tripledes_set3keys and then another check for weak keys. Finally, it returns 0.
+
+Now, I need to represent each statement as a node in the graph. Let's number them sequentially:
+
+1. Check selftest_failed
+2. Check keylen !=24
+3. Call tripledes_set3keys
+4. Check if any key is weak
+5. Return 0
+
+Each node will have labels indicating their operation and data flow.
+
+For each node, I need to note the definitions (def) and uses (c-use/p-use). 
+
+- Node 1: Uses selftest_failed.
+- Node 2: Uses keylen.
+- Node 3: Uses ctx and key.
+- Node 4: Uses key, key+8, key+16.
+- Node 5: No data usage.
+
+Now, connect the nodes with edges. The control flow is sequential unless there are conditionals. In this case, each check is a conditional that returns if not met, so it's like an AND of conditions. So after node 1 (if passed), we proceed to node 2. If both pass, then to node3, then node4. After passing all, node5.
+
+So the edges are:
+
+1 -> 2 (since if selftest failed, returns; else proceeds)
+2 -> 3
+3 ->4
+4->5
+
+Wait, but in code, each check is a separate condition with return statements. So after each check that fails, it returns immediately. So the flow is like:
+
+Start at node1: if true (selftest failed), return G10ERR_SELFTEST_FAILED.
+
+If node1 passes, go to node2: check keylen !=24, and if true, return G10ERR_WRONG_KEYLEN.
+
+Else proceed to node3: call function.
+
+After node3, check node4: if any weak keys, return G10ERR_WEAK_KEY.
+
+If all pass, proceed to node5: return 0.
+
+So the graph will have edges from each node to their respective returns or next step.
+
+Wait, but in control flow graphs, nodes represent basic blocks. So after node1, if it's a conditional that returns, then the next node is only taken if the condition is false.
+
+So I think I need to model this correctly with conditional flows.
+
+Alternatively, perhaps each check is an edge with conditions leading to either returning or proceeding.
+
+Wait, let me try to outline:
+
+- Node 1: if (selftest_failed) return error. So it's a decision node that returns on true, else proceeds.
+
+So the graph would have:
+
+Node1 has two edges: one for when selftest_failed is true (return), and another when false (proceed).
+
+Similarly, Node2 checks keylen !=24: if true, return; else proceed.
+
+Same with Node4: if any weak keys, return; else proceed to node5.
+
+So the nodes are:
+
+1. Check selftest_failed
+   - If true: return error.
+   - Else: go to 2
+
+2. Check keylen ==24?
+   - If false (keylen !=24): return error.
+   - Else: go to3
+
+3. Call tripledes_set3keys
+   - Proceed to4 regardless.
+
+4. Check if any keys are weak
+   - If true: return G10ERR_WEAK_KEY
+   - Else: proceed to5
+
+5. Return 0 (terminal node)
+
+So the nodes and edges would be:
+
+- Node1 is a diamond (decision) with two edges: one for returning, another leading to node2.
+
+Wait, but each of these functions returns immediately if a condition fails. So perhaps the basic blocks are as follows:
+
+BB1: selftest check
+   if true -> return error
+   else proceed to BB2
+
+BB2: keylen check
+   if true -> return error
+   else proceed to BB3
+
+BB3: call tripledes_set3keys
+
+BB4: weak key check
+   if true -> return error
+   else proceed to BB5
+
+BB5: return 0
+
+So the graph would have:
+
+- Node1 (BB1) with a condition leading either to returning or proceeding.
+
+But in the context of CDFG, each conditional is represented as a node. So I'll model this with edges representing the conditions.
+
+Now, let's assign each basic block a number and describe their def/use.
+
+Node1:
+   Uses: selftest_failed
+   If true (def): return error.
+   Else: proceed to Node2
+
+Wait, but perhaps in terms of data flow:
+
+Each node represents a set of instructions. For the function, I need to model the control flow as well as data usages and definitions.
+
+So for each node:
+
+1:
+- Check if selftest_failed is true
+  - If yes: return error.
+  - Else: proceed
+
+2:
+- Check keylen !=24
+  - If yes: return error
+  - Else: proceed
+
+3:
+- Call tripledes_set3keys (uses ctx and key)
+- Proceed to Node4.
+
+4:
+- Check if any key is weak
+  - If yes: return error
+  - Else: proceed
+
+5:
+- Return 0
+
+So now, let me model this in the CDFG:
+
+Nodes are numbered as follows:
+
+1. selftest check (decision node)
+2. keylen check (decision node)
+3. set3keys call (process node)
+4. weak key check (decision node)
+5. return 0 (terminal)
+
+Each decision node has two edges: one for true condition and another for false, leading to the next appropriate node.
+
+So in the DOT code:
+
+digraph do_tripledes_setkey {
+    rankdir=TB;
+    
+    // Node definitions
+    1 [label="Check selftest_failed" shape=diamond xlabel="selftest_failed"];
+    2 [label="Check keylen ==24" shape=diamond xlabel="keylen !=24"];
+    3 [label="Call tripledes_set3keys(ctx, key, key+8, key+16)" shape=box];
+    4 [label="Check is_weak_key for all keys" shape=diamond xlabel="is_weak_key"];
+    5 [label="Return 0" shape=doublecircle];
+
+    // Edges
+    1 -> 2 [label="False\n(selftest not failed)"];
+    1 -> 5 [label="True\n(selftest_failed)"];  // Wait, no: if selftest Failed, return error. So from node1, on true, returns an error (which is a terminal). Hmm, perhaps I should represent the error returns as part of the nodes.
+
+Wait, but in the code, each condition leads to a return. So after Node1:
+
+If selftest_failed is true, function returns G10ERR_SELFTEST_FAILED (so it's a sink node).
+
+Similarly, if keylen !=24, returns another error.
+
+Same for weak keys: returns an error if any are found.
+
+Only if all pass does it reach the final return 0.
+
+So perhaps each decision node has two edges:
+
+- On condition met: returns an error (terminal)
+- Else: proceed to next node
+
+Thus, in the graph:
+
+Node1:
+   If selftest_failed is true: edge to a terminal node with that error.
+   Else: edge to Node2.
+
+But wait, this would require each return to be a separate sink. Alternatively, perhaps it's better to have each decision node lead either to a return (as an exit) or proceed.
+
+So let me structure the graph as follows:
+
+Nodes:
+
+1: selftest check
+   Edges:
+      - if true: -> Return SelfTestError (terminal)
+      - else: -> Node2
+
+Node2: keylen check
+   Edges:
+      - if true: -> Return KeyLenError (terminal)
+      - else: -> Node3
+
+Node3: set keys
+   Edge: always -> Node4
+
+Node4: weak key check
+   Edges:
+      - if true: -> Return WeakKeyError (terminal)
+      - else: -> Node5
+
+Node5: return 0 (terminal)
+
+So the graph will have these nodes and edges.
+
+Now, let's define each node in the DOT code:
+
+1. Node1 is a decision node (diamond) with two outgoing edges: one for returning error on true, another leading to Node2.
+2. Node2 similarly is a diamond with two edges: return error or proceed.
+3. Node3 is a process box with an edge to Node4.
+4. Node4 is a diamond with edges to return error or proceed to Node5.
+5. Node5 is the end node (double circle).
+
+Now, data usages:
+
+- Node1 uses selftest_failed
+- Node2 uses keylen
+- Node3 uses ctx and key
+- Node4 uses key, key+8, key+16
+
+I'll include this information in the xlabel.
+
+Putting it all together, here's the DOT code:

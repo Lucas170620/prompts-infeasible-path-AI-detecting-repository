@@ -1,0 +1,47 @@
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph iir1 {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: i = 0"];
+    2 [label="2", xlabel="P-Use: i, N"];
+    3 [label="3", xlabel="C-Use: a[i], b[...], output[i]\nDef: output[i]"];
+    4 [label="4", xlabel="Def: i = i + 1"];
+    5 [label="5", xlabel="C-Use: a, b, N, d\nDef: d"];
+    6 [label="6", shape=doublecircle];
+    
+    1 -> 2;
+    2 ->3 [label="True\n(i < N-2)"];
+    2 ->5 [label="False"];
+    3 ->4;
+    4 ->2;
+    5 ->6;
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós (em tags):**
+
+<codigos - iir1>
+Node 1:
+for (int i=0; i<N-2; i++) {
+    output[i] = ((long int)a[i] * b[...)) + ...;
+}
+---
+Node 2:
+if (i < N-2)
+---
+Node 3:
+output[i] = ...;
+---
+Node 4:
+i++;
+---
+Node 5:
+d = latsynth(a, b, N, d);
+---
+Node 6:
+return;
+</codigos>

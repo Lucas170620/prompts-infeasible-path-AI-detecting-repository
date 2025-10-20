@@ -1,0 +1,55 @@
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph des_get_info {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Use: did_selftest"];
+    2 [label="2", xlabel="Def: s, did_selftest, selftest_failed\nC-Use: stderr"];
+    3 [label="3", xlabel="Def: did_selftest"];
+    4 [label="4", xlabel="P-Use: algo"];
+    5 [label="5", xlabel="Def: keylen, blocksize, contextsize"];
+    6 [label="6", xlabel="Def: setkey(), encrypt(), decrypt()"];
+    7 [label="7", xlabel="Return: \"3DES\"", shape=doublecircle];
+    
+    1 -> 2 [label="False\n(did_selftest != false)"];
+    1 -> 3 [label="True"];
+    2 -> 7 [label="Error"];
+    3 -> 4;
+    4 -> 5;
+    5 -> 6;
+    6 -> 7;
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós (em tags):**
+
+<codigos - des_get_info>
+Node 1:
+if (!did_selftest)
+---
+Node 2:
+const char *s = selftest();
+fprintf(stderr,"%s\n", s );
+selftest_failed = s;
+return NULL;
+---
+Node 3:
+did_selftest = 1;
+---
+Node 4:
+if (algo == CIPHER_ALGO_3DES)
+---
+Node 5:
+*keylen = 192;
+*blocksize = 8;
+*contextsize = sizeof(struct _tripledes_ctx);
+---
+Node 6:
+*(int (**)(struct _tripledes_ctx*, byte*, unsigned))r_setkey
+							= do_tripledes_setkey;
+...
+return "3DES";
+</codigos>

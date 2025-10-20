@@ -1,0 +1,10 @@
+
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [scalel]**
+   - **Trechos de Código**:
+     - Linha [onde está node2]: `if (wd > 15359)`
+     - Linha [nodeA]: `wd = 15359`
+     - Linha [node3]: `if (wd < -15360)`
+   - **Descrição**: Nó Node2 → Nó NodeA → Nó Node3
+   - **Motivo**: Contradição lógica: Após a atribuição de wd = 15359, a condição wd < -15360 nunca será verdadeira.

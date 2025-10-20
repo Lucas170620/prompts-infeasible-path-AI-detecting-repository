@@ -1,0 +1,10 @@
+digraph CDFG {
+    node1 [label="Compute a = x * x"];
+    node2 [label="Compute b = 8 * x"];
+    node3 [label="Compute c = b << (4 - x)"];
+    node4 [label="Compute result = a + c"];
+    
+    node1 -> node4;
+    node2 -> node3;
+    node3 -> node4;
+}

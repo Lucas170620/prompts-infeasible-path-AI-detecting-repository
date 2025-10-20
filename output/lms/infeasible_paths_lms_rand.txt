@@ -1,0 +1,12 @@
+
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [lms_rand]**  
+   - **Trechos de Código**:  
+     - Linha 1: `static unsigned long next = 1;`  
+     - Linha 2: `next = next * 1103515245 + 12345;`  
+     - Linha 3: `return (unsigned int)(next / 65536) % 32768;`  
+   - **Descrição**: Sequência de nós única e obrigatória.  
+   - **Motivo**: O caminho único é estaticamente viável, não havendo divergências ou condições que possam alterar a execução sequencial.
+
+Nenhum outro caminho inviável foi identificado, pois o fluxo de controle é linear e determinístico sem ramos condicionais ou loops que permitam alternativas de execução.

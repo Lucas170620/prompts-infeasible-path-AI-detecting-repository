@@ -1,0 +1,36 @@
+digraph icrc {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: icrctb, init, rchr\nC-Use: j, it"];
+    2 [label="2", xlabel="P-Use: !init"];
+    3 [label="3", xlabel="Def: icrctb[j], rchr[j]"];
+    4 [label="4", xlabel="P-Use: jinit >=0"];
+    5 [label="5", xlabel="Def: cword"];
+    6 [label="6", xlabel="P-Use: jrev <0"];
+    7 [label="7", xlabel="Def: cword"];
+    8 [label="8", xlabel="P-Use: len, jrev"];
+    9 [label="9", xlabel="P-Use: lin[j], HIBYTE(cword)"];
+    10 [label="10", xlabel="Def: tmp1"];
+    11 [label="11", xlabel="Def: cword"];
+    12 [label="12", xlabel="P-Use: jrev >=0, HIBYTE(cword), rchr[HIBYTE(cword)], rchr[LOBYTE(cword)]"];
+    13 [label="13", xlabel="Def: tmp2"];
+    14 [label="14", shape=doublecircle, xlabel="Return: tmp2"];
+
+    1 -> 2;
+    2 -> 3 [label="True\n(!init)"];
+    2 -> 5 [label="False"];
+    3 -> 4;
+    4 -> 5 [label="True\n(jinit >=0)"];
+    4 -> 6 [label="False"];
+    5 -> 7;
+    6 -> 7 [label="True\n(jrev <0)"];
+    7 -> 8;
+    8 -> 9 [label="j <= len"];
+    9 -> 10;
+    10 -> 11;
+    11 -> 8 [label="(loop continue)"];
+    11 -> 12 [label="j > len"];
+    12 -> 13;
+    13 -> 14;
+}

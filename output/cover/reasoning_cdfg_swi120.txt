@@ -1,0 +1,387 @@
+Okay, I need to create a hybrid Control and Data Flow Graph (CDFG) for the function swi120 using Graphviz DOT. Let me start by understanding what the function does.
+
+Looking at the code, swi120 takes an integer c as input and loops from 0 to 119. Inside the loop, there's a switch statement that increments c for each case from 0 to 119 and decrements it otherwise. 
+
+So, the function has a single loop with a switch inside. Each iteration of the loop processes one value of i. The switch checks if i is within 0-119 (which it always is in this loop) and increments c each time.
+
+Wait, but actually, since the loop runs from i=0 to i<120, which is 0 to 119 inclusive, every case in the switch will match. So, for each of these iterations, c is incremented by 1. After all loops, it returns c.
+
+Now, I need to break this down into basic blocks and map data flows.
+
+Each iteration of the loop is a basic block. Since there are 120 iterations, but they're structurally similar, I can represent them with one node that repeats 120 times.
+
+Wait, no. Each case in the switch is a separate statement. So for each i from 0 to 119, c is incremented. But since all cases do the same thing (increment c), maybe they can be represented as a single block repeated 120 times. Or perhaps, more accurately, each loop iteration corresponds to one case.
+
+But for the CDFG, I should represent each unique control flow path. Since all cases result in c++, the switch doesn't change the outcome; it's just a series of increments. So maybe the entire loop can be represented as a single node that is executed 120 times.
+
+Wait, no. The loop runs for i from 0 to 119. Each iteration goes into the switch and hits a case statement where c is incremented. So each iteration is similar but separate in terms of control flow.
+
+Hmm, perhaps it's better to model this as a single loop node that has a body which always increments c. Because regardless of i, the switch will always cause c to be incremented (since all cases 0-119 are handled, and default is only when i >= 120, but since the loop runs up to i<120, default never occurs). So in this case, every iteration increments c.
+
+So, for each of the 120 iterations, c increases by 1. Therefore, after all loops, c will be increased by 120.
+
+Wait, let's think about it step by step:
+
+- The function starts with some initial value of c.
+- For each i from 0 to 119:
+   - switch (i) falls into one of the cases 0-119, increments c by 1.
+So, after all iterations, c is increased by 120.
+
+Therefore, the entire function can be seen as a loop that runs 120 times, each time adding 1 to c. So in terms of data flow, c is read and written each iteration.
+
+Now, for the CDFG:
+
+I'll have nodes representing the start, the loop condition, the loop body (which is just an increment), and the end.
+
+Wait, but the loop is a for loop with i starting at 0, condition i < 120. So the first node is entering the function, then checking if i < 120. Since it's true on the first iteration, we enter the loop body.
+
+The loop body consists of incrementing c and then updating i (i++) before checking again.
+
+But in the code provided for swi120, after the switch statement, there's no further operation except the loop increment.
+
+So the data flow is:
+
+- Node 1: Entry to function.
+- Node 2: Check if i < 120. Since initially i=0, it's true.
+- Node 3: Execute switch (i) which increments c.
+- Node 4: Increment i by 1.
+- Back to node 2.
+
+This forms a loop until i becomes 120, at which point the condition is false, and we exit.
+
+So in terms of CDFG:
+
+- Start node (entry), then the loop condition check.
+- If true, execute switch (increment c), then increment i, back to condition.
+- After loop ends, return c.
+
+But wait, looking at the code again, after the for loop, it returns c. So nodes would be:
+
+1. Entry
+2. Loop condition check (i < 120)
+3. Switch body: increment c
+4. Increment i
+5. Exit loop and return
+
+Wait, but in terms of control flow graph, this is a simple loop where each iteration does the same thing.
+
+So the CDFG would have:
+
+- Node A: Entry.
+- Node B: Loop condition (i < 120). This has two edges: true to switch body, false to exit.
+- Switch body: increments c. Then it must flow back to increment i and check again.
+Wait no: After the switch, the loop increments i automatically because it's a for loop. So after the switch, we go back to the condition.
+
+So in code:
+
+for (i=0; i<120; i++) {
+   switch(i) { ... }
+}
+
+Which can be thought of as:
+
+- Entry
+- Check condition (i < 120)
+   - If yes:
+      - Switch body: increment c
+      - Increment i
+      - Back to condition check
+   - Else:
+      - Exit loop and return
+
+So the CDFG will have nodes for:
+
+1. Entry node.
+2. Condition check (node B).
+3. Switch body execution (increment c) (node C).
+4. Increment i (node D).
+5. Return statement (node E).
+
+Edges:
+
+- A -> B
+- B has two edges: true to C, false to E
+Wait no, because after executing the switch and incrementing i, you loop back.
+
+So more accurately:
+
+A (entry) -> B (condition check)
+
+B has two outgoing edges:
+
+- True: to C (switch body), then from C -> D (increment i)
+- False: to E (return)
+
+But wait, in a for loop, the structure is:
+
+i = 0;
+while (condition) {
+   body;
+   increment i;
+}
+
+So after the switch body (C), we have to go back through the condition check.
+
+Thus, from C, you must go back to B via D (incrementing i). So perhaps:
+
+After node C (switch), we have node D which is the 'i++' operation. Then from D, we loop back to node B for the next condition check.
+
+So nodes:
+
+1. A: Entry
+2. B: Loop condition (i < 120)
+3. C: Switch body (increment c)
+4. D: i++
+5. E: Return
+
+Edges:
+
+A -> B
+
+B has two edges:
+
+- True: B -> C
+- False: B -> E
+
+After C, we go to D (C -> D), then from D back to B.
+
+So the control flow is A->B->(true) C -> D -> B.
+
+This loop continues until B's condition becomes false, then proceeds to E.
+
+Now, for data flows:
+
+In node B: uses i and 120. It defines nothing here; it's a predicate use.
+
+Node C: uses i (as switch parameter), reads c, writes c.
+
+Node D: uses i, writes i.
+
+So in terms of Data Flow Analysis:
+
+Each node has defs and uses.
+
+Let me list all nodes with their def-use.
+
+Nodes:
+
+1. A: Entry
+   - No operation, just start.
+2. B: if (i < 120)
+   - C-Use: reads i, 120
+3. C: switch(i) { ... }
+   - P-Use: evaluates the condition for each case, but since all cases are true in this loop, it's effectively a c-use of i to determine which case.
+   - But more accurately, the switch is a control structure that uses i as a predicate.
+   - C-Use: reads c and increments it (so both read and write).
+4. D: i++
+   - C-Use: reads i, writes i.
+
+Wait, perhaps I should model each node's def and use.
+
+Let me try again:
+
+Node 1 (Entry):
+- No operation yet.
+   - defs: none
+   - uses: none
+
+Node 2 (B): condition check (i < 120)
+   - P-Use: i is read, 120 is a constant used in the comparison.
+
+Node 3 (C): switch(i) { ... }
+   - For each case, c is incremented. So here, c is read and written.
+   - Also, i is read to determine which case to execute, but since all cases are covered, it's more about control flow.
+
+Wait, in the CDFG, the switch statement itself uses i as a predicate for branching, so node C would have:
+
+- P-Use: i (since it's used in the switch)
+- C-Use: c is read and written because of the increment.
+
+Node 4 (D): i++ operation
+   - C-Use: reads i, writes i.
+
+Now, considering that each loop iteration goes through B -> C -> D -> B until B's condition fails.
+
+So for data flow:
+
+In node C, after processing, c is incremented. This affects the value of c in subsequent nodes.
+
+But since it's a loop, each time we go back to B and then C, the same operation is done.
+
+I think I should represent this as follows:
+
+Nodes:
+
+1. Entry (start)
+2. Loop condition check (B)
+3. Switch body (C)
+4. i increment (D)
+
+Edges:
+
+1 -> 2
+2 has two edges: true->C, false->E
+
+After C and D, back to B.
+
+Now, mapping def-use for each node:
+
+Node A:
+- defs: none
+- uses: none
+
+Node B:
+- defs: none
+- p-use: i (read), 120 (constant)
+
+Node C:
+- c-use: c (read and write)
+- p-use: i (used in switch)
+
+Wait, perhaps not. The switch is a control structure that uses i to determine the case. So it's a P-Use for i.
+
+Also, since each case leads to an increment of c, node C has:
+
+c_use: c (incremented)
+p_use: i
+
+Node D:
+- c-use: i (read and write)
+
+Now, regarding def and use:
+
+Each time through the loop, in node C, c is read and written. So for data flow analysis, we need to track how c's value flows through the nodes.
+
+But since this is a single function, the data flow will be straightforward.
+
+So putting it all together:
+
+Nodes:
+
+1. Entry (A)
+2. Loop condition check (B)
+3. Switch body (C) - increments c
+4. i increment (D)
+
+Edges:
+
+A -> B
+B has two edges: B->C (true), B->E (false)
+After C, D is executed, then back to B.
+
+Now, for the CDFG in Graphviz:
+
+Each node will be a circle.
+
+Node A: Entry
+
+Nodes:
+
+1. [label="Entry"]
+2. [shape=diamond, label="i < 120?"]
+3. [label="c++", xlabel="C-Use: c\nP-Use: i"]
+4. [label="i++"]
+
+Edges:
+
+A -> B
+B has edges to C and E.
+C -> D
+D -> B
+
+E is the exit node, a double circle.
+
+Wait, but in terms of numbering nodes, perhaps I should assign numbers 1,2,3,4,5 where 5 is the exit.
+
+So let me structure this:
+
+Nodes:
+
+1. Entry (A)
+2. Loop condition (B)
+3. Switch body (C)
+4. i increment (D)
+5. Exit (E)
+
+Edges:
+
+1 -> 2
+2 has edges to 3 (true) and 5 (false)
+3 -> 4
+4 -> 2
+
+So in Graphviz, the nodes are numbered as follows.
+
+Now, creating the DOT code:
+
+- Start with digraph swi120 { ... }
+- Set rankdir=TB
+- Node shapes: circle for process, diamond for condition, doublecircle for exit.
+- Nodes:
+   - 1 [shape=circle, label="Entry"]
+   - 2 [shape=diamond, label="i < 120?"]
+   - 3 [shape=circle, label="c++", xlabel="C-Use: c\nP-Use: i"]
+   - 4 [shape=circle, label="i++"]
+   - 5 [shape=doublecircle, label="Return"]
+
+Edges:
+
+1 -> 2
+2 has two edges:
+   2 -> 3 [label="True"]
+   2 -> 5 [label="False"]
+3 ->4
+4->2
+
+So the DOT code would be:
+
+digraph swi120 {
+    rankdir=TB;
+    
+    1 [shape=circle, label="Entry"];
+    2 [shape=diamond, label="i < 120?"];
+    3 [shape=circle, label="c++", xlabel="C-Use: c\nP-Use: i"];
+    4 [shape=circle, label="i++"];
+    5 [shape=doublecircle, label="Return"];
+    
+    1 -> 2;
+    2 -> 3 [label="True"];
+    2 -> 5 [label="False"];
+    3 -> 4;
+    4 -> 2;
+}
+
+Now, the code block expects me to provide both the code and the explanation.
+
+Wait, but in the initial code provided, it's a for loop with i from 0 to 119. So the switch is within that loop.
+
+But perhaps I should consider that the switch doesn't have any effect other than incrementing c, so node C can be simplified as just "c++".
+
+Now, regarding def-use:
+
+In the code, in each iteration of the for loop, i is used in the switch and then incremented.
+
+So in the control flow graph, after processing the switch (node 3), we must process the i increment (node4) before checking the condition again.
+
+Thus, the CDFG correctly models this by going from node3 to node4 and back to node2.
+
+Now, mapping def-use:
+
+Node1: Entry - no def or use
+
+Node2: B
+- p_use: i (used in condition)
+- uses 120 as a constant.
+
+Node3: C
+- c_use: c is read and written
+- p_use: i used in switch
+
+Node4: D
+- c_use: i is read and written
+
+So, the xlabel for node3 includes both c_use and p_use.
+
+Similarly, node2 has p_use.
+
+Putting it all together.

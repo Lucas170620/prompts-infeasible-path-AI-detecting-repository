@@ -1,0 +1,44 @@
+digraph ludcmp {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="C-Use: n, eps"];
+    2 [label="2", xlabel="P-Use: n > 99, eps <= 0"];
+    3 [label="3", xlabel="Def: return 999"];
+    4 [shape=diamond, label="4", xlabel="P-Use: n > 99, eps <= 0"];
+    5 [label="5", xlabel="C-Use: i"];
+    6 [shape=diamond, label="6", xlabel="P-Use: a[i][i] <= eps"];
+    7 [label="7", xlabel="Def: return 1"];
+    8 [label="8", xlabel="C-Use: j, a[j][i], a[k][i], k"];
+    9 [label="9", xlabel="Def: a[j][i]"];
+    10 [shape=diamond, label="10", xlabel="P-Use: i"];
+    11 [label="11", xlabel="C-Use: j, w, a[i+1][j], a[i+1][k], k"];
+    12 [label="12", xlabel="Def: a[i+1][j]"];
+    13 [shape=diamond, label="13", xlabel="P-Use: i >=0"];
+    14 [label="14", xlabel="C-Use: y[j], b[i], j"];
+    15 [label="15", xlabel="Def: y[i]"];
+    16 [shape=diamond, label="16", xlabel="P-Use: i >=0"];
+    17 [label="17", xlabel="C-Use: x[j], a[i][j], j"];
+    18 [label="18", xlabel="Def: x[i]"];
+    19 [shape=doublecircle, label="19"];
+
+    1 -> 2;
+    2 -> 3 [label="True"];
+    2 -> 4 [label="False"];
+    4 ->5 ;
+    5 ->6 ;
+    6 ->7 [label="True"];
+    6 ->8 [label="False"];
+    8->9 ;
+    9->10 ;
+    10->11 ;
+    11->12 ;
+    12->13 ;
+    13->14 ;
+    14->15 ;
+    15->16 ;
+    16->17 ;
+    17->18 ;
+    18->19 ;
+
+}

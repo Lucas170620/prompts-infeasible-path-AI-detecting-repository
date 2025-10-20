@@ -1,0 +1,31 @@
+digraph gaussian {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: ready, gstore, rconst1, rconst2\nC-Use: none"];
+    2 [label="2", xlabel="P-Use: ready"];
+    3 [label="3"];
+    4 [label="4"];
+    5 [label="5"];
+    6 [label="6"];
+    7 [label="7", xlabel="Def: gaus, ready\nC-Use: v1, v2, r"];
+    8 [label="8"];
+    9 [label="9", xlabel="Def: gstore, gaus, ready\nC-Use: v1, v2, r"];
+    10 [label="10", xlabel="P-Use: ready"];
+    11 [label="11"];
+    
+    1 -> 2;
+    2 -> 3 [label="True\n(ready == 0)"];
+    2 -> 10 [label="False"];
+    3 -> 4 [label="..."];
+    4 -> 5 [label="(r <= 1.0)"];
+    4 -> 3 [label="(r > 1.0)"];
+    5 -> 6;
+    6 -> 9;
+    7 -> 8;
+    8 -> 11 [label="..."];
+    9 -> 7;
+    10 -> 8;
+    
+    11 [shape=doublecircle];
+}

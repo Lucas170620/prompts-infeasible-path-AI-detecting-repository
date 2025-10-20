@@ -1,0 +1,323 @@
+[code]
+/*************************************************************************/
+/*                                                                       */
+/*   SNU-RT Benchmark Suite for Worst Case Timing Analysis               */
+/*   =====================================================               */
+/*                              Collected and Modified by S.-S. Lim      */
+/*                                           sslim@archi.snu.ac.kr       */
+/*                                         Real-Time Research Group      */
+/*                                        Seoul National University      */
+/*                                                                       */
+/*                                                                       */
+/*        < Features > - restrictions for our experimental environment   */
+/*                                                                       */
+/*          1. Completely structured.                                    */
+/*               - There are no unconditional jumps.                     */
+/*               - There are no exit from loop bodies.                   */
+/*                 (There are no 'break' or 'return' in loop bodies)     */
+/*          2. No 'switch' statements.                                   */
+/*          3. No 'do..while' statements.                                */
+/*          4. Expressions are restricted.                               */
+/*               - There are no multiple expressions joined by 'or',     */
+/*                'and' operations.                                      */
+/*          5. No library calls.                                         */
+/*               - All the functions needed are implemented in the       */
+/*                 source file.                                          */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+/*                                                                       */
+/*  FILE: bs.c                                                           */
+/*  SOURCE : Public Domain Code                                          */
+/*                                                                       */
+/*  DESCRIPTION :                                                        */
+/*                                                                       */
+/*     Binary search for the array of 15 integer elements.               */
+/*                                                                       */
+/*  REMARK :                                                             */
+/*                                                                       */
+/*  EXECUTION TIME :                                                     */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+
+
+
+
+struct DATA {
+  int  key;
+  int  value;
+}  ;
+
+#ifdef DEBUG
+	int cnt1;
+#endif
+
+struct DATA data[15] = { {1, 100},
+	     {5,200},
+	     {6, 300},
+	     {7, 700},
+	     {8, 900},
+	     {9, 250},
+	     {10, 400},
+	     {11, 600},
+	     {12, 800},
+	     {13, 1500},
+	     {14, 1200},
+	     {15, 110},
+	     {16, 140},
+	     {17, 133},
+	     {18, 10} };
+
+main()
+{
+	binary_search(8);
+}
+
+binary_search(x)
+{
+  int fvalue, mid, up, low ;
+
+  low = 0;
+  up = 14;
+  fvalue = -1 /* all data are positive */ ;
+  while (low <= up) {
+    mid = (low + up) >> 1;
+    if ( data[mid].key == x ) {  /*  found  */
+      up = low - 1;
+      fvalue = data[mid].value;
+#ifdef DEBUG
+	printf("FOUND!!\n");
+#endif
+    }
+    else  /* not found */
+      if ( data[mid].key > x ) 	{
+	up = mid - 1;
+#ifdef DEBUG
+	printf("MID-1\n");
+#endif
+      }
+      else   {
+             	low = mid + 1;
+#ifdef DEBUG
+	printf("MID+1\n");
+#endif
+      }
+#ifdef DEBUG
+	cnt1++;
+#endif
+  }
+#ifdef DEBUG
+	printf("Loop Count : %d\n", cnt1);
+#endif
+  return fvalue;
+}
+
+---
+
+---
+[cdfg main]
+
+```dot
+digraph binary_search {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: low (0), up (14)\nC-Use: none"];
+    2 [label="2", xlabel="P-Use: low, up"];
+    3 [label="3", xlabel="Def: mid\nC-Use: low, up"];
+    4 [label="4", xlabel="P-Use: data[mid].key, x (8)"];
+    5 [label="5", xlabel="Def: fvalue\nP-Use: data[mid].value"];
+    6 [label="6", xlabel="Def: up = low -1"];
+    7 [label="7", xlabel="P-Use: mid"];
+    8 [label="8", xlabel="Def: up"];
+    9 [label="9", xlabel="Def: low"];
+    10[label="10", xlabel="End node"];
+
+    2 -> 3;
+    3 -> 4 [label="Calculate mid"];
+    4 -> 5 [label="True\n(data[mid].key == x)"];
+    4 -> 7 [label="False"];
+    5 -> 6;
+    6 -> 10;
+    7 -> 9 [label="data[mid].key > x"];
+    7 -> 8 [label="False"];
+    9 -> 2;
+    8 -> 2;
+}
+```
+
+<codigos - binary_search>
+Node 1:
+low = 0;
+up = 14;
+fvalue = -1;
+---
+Node 2:
+while (low <= up) {
+---
+Node 3:
+mid = (low + up) >> 1;
+---
+Node 4:
+if (data[mid].key == x)
+---
+Node 5:
+found case
+...
+Node 6:
+up = low -1;
+fvalue = data[mid].value;
+...
+Node 7:
+else if (data[mid].key > x)
+...
+Node 8:
+up = mid -1;
+...
+Node 9:
+low = mid +1;
+...
+</codigos>
+---
+
+---
+[analise infeasible_paths main]
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [binary_search]**  
+   - **Trechos de Código**:  
+     - Nenhuma linha específica, pois o caminho é impossível.  
+   - **Descrição**: [Nenhum caminho inviável identificado]  
+   - **Motivo**: O código do binary search é lógico e não possui condições que possam levar a situações inconsistentes ou violações de invariants, uma vez que o array está ordenado e a chave está presente. Assim, todos os caminhos são viáveis.
+
+"Nenhum caminho inviável foi identificado."
+```
+---
+
+---
+[cdfg binary_search]
+
+```dot
+digraph binary_search {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: fvalue=-1, low=0, up=14\nC-Use: none"];
+    2 [label="2", xlabel="P-Use: low, up"];
+    3 [label="3", xlabel="Def: mid=(low+up)>>1"];
+    4 [label="4", xlabel="P-Use: data[mid].key"];
+    5 [label="5", xlabel="Def: fvalue=data[mid].value\nP-Use: x, data[mid].key"];
+    6 [label="6", xlabel="P-Use: low, up, mid"];
+    7 [label="7", xlabel="Def: up=mid-1"];
+    8 [label="8", xlabel="Def: low=mid+1"];
+    9 [label="9", xlabel="P-Use: low, up"];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> 4;
+    4 -> 5 [label="True\n(data[mid].key == x)"];
+    4 -> 6 [label="False"];
+    6 -> 7 [label="True\n(data[mid].key > x)"];
+    6 -> 8 [label="False"];
+    7 -> 9;
+    8 -> 9;
+    9 -> 2;
+    5 -> 9;
+    
+    9 [shape=doublecircle];
+}
+```
+
+<codigos - binary_search>
+Node 1:
+int fvalue = -1, low = 0, up = 14;
+---
+Node 2:
+while (low <= up)
+---
+Node 3:
+mid = (low + up) >> 1;
+---
+Node 4:
+if (data[mid].key == x)
+---
+Node 5:
+fvalue = data[mid].value; up = low - 1;
+---
+Node 6:
+else
+---
+Node 7:
+up = mid - 1;
+---
+Node 8:
+low = mid + 1;
+---
+Node 9:
+}
+</codigos>
+---
+
+---
+[analise infeasible_paths binary_search]
+
+```markdown
+Nenhum caminho inviável foi identificado.
+```
+---
+
+---
+**Análise de Caminhos Inviáveis em Código - Especialista em Testes Estruturais**
+
+**Instruções de Entrada:**  
+Forneça:  
+1. O código-fonte a ser analisado  
+2. Para cada função no código, inclua:  
+   - O **CDFG (Control Data Flow Graph)** correspondente, representando todos os nós (operações/blocos básicos) e arestas (fluxos de controle)  
+   - Uma **análise preliminar** indicando possíveis *infeasible paths* identificados  
+
+---
+
+**Processo de Análise (Executado Automaticamente):**  
+
+**1. Mapeamento CDFG-Função**  
+Para cada função no código:  
+- Identificar nós críticos (ex: branches com condições dependentes de dados)  
+- Mapear arestas do CDFG para trechos de código correspondentes  
+
+**2. Detecção de Infeasible Paths**  
+Analisar cada caminho do CDFG considerando:  
+- **Dependências de Dados:** Caminhos onde variáveis têm estados conflitantes  
+- **Constraints Lógicas:** Condições mutualmente exclusivas (ex: `(x > 0 && x < 0)`)  
+- **Invariantes de Loop:** Caminhos que violam condições de saída de loops  
+- **Dead Code:** Blocos inalcançáveis identificados no CDFG  
+
+**3. Classificação de Inviabilidade**  
+Categorizar cada caminho inviável como:  
+- **Estaticamente Inviável:** Inviável em todas as execuções (ex: lógica contraditória)  
+- **Dinamicamente Inviável:** Inviável sob condições específicas de entrada  
+
+**4. Relatório Consolidado**  
+Gerar para cada função:  
+- Lista de caminhos inviáveis com localização no código  
+- Justificativa técnica baseada no CDFG  
+- Impacto na cobertura de testes estruturais  
+- Recomendações para refinamento do CDFG/código  
+
+---
+
+**Exemplo de Saída Esperada:**  
+```  
+Função: calculate_grade  
+- Caminho Inviável #1: Nós [A3→B5→C7]  
+  Motivo: Condição "score > 100 && score < 50" é logicamente impossível  
+  Efeito: Dead code detectado no bloco C7  
+- Caminho Inviável #2: Nós [A3→D9]  
+  Motivo: Variável 'initialized' deve ser false em A3 mas true em D9  
+```  
+
+**Nota Técnica:** Esta análise assume que o CDFG fornecido reflete fielmente o fluxo de controle e dados. Inviabilidades detectadas podem indicar oportunidades de otimização ou necessidade de revisão do modelo.
+---

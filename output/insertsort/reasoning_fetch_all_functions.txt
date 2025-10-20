@@ -1,0 +1,9 @@
+Alright, I need to analyze the provided C code and extract all user-defined functions or methods. The rules specify that I should list each function name on a new line without any additional formatting, preserving their original case.
+
+Looking at the code, I see that it's an insertion sort implementation. The main function is named 'main', which is a standard entry point for C programs. 
+
+I also notice some conditional compilation directives using #ifdef DEBUG, but those don't affect the extraction of function names because they're part of the same code block.
+
+Checking the code, there are no other functions defined besides 'main'. The variables and loops within the main function aren't considered functions on their own.
+
+So, the only user-defined function here is 'main'.

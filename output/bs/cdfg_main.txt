@@ -1,0 +1,62 @@
+
+```dot
+digraph binary_search {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: low (0), up (14)\nC-Use: none"];
+    2 [label="2", xlabel="P-Use: low, up"];
+    3 [label="3", xlabel="Def: mid\nC-Use: low, up"];
+    4 [label="4", xlabel="P-Use: data[mid].key, x (8)"];
+    5 [label="5", xlabel="Def: fvalue\nP-Use: data[mid].value"];
+    6 [label="6", xlabel="Def: up = low -1"];
+    7 [label="7", xlabel="P-Use: mid"];
+    8 [label="8", xlabel="Def: up"];
+    9 [label="9", xlabel="Def: low"];
+    10[label="10", xlabel="End node"];
+
+    2 -> 3;
+    3 -> 4 [label="Calculate mid"];
+    4 -> 5 [label="True\n(data[mid].key == x)"];
+    4 -> 7 [label="False"];
+    5 -> 6;
+    6 -> 10;
+    7 -> 9 [label="data[mid].key > x"];
+    7 -> 8 [label="False"];
+    9 -> 2;
+    8 -> 2;
+}
+```
+
+<codigos - binary_search>
+Node 1:
+low = 0;
+up = 14;
+fvalue = -1;
+---
+Node 2:
+while (low <= up) {
+---
+Node 3:
+mid = (low + up) >> 1;
+---
+Node 4:
+if (data[mid].key == x)
+---
+Node 5:
+found case
+...
+Node 6:
+up = low -1;
+fvalue = data[mid].value;
+...
+Node 7:
+else if (data[mid].key > x)
+...
+Node 8:
+up = mid -1;
+...
+Node 9:
+low = mid +1;
+...
+</codigos>

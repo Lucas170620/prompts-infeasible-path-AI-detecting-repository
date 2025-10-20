@@ -1,0 +1,15 @@
+Alright, so I'm trying to figure out the infeasible paths in these two functions: icrc1 and icrc. Let me start by looking at the code for each function and their respective CDFGs.
+
+First, let's take a look at icrc1. The function is supposed to compute the CRC for one character. From the code, I can see that it takes a current CRC value and a new character, then updates the CRC based on a polynomial (4129 in this case). The function uses bitwise operations to shift and XOR with the polynomial.
+
+The CDFG provided shows nodes labeled 1 through 5. Node 1 has some variables being defined and used, node 2 is a condition check (!init), node 3 handles the initialization of tables if !init is true, and so on. I don't immediately see any infeasible paths here because all the operations seem straightforward. The function either initializes the tables or continues processing based on whether init is set.
+
+Now, moving on to the icrc function. This one's a bit more complex. It uses the previously defined icrc1 function and handles CRC computation for a string with some initial conditions (jinit) and reverse processing (jrev). The CDFG provided has nodes 1 through 14, showing various condition checks and variable assignments.
+
+Looking closer, I notice that in icrc, there's a block where cword is assigned based on jinit or jrev. There's an if-else structure here: if jinit >=0, cword is set to ((uchar)jinit | ...), else if jrev <0, it does something else. But what happens when both conditions are false? That would mean jinit < 0 and jrev >=0.
+
+Wait a minute! If jinit is less than zero and jrev isn't less than zero (so jrev is non-negative), then cword is never initialized in that block. So, if the function enters that else case where jrev >=0 without initializing cword, it would lead to undefined behavior because cword hasn't been assigned any value before being used later.
+
+This seems like a solid candidate for an infeasible path. The condition jinit < 0 and jrev >=0 can theoretically occur if the function is called with such parameters. Since there's no default case handling, this would leave cword uninitialized, leading to unexpected behavior or errors during execution.
+
+So, in summary, the infeasible path in icrc occurs when both jinit is negative and jrev is non-negative, resulting in an uninitialized variable cword being used, which is logically impossible and invalid.

@@ -1,9 +1,0 @@
-digraph RandomInteger {
-      rankdir=TB;
-      node [shape=box];
-      start [label="RandomInteger: Start", shape=ellipse];
-      end [label="RandomInteger: End", shape=ellipse];
-      n1 [label="Seed = ((Seed * 133) + 81) % 8095"];
-      n2 [label="return Seed"];
-      start -> n1 -> n2 -> end;
-  }

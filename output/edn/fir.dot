@@ -1,0 +1,22 @@
+digraph fir {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: a, b, output\nC-Use:"];
+    2 [label="2", xlabel="Def: i\nC-Use:"];
+    3 [label="3", xlabel="P-Use: i < N"];
+    4 [label="4", xlabel="Def: output[i]\nC-Use: a, b"];
+    5 [label="5", xlabel="C-Use: i"];
+    6 [label="6", xlabel="Def: i\nC-Use:"];
+    7 [label="7", xlabel="P-Use: i >= N"];
+    8 [label="8", xlabel="Terminou"];
+    
+    1 -> 2;
+    2 -> 3 [label="Entrar no loop"];
+    3 -> 4 [label="True\ni < N"];
+    4 -> 5;
+    5 -> 6 [label="Próximo"];
+    6 -> 3 [label="False\ni >= N"];
+    6 -> 7 [label="Continuar"];
+    7 -> 8;
+}

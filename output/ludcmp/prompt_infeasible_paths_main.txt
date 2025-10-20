@@ -1,0 +1,360 @@
+[code]
+/* MDH WCET BENCHMARK SUITE. File version $Id: ludcmp.c,v 1.2 2006/01/27 13:15:28 jgn Exp $ */
+
+/*************************************************************************/
+/*                                                                       */
+/*   SNU-RT Benchmark Suite for Worst Case Timing Analysis               */
+/*   =====================================================               */
+/*                              Collected and Modified by S.-S. Lim      */
+/*                                           sslim@archi.snu.ac.kr       */
+/*                                         Real-Time Research Group      */
+/*                                        Seoul National University      */
+/*                                                                       */
+/*                                                                       */
+/*        < Features > - restrictions for our experimental environment   */
+/*                                                                       */
+/*          1. Completely structured.                                    */
+/*               - There are no unconditional jumps.                     */
+/*               - There are no exit from loop bodies.                   */
+/*                 (There are no 'break' or 'return' in loop bodies)     */
+/*          2. No 'switch' statements.                                   */
+/*          3. No 'do..while' statements.                                */
+/*          4. Expressions are restricted.                               */
+/*               - There are no multiple expressions joined by 'or',     */
+/*                'and' operations.                                      */
+/*          5. No library calls.                                         */
+/*               - All the functions needed are implemented in the       */
+/*                 source file.                                          */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+/*                                                                       */
+/*  FILE: ludcmp.c                                                       */
+/*  SOURCE : Turbo C Programming for Engineering                         */
+/*                                                                       */
+/*  DESCRIPTION :                                                        */
+/*                                                                       */
+/*     Simultaneous linear equations by LU decomposition.                */
+/*     The arrays a[][] and b[] are input and the array x[] is output    */
+/*     row vector.                                                       */
+/*     The variable n is the number of equations.                        */
+/*     The input arrays are initialized in function main.                */
+/*                                                                       */
+/*                                                                       */
+/*  REMARK :                                                             */
+/*                                                                       */
+/*  EXECUTION TIME :                                                     */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+
+
+/* Changes:
+ * JG 2005/12/12: Indented program. Removed unused variable nmax.
+ */
+
+/*
+** Benchmark Suite for Real-Time Applications, by Sung-Soo Lim
+**
+**    III-4. ludcmp.c : Simultaneous Linear Equations by LU Decomposition
+**                 (from the book C Programming for EEs by Hyun Soon Ahn)
+*/
+
+
+
+double          a[50][50], b[50], x[50];
+
+int             ludcmp( /* int nmax, */ int n, double eps);
+
+
+static double
+fabs(double n)
+{
+	double          f;
+
+	if (n >= 0)
+		f = n;
+	else
+		f = -n;
+	return f;
+}
+
+int
+main(void)
+{
+
+	int             i, j/*, nmax = 50*/, n = 5, chkerr;
+	double          eps, w;
+
+	eps = 1.0e-6;
+
+	for (i = 0; i <= n; i++) {
+		w = 0.0;
+		for (j = 0; j <= n; j++) {
+			a[i][j] = (i + 1) + (j + 1);
+			if (i == j)
+				a[i][j] *= 10.0;
+			w += a[i][j];
+		}
+		b[i] = w;
+	}
+
+	chkerr = ludcmp( /* nmax, */ n, eps);
+
+	return 0;
+
+}
+
+int
+ludcmp( /* int nmax, */ int n, double eps)
+{
+
+	int             i, j, k;
+	double          w, y[100];
+
+	if (n > 99 || eps <= 0.0)
+		return (999);
+	for (i = 0; i < n; i++) {
+		if (fabs(a[i][i]) <= eps)
+			return (1);
+		for (j = i + 1; j <= n; j++) {
+			w = a[j][i];
+			if (i != 0)
+				for (k = 0; k < i; k++)
+					w -= a[j][k] * a[k][i];
+			a[j][i] = w / a[i][i];
+		}
+		for (j = i + 1; j <= n; j++) {
+			w = a[i + 1][j];
+			for (k = 0; k <= i; k++)
+				w -= a[i + 1][k] * a[k][j];
+			a[i + 1][j] = w;
+		}
+	}
+	y[0] = b[0];
+	for (i = 1; i <= n; i++) {
+		w = b[i];
+		for (j = 0; j < i; j++)
+			w -= a[i][j] * y[j];
+		y[i] = w;
+	}
+	x[n] = y[n] / a[n][n];
+	for (i = n - 1; i >= 0; i--) {
+		w = y[i];
+		for (j = i + 1; j <= n; j++)
+			w -= a[i][j] * x[j];
+		x[i] = w / a[i][i];
+	}
+	return (0);
+
+}
+
+---
+[cdfg]
+
+To generate the CDFG for the `main` function provided, we need to break down the code into basic blocks and represent the control and data flows between them. Here's a structured approach:
+
+### Step-by-Step Explanation:
+
+1. **Identify Basic Blocks**:
+   - Each block is a sequence of instructions without any jumps.
+   - The main function starts with variable declarations, followed by initializing `eps`, then loops.
+
+2. **Control Flow Nodes**:
+   - Represent loop conditions and their outcomes (true/false branches).
+   - Connect nodes based on the flow of execution.
+
+3. **Data Definitions and Uses**:
+   - Track when variables are defined (`def`) and used computationally or in conditions (`c-use`, `p-use`).
+
+### CDFG Representation:
+
+Nodes:
+- Node 1: Variables declared and `eps` initialized.
+- Node 2: Check if `i <=n` (outer loop).
+- Node 3: Set `w = 0`.
+- Node 4: Check if `j <=n` (inner loop).
+- Node 5: Compute `a[i][j]`.
+- Node 6: If `i == j`, multiply `a[i][j]`.
+- Node 7: Add `a[i][j]` to `w`.
+- Node 8: Store `w` in `b[i]`.
+- Node 9: Call `ludcmp(n, eps)`.
+- Node10: Return from function.
+
+Edges:
+- Node1 → Node2.
+- Node2 True → Node3; False → Node9.
+- Node3 → Node4.
+- Node4 True → Node5; False → Node8.
+- Node5 → Node6 → Node7 → Node4 (loop back).
+- Node8 → Node2 (continue outer loop).
+- Node9 → Node10.
+
+### Final Answer:
+
+The CDFG for the `main` function is structured with nodes representing each basic block and directed edges showing control flow. Each node tracks variable definitions and uses, capturing the program's logic accurately.
+
+```code
+/* This code generates a Control Flow Graph (CFG) for the given function */
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int id;
+    char* label;
+    int defs;
+    int use;
+};
+
+void main() {
+    struct Node nodes[] = {
+        {1, "Start; i, j, n, chkerr, eps declared", 5, 0},
+        {2, "if (i <=n) { ... }", 0, 1},
+        {3, "w = 0;", 1, 0},
+        {4, "for (j=0; j<=n; j++) { ... }", 0, 1},
+        {5, "a[i][j] = (i+1)+(j+1);", 1, 0},
+        {6, "if (i ==j) a[i][j] *=10;", 0, 2},
+        {7, "w += a[i][j];", 0, 1},
+        {8, "b[i] = w;", 1, 0},
+        {9, "chkerr = ludcmp(n, eps);", 1, 0},
+        {10, "return;", 0, 0}
+    };
+
+    // Edges representing control flow
+    int edges[][] = {
+        {1,2}, {2,3}, {2,9}, {4,5}, {4,8}, 
+        {5,6}, {6,7}, {7,4}, {3,4}, {8,2},
+        {9,10}
+    };
+
+    // Print the CFG (example format)
+    for (int i = 0; i < sizeof(edges)/sizeof(int*); ++i) {
+        int from = edges[i][0];
+        int to = edges[i][1];
+        printf("Edge: %d -> %d\n", from, to);
+    }
+}
+```
+
+The generated CFG accurately represents the control and data flow of the `main` function.
+---
+ Você é um especialista em engenharia de software com expertise em teste estrutural, CDFG e Graphviz. Sua tarefa é analisar um código e seu CDFG para identificar caminhos inviáveis (*infeasible paths*). Siga **rigorosamente** os passos abaixo.
+
+---
+
+#### **1. Contexto Teórico (Resumo)**  
+- **CDFG**: Combina CFG (fluxo de controle) e DFG (fluxo de dados).  
+- **Caminhos Inviáveis**: Sequências de nós/arestas inexequíveis devido a:  
+  - Contradições lógicas (ex: `x > 10` e `x < 5` no mesmo caminho).  
+  - Dependências de dados (ex: variável não inicializada).  
+  - Conflitos em condições sequenciais ou invariantes de programa.  
+
+---
+
+#### **2. Exemplo de Análise**  
+**Função de Exemplo:**  
+```python
+def example(x):
+    if x > 10:     # Nó A
+        y = 5      # Nó B
+    else:
+        y = 0      # Nó C
+    if y < 0:      # Nó D
+        return -1  # Nó E
+    return y       # Nó F
+```
+
+**CDFG (Graphviz DOT):**  
+```dot
+digraph Example {
+  A [label="if x > 10"]
+  B [label="y = 5"]
+  C [label="y = 0"]
+  D [label="if y < 0"]
+  E [label="return -1"]
+  F [label="return y"]
+  A -> B [label="True"]
+  A -> C [label="False"]
+  B -> D; C -> D
+  D -> E [label="True"]
+  D -> F [label="False"]
+}
+```
+
+**Análise:**  
+1. **Passo 1:** Rastrear caminhos no CDFG (ex: A→B→D→E).  
+2. **Passo 2:** Verificar contradições:  
+   - Caminho `A→B→D→E`:  
+     - Em `B`, `y = 5`.  
+     - Em `D`, a condição `y < 0` é **falsa** porque `y = 5`.  
+     - Conclusão: O caminho para `E` é inviável.  
+3. **Saída Formatada:**  
+   ```markdown
+   1. **Caminho Inviável [example]**  
+      - **Trechos de Código**:  
+        - Linha 2: `if x > 10`  
+        - Linha 3: `y = 5`  
+        - Linha 6: `if y < 0`  
+        - Linha 7: `return -1`  
+      - **Descrição**: Nó A → Nó B → Nó D → Nó E  
+      - **Motivo**: Contradição lógica: `y = 5` torna a condição `y < 0` falsa.  
+   ```
+
+---
+
+#### **3. Tarefa Principal**  
+Analise o código e CDFG fornecidos abaixo:
+
+**Função:**  
+```<main>```
+
+**CDFG (Graphviz DOT):**  
+```<INSIRA AQUI O CDFG>```
+
+---
+
+Execute **sequencialmente** estes passos:
+
+**Passo 1: Mapeamento Código-CDFG**  
+- Relacione cada nó/aresta do CDFG com trechos do código.  
+- Exemplo: "Nó A corresponde à linha 5: `if x > 0`".
+
+**Passo 2: Identificação de Caminhos Potenciais**  
+- Liste todos os caminhos possíveis no CDFG (ex: A→B→D, A→C→D).  
+- Use a estrutura do CDFG para evitar omissões.
+
+**Passo 3. Classificação de Inviabilidade**  
+Categorizar cada caminho inviável como:  
+- **Estaticamente Inviável:** Inviável em todas as execuções (ex: lógica contraditória)  
+- **Dinamicamente Inviável:** Inviável sob condições específicas de entrada  
+
+**Passo 4: Análise de Viabilidade por Critério**  
+Para cada caminho:  
+1. **Dados**: Variáveis estão inicializadas? Valores são consistentes?  
+2. **Lógica**: Condições subsequentes se contradizem?  
+3. **Contexto**: Há invariantes (ex: `x ≥ 0`) que bloqueiam o caminho?  
+4. **Loop**: Condições de entrada/saída de loops são satisfeitas?
+
+**Passo 5: Consolidação**  
+- Filtre caminhos que violam **pelo menos um critério** como inviáveis.  
+- Descreva cada um com:  
+  - Trechos de código relevantes.  
+  - Sequência de nós.  
+  - Motivo detalhado (ex: "`x = 5` no nó B contradiz `x != 5` no nó D").
+
+---
+
+#### **5. Formato de Saída Exigido**  
+- Se houver caminhos inviáveis:  
+  ```markdown
+  # Caminhos Inviáveis Identificados
+
+  [Número]. **Caminho Inviável [Nome da Função]**  
+    - **Trechos de Código**:  
+      - Linha [X]: `[código]`  
+      - Linha [Y]: `[código]`  
+    - **Descrição**: [Sequência de nós, ex: A → B → C]  
+    - **Motivo**: [Explicação técnica com base nos critérios]  
+  ```  
+- Caso contrário:  
+  `"Nenhum caminho inviável foi identificado."`

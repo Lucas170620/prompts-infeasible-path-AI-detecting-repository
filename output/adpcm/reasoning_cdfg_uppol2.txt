@@ -1,0 +1,60 @@
+Okay, I need to generate a precise hybrid Control and Data Flow Graph (CDFG) in Graphviz DOT format for the function uppol2. Let me first understand what this function does by looking at its code.
+
+Looking at the provided C code, the function uppol2 has several operations:
+
+1. It declares some long variables: wd2, wd4.
+2. Calculates wd2 as 4L * al1.
+3. Checks if plt and plt1 have the same sign using (long)plt*plt1 >=0L. If they do, it negates wd2, else it leaves it as is.
+4. Then shifts right by 7 bits, which effectively divides by 128 and rounds towards zero since it's a signed shift.
+5. Next, calculates wd4 based on whether plt and plt2 have the same sign. If yes, adds 128 to wd2; else subtracts 128.
+6. Adds apl2 to this value, but before that, apl2 is multiplied by 127 and shifted right by 7 bits (leak factor of 127/128).
+7. Applies some saturation checks: if the result is above 12288 or below -12288, it clamps to those values.
+8. Returns apl2.
+
+Now, I need to break this down into basic blocks and identify data definitions (def) and uses (c-use and p-use). 
+
+Each line of code will be a node in the CDFG. For each operation:
+
+- Node 1: Declares wd2 and computes it as 4L * al1. This is a def for wd2, using al1 (C-use).
+- Node 2: The condition (long)plt*plt1 >=0L is evaluated. This is a p-use of plt and plt1.
+- Node 3: Depending on the condition, either subtract or not from wd2. So an if statement creates two paths: true and false.
+- Similarly, for the next condition regarding plt2, another decision point with two paths.
+
+I need to represent each operation as nodes and connect them based on control flow. Also, track how variables are used (C-use) and defined (def).
+
+Let me outline the nodes:
+
+1. Node 1: Compute wd2.
+   - Def: wd2
+   - Use: al1
+
+2. Node 2: Check if plt*plt1 >=0.
+   - Use: plt, plt1
+
+3. Node 3: If condition is true, set wd2 = -wd2; else leave as is.
+   - This affects the value of wd2.
+
+4. Node 4: Shift wd2 right by 7 bits. So, this node uses the modified wd2 and defines a new value for wd2.
+
+5. Node 5: Check if plt*plt2 >=0.
+   - Use: plt, plt2
+
+6. Node 6: Depending on condition, add or subtract 128 from wd2.
+   - Modifies wd2.
+
+7. Node 7: Compute apl2 by using al2 and applying the leak factor (127/128).
+   - Def: apl2
+   - Use: al2
+
+8. Node 8: Add apl2 to wd4.
+   - Use: wd4, apl2
+   - Def: wd4 becomes this sum.
+
+9. Node 9: Apply saturation to wd4, clamping it between -12288 and 12288.
+   - Modifies wd4.
+
+Each of these steps will be nodes in the graph. The control flow will have edges based on the conditions evaluated in nodes 2 and 5.
+
+Now, I'll structure this into a DOT file. Each node is numbered sequentially, and edges represent control flow with their respective conditions. Data dependencies are noted as xlabel attributes.
+
+I need to ensure that each node correctly represents its operations, uses, and defs. Also, the graph should show all possible paths through the function, including both branches of the if statements.

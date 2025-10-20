@@ -1,0 +1,11 @@
+digraph CDFG {
+    node1 [label="Node 1\n Entry\n defs: i, j\n uses: a, b, output"];
+    node2 [label="Node 2\n if (i < N)\n p-use: i < N"];
+    node3 [label="Node 3\n multiply a[i] * b[j]\n accumulate into output[k]\n defs: temp_var, output[k]\n c-uses: a[i], b[j], i, j"];
+    exit_node [label="Exit"];
+
+    node1 -> node2;
+    node2 -> node3 [label="true"];
+    node3 -> node2;
+    node2 -> exit_node [label="false"];
+}

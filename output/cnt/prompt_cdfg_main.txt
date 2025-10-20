@@ -1,0 +1,377 @@
+[code]
+/* $Id: cnt.c,v 1.3 2005/04/04 11:34:58 csg Exp $ */
+
+
+
+/* sumcntmatrix.c */
+
+
+
+//#include <sys/types.h>
+
+//#include <sys/times.h>
+
+
+
+// #define WORSTCASE 1
+
+// #define MAXSIZE 100 Changed JG/Ebbe
+
+#define MAXSIZE 10
+
+
+
+// Typedefs
+
+typedef int matrix [MAXSIZE][MAXSIZE];
+
+
+
+// Forwards declarations
+
+int main(void);
+
+int Test(matrix);
+
+int Initialize(matrix);
+
+int InitSeed(void);
+
+void Sum(matrix);
+
+int RandomInteger(void);
+
+
+
+// Globals
+
+int Seed;
+
+matrix Array;
+
+int Postotal, Negtotal, Poscnt, Negcnt;
+
+
+
+// The main function
+
+int main (void)
+
+{
+
+   InitSeed();
+
+   //printf("\n   *** MATRIX SUM AND COUNT BENCHMARK TEST ***\n\n");
+
+   //printf("RESULTS OF THE TEST:\n");
+
+   Test(Array);
+
+   return 1;
+
+}
+
+
+
+
+
+int Test(matrix Array)
+
+{
+
+   long StartTime, StopTime;
+
+   float TotalTime;
+
+
+
+   Initialize(Array);
+
+   StartTime = 1000.0; //ttime();
+
+   Sum(Array);
+
+   StopTime = 1500.0; //ttime();
+
+
+
+   TotalTime = (StopTime - StartTime) / 1000.0;
+
+
+
+   //printf("    - Size of array is %d\n", MAXSIZE);
+
+   //printf("    - Num pos was %d and Sum was %d\n", Poscnt, Postotal);
+
+   //printf("    - Num neg was %d and Sum was %d\n", Negcnt, Negtotal);
+
+   //printf("    - Num neg was %d\n", Negcnt);
+
+   //printf("    - Total sum time is %3.3f seconds\n\n", TotalTime);
+
+   return 0;
+
+}
+
+
+
+
+
+// Intializes the given array with random integers.
+
+int Initialize(matrix Array)
+
+{
+
+   register int OuterIndex, InnerIndex;
+
+
+
+   for (OuterIndex = 0; OuterIndex < MAXSIZE; OuterIndex++) //100 + 1
+
+      for (InnerIndex = 0; InnerIndex < MAXSIZE; InnerIndex++) //100 + 1
+
+         Array[OuterIndex][InnerIndex] = RandomInteger();
+
+
+
+   return 0;
+
+}
+
+
+
+
+
+// Initializes the seed used in the random number generator.
+
+int InitSeed (void)
+
+{
+
+   Seed = 0;
+
+   return 0;
+
+}
+
+
+
+void Sum(matrix Array)
+
+{
+
+  register int Outer, Inner;
+
+
+
+  int Ptotal = 0; /* changed these to locals in order to drive worst case */
+
+  int Ntotal = 0;
+
+  int Pcnt = 0;
+
+  int Ncnt = 0;
+
+
+
+  for (Outer = 0; Outer < MAXSIZE; Outer++) //Maxsize = 100
+
+    for (Inner = 0; Inner < MAXSIZE; Inner++)
+
+#ifdef WORSTCASE
+
+      if (Array[Outer][Inner] >= 0) {
+
+#else
+
+	if (Array[Outer][Inner] < 0) {
+
+#endif
+
+	  Ptotal += Array[Outer][Inner];
+
+	  Pcnt++;
+
+	}
+
+	else {
+
+	  Ntotal += Array[Outer][Inner];
+
+	  Ncnt++;
+
+	}
+
+
+
+  Postotal = Ptotal;
+
+  Poscnt = Pcnt;
+
+  Negtotal = Ntotal;
+
+  Negcnt = Ncnt;
+
+}
+
+
+
+
+
+// This function returns in milliseconds the amount of compiler time
+
+//int ttime()
+
+//{
+
+//  struct tms buffer;
+
+//int utime;
+
+
+
+//times(&buffer);
+
+//utime = (buffer.tms_utime / 60.0) * 1000.0;
+
+//return (utime);
+
+//}
+
+
+
+
+
+// Generates random integers between 0 and 8095
+
+int RandomInteger(void)
+
+{
+
+   Seed = ((Seed * 133) + 81) % 8095;
+
+   return Seed;
+
+}
+
+---
+Você é um especialista em análise estática de código e teste estrutural. Sua tarefa é analisar código fornecido e gerar um **CDFG (Control and Data Flow Graph)** preciso em formato Graphviz DOT para uma função main.
+
+### Especificações Técnicas:
+
+**1. Linguagem Graphviz DOT:**
+- Use digrafos direcionados: `digraph NomeFuncao { ... }`
+- Personalize nós com: `NóID [label="Texto" shape="forma" xlabel="info dados"]`
+- Formas principais: box (processamento), diamond (decisão), doublecircle (fim)
+- Rotule arestas com condições: `A -> B [label="condição"]`
+- Use `rankdir=TB` para layout vertical
+
+**2. Construção do CDFG Híbrido:**
+Integre estas informações em cada nó:
+- **Fluxo de Controle:** sequência de execução básica
+- **Fluxo de Dados:** def (definições) e use (usos) de variáveis
+- **Tipos de Uso:** C-Use (computacional) e P-Use (predicativo)
+
+**3. Estrutura de Representação:**
+- Nós de processo: operações sequenciais
+- Nós de decisão: condições if/while/for
+- Arestas verdadeiro/falso para bifurcações
+- Loops: nó de condição com retorno ao corpo
+- Use circulo para representar os nós
+- Um circulo duplo para representar o nó final.
+
+### Processamento Obrigatório:
+
+**Para a função especificada:**
+1. Identifique todos os blocos básicos
+2. Mapeie definições (def) e usos (c-use/p-use) de variáveis
+3. Construa o grafo integrando controle e dados
+4. Numere nós sequencialmente
+5. Gere lista de correspondência código-nós
+
+### Saída Exigida:
+
+**Parte 1 - Código Graphviz:**
+```dot
+digraph NomeFuncao {
+    // Configurações e nós
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós (em tags):**
+<codigos - NomeFuncao>
+Node [ID]:
+[Trecho código relevante]
+---
+[Próximo node...]
+</codigos>
+
+### Exemplo de Referência:
+
+**Código:**
+```java
+public class Order {
+    public void applyDiscount(Customer customer, Product product) {
+        boolean isPremium = customer.isPremiumMember();
+        boolean isEligibleForDiscount = product.getPrice() > 100.00;
+        boolean isOnClearance = product.isOnClearance();
+        
+        if (isPremium && isEligibleForDiscount) {
+            System.out.println("Desconto Premium aplicado.");
+        }
+
+        if (isOnClearance) {
+            System.out.println("Item em liquidação.");
+            if (isPremium && isEligibleForDiscount) {
+                System.out.println("Super Desconto para Premium em Liquidação!");
+            }
+        }
+    }
+}
+```
+
+**Saída Esperada:**
+```dot
+digraph order {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: isPremium, isEligibleForDiscount, isOnClearance\nC-Use: customer, product"];
+    2 [label="2", xlabel="P-Use: isPremium, isEligibleForDiscount"];
+    3 [label="3"];
+    4 [label="4", xlabel="P-Use: isOnClearance"];
+    5 [label="5"];
+    6 [label="6", xlabel="P-Use: isPremium, isEligibleForDiscount"];
+    7 [label="7"];    
+    8 [label="8"];
+    
+    1 -> 2 ;
+    2 -> 3 [label="True\n(isPremium && isEligibleForDiscount)"];
+    2 -> 4 [label="False"];
+    3 -> 4 ;
+    4 -> 5 [label="True\n(isOnClearance)"];
+    4 -> 8 [label="False"];
+    5 -> 6 ;
+    6 -> 7 [label="True"];
+    6 -> 8 [label="False"];
+    7 -> 8 ;    
+    8 [shape=doublecircle];
+}
+```
+
+<codigos - exemplo>
+Node 1:
+int y = x * 2;
+---
+Node 2:
+if (y > 10)
+---
+Node 3:
+System.out.println("Maior")
+---
+Node 4:
+return
+</codigos>
+
+**Agora, gere o CDFG completo para o código e função fornecidos. Mantenha precisão técnica e complete ambas as partes da saída.**

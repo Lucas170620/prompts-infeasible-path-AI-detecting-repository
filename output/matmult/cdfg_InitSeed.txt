@@ -1,0 +1,40 @@
+
+The Control and Data Flow Graph (CDFG) for the `InitSeed` function consists of two nodes. The first node represents the assignment of Seed to 0, and the second node is the exit point.
+
+**Step-by-Step Explanation:**
+
+1. **Function Analysis:** The `InitSeed` function initializes the global variable `Seed` to zero. It contains a single statement without any control flow structures (no loops or branches).
+
+2. **Basic Blocks:** Since there's only one statement, it forms a single basic block.
+
+3. **Data Flow:**
+   - **Definition (Def):** The assignment `Seed = 0;` defines the variable `Seed`.
+   - **Use (C-Use):** There are no computational uses of variables in this statement since the right-hand side is a constant.
+
+4. **Control Flow:** The function starts at the assignment, then exits without any branches or loops.
+
+5. **Graph Structure:**
+   - Node 1 represents the assignment and includes the definition of `Seed`.
+   - Node 2 is the exit node, represented as a double circle.
+
+**CDFG Representation:**
+
+```graphviz
+digraph InitSeed {
+    rankdir=TB;
+    
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: Seed\nC-Use: None"];
+    2 [label="", shape=doublecircle];
+    
+    1 -> 2;
+}
+```
+
+**Mapping of Nodes to Code Lines:**
+
+- **Node 1:** Line `Seed = 0;` → Defines `Seed`.
+- **Node 2:** Exit point.
+
+This graph accurately represents the control and data flow for the `InitSeed` function.

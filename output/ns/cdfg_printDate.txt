@@ -1,0 +1,71 @@
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph foo {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: i\nC-Use: none"];
+    2 [label="2", xlabel="P-Use: i < 5"];
+    3 [label="3", xlabel="Def: j\nC-Use: i"];
+    4 [label="4", xlabel="P-Use: j < 5"];
+    5 [label="5", xlabel="Def: k\nC-Use: i, j"];
+    6 [label="6", xlabel="P-Use: k < 5"];
+    7 [label="7", xlabel="Def: l\nC-Use: i, j, k"];
+    8 [label="8", xlabel="P-Use: l < 5"];
+    9 [label="9", xlabel="Use: keys[i][j][k][l], x"];
+    10 [label="10", xlabel="Return: answer[i][j][k][l] + keys[i][j][k][l]"];
+    11 [label="11", xlabel="P-Use: none"];
+    
+    1 -> 2;
+    2 -> 3 [label="True\n(i < 5)"];
+    2 -> 11 [label="False"];
+    3 -> 4;
+    4 -> 5 [label="True\n(j < 5)"];
+    4 -> 8 [label="False"];
+    5 -> 6;
+    6 -> 7 [label="True\n(k < 5)"];
+    6 -> 10 [label="False"];
+    7 -> 8;
+    8 -> 9 [label="True\n(l < 5)"];
+    8 -> 11 [label="False"];
+    9 -> 10;
+    10 -> 11;
+    11 [shape=doublecircle];
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós:**
+
+<codigos - foo>
+Node 1:
+for(i=0; i<5; i++)
+---
+Node 2:
+i < 5
+---
+Node 3:
+j = 0;
+---
+Node 4:
+j < 5
+---
+Node 5:
+k = 0;
+---
+Node 6:
+k < 5
+---
+Node 7:
+l = 0;
+---
+Node 8:
+l < 5
+---
+Node 9:
+if(keys[i][j][k][l] == x)
+---
+Node 10:
+return answer[i][j][k][l] + keys[i][j][k][l];
+</codigos>

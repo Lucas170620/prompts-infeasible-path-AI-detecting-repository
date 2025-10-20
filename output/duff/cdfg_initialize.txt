@@ -1,0 +1,31 @@
+
+The hybrid Control Flow Graph (CFG) for the given code combines both control flow and data flow information. Here's a step-by-step explanation of the graph:
+
+1. **Node 1:** Represents the declaration of `int i;`.
+   - Shape: Box
+   - xlabel: Def: i
+
+2. **Node 2:** Represents the start of the for loop, including initialization (`i=0`), condition check (`i < length`), and increment (`i++`).
+   - Shape: Diamond (Decision)
+   -xlabel: Use: length (P-Use in condition), i (C-Use in assignment and condition); Def: i
+   - Edges:
+     - To Node 3 if `i < length` is true.
+     - To Exit node (Node4) if false.
+
+3. **Node 3:** Represents the loop body where `arr[i]` is assigned the value `length - i`.
+   - Shape: Box
+   -xlabel: Use: arr (address), length, i; Def: arr[i]
+   - Edge:
+     - Back to Node2 for the next iteration.
+
+4. **Node 4:** Represents the exit node.
+   - Shape: Doublecircle
+
+### Edges:
+
+- **Edge from Node1 to Node2:** Entry into the loop initialization.
+- **Edge from Node2 to Node3 (labeled "i < length"):** Control flows into the loop body if the condition is true.
+- **Edge from Node2 to Node4 (labeled "!i < length"):** Exits the function when the loop condition fails.
+- **Edge from Node3 back to Node2:** After executing the loop body, control returns to check the condition again.
+
+This graph effectively captures both the flow of execution and the data dependencies within each node.

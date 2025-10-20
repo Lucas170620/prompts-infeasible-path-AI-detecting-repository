@@ -1,7 +1,0 @@
-digraph InitSeed_DFG {
-    node [shape=ellipse];
-    Seed [label="Seed"];
-    node [shape=box];
-    AssignSeed [label="="];
-    AssignSeed -> Seed;
-}

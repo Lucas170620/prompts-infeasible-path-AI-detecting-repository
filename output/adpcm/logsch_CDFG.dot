@@ -1,0 +1,25 @@
+digraph logsch_CDFG {
+    node1 [label="Entry\nUses: ih, nbh"];
+    node2 [label="Compute wd = ((long)nbh * 127L) >>7L\ndefinitions: wd"];
+    node3 [label="Compute nbh = wd + wh_code_table[ih]\ndefinitions: nbh"];
+    node4 [label="if (nbh <0)\nuses: nbh"];
+    node5a [label="nbh = 0\ndefinitions: nbh"];
+    node6 [label="Proceed\nNo change"];
+    node7 [label="if (nbh>22528)\nuses: nbh"];
+    node8a [label="nbh=22528\ndefinitions: nbh"];
+    node9 [label="Return nbh"];
+
+    // Control Flow Edges
+    node1 -> node2;
+    node2 -> node3;
+    node3 -> node4;
+    node4 -> node5a [label="if true"];
+    node4 -> node6 [label="if false"];
+    node6 -> node7;
+    node5a -> node7;
+    node7 -> node8a [label="if true"];
+    node7 -> node9 [label="if false"];
+    node8a -> node9;
+
+    // Data Flow within Nodes (not explicitly shown in edges, but implied)
+}

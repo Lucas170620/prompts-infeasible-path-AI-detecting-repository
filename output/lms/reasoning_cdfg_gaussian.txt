@@ -1,0 +1,34 @@
+Alright, I need to generate a Control and Data Flow Graph (CDFG) for the `gaussian` function provided in the code using Graphviz DOT notation. Let me start by understanding what the function does.
+
+The function starts with some static variables: `ready`, `gstore`, `rconst1`, and `rconst2`. It then generates Gaussian random numbers, which involves several steps including calls to `lms_rand()`, calculations, loops, and condition checks.
+
+First, I'll identify all the basic blocks in the function. Each block will correspond to a node in the CDFG. I'll also note where variables are defined (def) and used (c-use or p-use).
+
+Looking at the code:
+
+1. The function starts by initializing static variables if not already done.
+2. It checks if `ready` is 0, which determines whether it's generating a new pair of random numbers or returning stored values.
+3. If `ready` is 0, it generates two random numbers and computes their squares sum (`r`). This continues in a loop until `r` is less than or equal to 1.0.
+4. Once valid `r` is found, it calculates `fac` using `lms_sqrt` and `lms_log`, then computes the Gaussian values for both variables.
+5. If `ready` isn't 0, it returns the stored Gaussian value.
+
+I'll break this down into nodes:
+
+- Node 1: Entering the function, initializing static variables.
+- Node 2: Checking if `ready` is 0.
+- Node 3: Generating random numbers and computing `r`.
+- Node 4: Loop until `r <= 1.0`.
+- Node 5: Calculating `fac` using `lms_sqrt` and `lms_log`.
+- Node 6: Assigning Gaussian values to `gaus` and `gstore`, updating `ready`.
+- Node 7: Returning the stored value when `ready` is not 0.
+
+Next, I'll map the data flow and control flow between these nodes. For example:
+
+- From Node 1, we move to Node 2.
+- If `ready == 0`, proceed to Node 3; else, go to Node 7.
+- After generating `r` in Node 3, if `r > 1.0`, loop back to Node 3 (Node 4).
+- Once `r` is valid, compute `fac` and update variables, then return the value.
+
+I'll ensure each node has labels indicating def and use information, such as which variables are being used or defined at each step. Control flow edges will be labeled with conditions where applicable.
+
+Finally, I'll structure this into a DOT file, ensuring nodes have appropriate shapes (boxes for processing, diamonds for decisions), and edges show the control flow with conditions. The final node should be a double circle to indicate termination.

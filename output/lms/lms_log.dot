@@ -1,0 +1,5 @@
+digraph lms_log {
+    rankdir=TB;
+    
+    1 [label="1", xlabel="Função lms_log\nRetorna 4.5"];
+}

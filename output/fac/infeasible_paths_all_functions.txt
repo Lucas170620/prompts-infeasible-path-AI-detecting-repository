@@ -1,0 +1,49 @@
+
+**Análise de Caminhos Inviáveis**
+
+Aqui está a análise detalhada para cada função:
+
+---
+
+### Função `fac(int n)`
+
+**CDFG:**  
+- **Nós:** 1 (Entrada), 2 (Condição `n == 0`), 3 (Retorno 1), 4 (Retorno `n * fac(n-1)`).
+- **Arestas:**
+  - 1 → 2
+  - 2 → 3 (`n == 0`)
+  - 2 → 4 (Falso)
+
+**Análise de Inviabilidade:**  
+- Não há caminhos inviáveis detectados. A função `fac` lida corretamente com os dois casos: `n == 0` e `n != 0`, sem condições conflitantes ou impossíveis.
+
+---
+
+### Função `main(void)`
+
+**CDFG:**  
+- **Nós:** Variáveis e blocos de código relacionados à inicialização, loop e operações.
+- **Arestas:** Fluxo controlado pelo loop que itera de 0 a `n`.
+
+**Análise de Inviabilidade:**  
+- O loop inicia com `i = 0` e incrementa até `i <= n`. Como `n` é fixado em 5, não há risco de loop infinito ou comportamento inválido.
+- As chamadas à função `fac(i)` são válidas para todos os valores de `i` no intervalo [0, 5].
+
+---
+
+**Conclusão:**  
+Nenhuma inabilidade foi identificada nos caminhos analisados das funções `fac` e `main`. O fluxo de controle é lógico e as variáveis são usadas consistentemente.
+
+```markdown
+# Relatório Consolidado
+
+## Função: fac(int n)
+
+- **Caminhos Inviáveis:** Nenhum identificado.
+- **Motivo:** A função possui condicional simples sem contradições lógicas.
+
+## Função: main(void)
+
+- **Caminhos Inviáveis:** Nenhum identificado.
+- **Motivo:** O loop é bem-formado e as variáveis são usadas de forma consistente.
+```

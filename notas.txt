@@ -1,0 +1,7 @@
+Nesta versão foi atualizado:
+
+- Mudanças na Pipeline
+- Adaptações dos grafos
+- Salvamento do reasoning
+- Adaptação do prompt
+- retirada clean code , devido a perca de informações no código. Em códigos mais de 500 linhas ele tava tirando informações

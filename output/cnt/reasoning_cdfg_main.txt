@@ -1,0 +1,151 @@
+Okay, so I need to analyze the given C code and generate a precise Hybrid Control and Data Flow Graph (CDFG) in Graphviz DOT format for the main function. The output should include both the DOT code and the code-to-node mapping. 
+
+First, let me understand the code structure. The main function calls Test(Array), which initializes the array and measures time, then calls Sum(Array). Sum processes each element of the matrix, checking if they are positive or negative and accumulating totals accordingly.
+
+I'll start by identifying all basic blocks in the main function. Each basic block is a sequence of instructions without any jumps or control flow changes. 
+
+Looking at the main function:
+1. It initializes the seed.
+2. Calls Test(Array), which does several things including initializing the array with random integers and summing them.
+
+Wait, no—main() doesn't do much except call InitSeed() and then Test(). So the main function is straightforward: it's a single basic block where it calls these functions in sequence.
+
+But wait, no. Actually, looking at the code:
+
+int main (void)
+{
+   InitSeed();
+   //printf(...);
+   Test(Array);
+   return 1;
+}
+
+So this is three statements inside main(). Each statement can be considered a node in the control flow graph. But since there are no branches or jumps within main(), it's a single linear path.
+
+Now, I need to construct the CDFG for main(). The nodes will represent each statement, and edges represent the control flow between them.
+
+Let me outline the steps:
+
+1. Node 1: InitSeed();
+2. Node 2: Test(Array);
+3. Node 3: return 1;
+
+Each of these is a sequential step in main().
+
+Now, for each node, I need to identify data definitions (def) and uses (use), distinguishing between C-uses (computational use) and P-uses (predicative use).
+
+Let's break down each node:
+
+Node 1: InitSeed();
+- Calls the function InitSeed(), which sets the global variable Seed.
+- Def: Seed is defined here.
+- Use: No variables are used except possibly implicit ones.
+
+Wait, no. The function InitSeed() returns an int, but in main(), it's called without using its return value. So:
+
+In Node 1:
+- Calls InitSeed();
+- The call itself doesn't use any variables from the caller's scope except Seed.
+- Def: Seed is set to 0 inside InitSeed().
+- Use: None from main()'s perspective.
+
+Node 2: Test(Array);
+- Calls the function Test, passing Array as an argument.
+- Array is a global matrix initialized elsewhere. So in main(), it's using Array (defined earlier).
+- C-Use: Array is used here because it's passed to Test().
+- P-Uses: None, since no condition is evaluated based on this call.
+
+Node 3: return 1;
+- Returns an integer value from main.
+- Def: The return value is set to 1.
+- Use: No variables are read here; just the literal 1 is used.
+
+Next, I need to represent each of these nodes as boxes in the DOT graph. Each node will have labels indicating their code and any dataflow info like def/use.
+
+For the control flow:
+- Node 1 → Node 2 → Node 3.
+- Then from Node 3, since it's the end of main(), we'll have an edge to a terminal node (doublecircle) representing the exit point.
+
+Now, let me structure this into DOT code. I'll assign each statement a node ID and connect them in order.
+
+Wait, but according to the example, nodes are numbered sequentially. So:
+
+Node 1: InitSeed();
+Node 2: Test(Array);
+Node 3: return 1;
+Then an exit node (probably Node 4) with doublecircle shape.
+
+So edges:
+1 → 2 → 3 → 4.
+
+Now, for dataflow:
+
+In each node, I need to note the defs and uses. Let's go through each node:
+
+Node 1: Calls InitSeed();
+- Def: Seed
+- No uses except possibly implicit function parameters.
+
+Wait, no—InitSeed() is a function that sets Seed to 0. So in main(), after this call, Seed is defined as 0.
+
+So Node 1:
+label: "Call InitSeed()"
+xlabel: def: Seed
+
+Node 2: Calls Test(Array);
+- Use: Array (as it's passed to the function)
+- No defs in main() here; the return value isn't used.
+
+Node 3: return 1;
+- Def: The return value of main() is set to 1.
+- Uses: none.
+
+So, in the DOT code:
+
+Each node will have a label with their code and an xlabel showing def/use info.
+
+Now, putting it all together:
+
+The graph starts at Node 1 (InitSeed()), goes to Node 2 (Test(Array)), then to Node 3 (return 1), then to exit node 4 (doublecircle).
+
+Edges are directed as 1→2, 2→3, 3→4.
+
+No conditional edges since main() is a straight line.
+
+So the DOT code would look something like this:
+
+digraph main {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="Call InitSeed()", xlabel="Def: Seed"];
+    2 [label="Call Test(Array)", xlabel="Use: Array"];
+    3 [label="return 1", xlabel="Def: return value"];
+    4 [shape=doublecircle, label="End of main()"];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> 4;
+}
+
+But I need to ensure each node is correctly numbered and the labels are accurate.
+
+Wait, maybe more detailed:
+
+Node 1:
+- Code: InitSeed();
+- Def: Seed
+
+Node 2:
+- Code: Test(Array);
+- Use: Array (C-use)
+
+Node 3:
+- Code: return 1;
+- Def: return value of main()
+
+So in the mapping part, each node is described with its code snippet and dataflow info.
+
+Let me also check if there are any other variables or dependencies. For example, does Test() modify the global Array? Yes, but from main()'s perspective, it's using Array as an argument, so it's a use of Array.
+
+I think that's all. Now, I'll structure the DOT code accordingly.

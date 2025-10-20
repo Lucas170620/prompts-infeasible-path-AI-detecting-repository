@@ -1,0 +1,12 @@
+
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [lms_sqrt]**
+   - **Trechos do Código:**
+     - Node 2 (if(val == 0)) → True
+     - Node 3 (x = 0)
+     - Node 4 (flag = 0)
+     - Node 5 (for loop entrada)
+     - Node 6 (!flag) → True
+   - **Motivo da Inviabilidade:** O caminho resulta em uma divisão por zero, o que é um erro runtime definido.
+   - **Tipo de Inviabilidade:** Estático

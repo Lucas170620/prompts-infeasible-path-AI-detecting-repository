@@ -1,0 +1,41 @@
+digraph jpeg_fdct_islow {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: data, CONST_BITS, DCTSIZE"];
+    2 [label="2", xlabel="Def: z\nUse: data"];
+    3 [label="3", xlabel="P-Use: (z < 0)"];
+    4 [label="4", xlabel="P-Use: (qBlockRows <= nBlocks)"];
+    5 [label="5", xlabel="Def: n, qBlockRows\nUse: data"];
+    6 [label="6", xlabel="Def: blockRow\nUse: qBlockRows"];
+    7 [label="7", xlabel="P-Use: (blockRow < DCTSIZE)"];
+    8 [label="8", xlabel="Def: tmp\nUse: z"];
+    9 [label="9", xlabel="P-Use: (tmp >= 0)"];
+    10 [label="10", xlabel="Def: data_block[...]\nUse: tmp"];
+    11 [label="11", xlabel="Def: qBlock\nUse: data_block"];
+    12 [label="12", xlabel="P-Use: (qBlock <= nBlocks)"];
+    13 [label="13", xlabel="Def: block\nUse: qBlock"];
+    14 [label="14", xlabel="P-Use: (block < DCTSIZE)"];
+    15 [label="15", xlabel="Def: data_block[...]\nUse: z"];
+    16 [label="16", xlabel="Def: data\nUse: data_block, blockRow"];
+    
+    1 -> 2;
+    2 -> 3 [label="True\n(z < 0)"];
+    2 -> 5 [label="False"];
+    3 -> 4;
+    4 -> 5;
+    5 -> 6;
+    6 -> 7;
+    7 -> 8 [label="True"];
+    7 -> 11 [label="False"];
+    8 -> 9 [label="tmp >= 0"];
+    9 -> 10;
+    10 -> 12;
+    10 -> 15 [label="qBlock <= nBlocks"];
+    11 -> 13 [label="(block < DCTSIZE)"];
+    13 -> 14;
+    14 -> 16;
+    15 -> 16;
+    
+    16 [shape=doublecircle];
+}

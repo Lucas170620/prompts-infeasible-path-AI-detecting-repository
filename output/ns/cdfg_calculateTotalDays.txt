@@ -1,0 +1,53 @@
+
+```dot
+digraph foo {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Entrada"];
+    2 [label="2", xlabel="Início de loops"];
+    3 [label="3", xlabel="Loop i"];
+    4 [label="4", xlabel="Loop j"];
+    5 [label="5", xlabel="Loop k"];
+    6 [label="6", xlabel="Loop l"];
+    7 [label="7", xlabel="Condição: keys[i][j][k][l] == x"];
+    8 [label="8", xlabel="Retorno com valor"];
+    9 [label="9", xlabel="Fim de loops, retorno -1"];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> 4;
+    4 -> 5;
+    5 -> 6;
+    6 -> 7;
+    7 -> 8 [label="True\n(keys[i][j][k][l] == x)"];
+    7 -> 9 [label="False"];
+}
+```
+
+<codigos - foo>
+Node 1:
+foo(int x) {
+---
+Node 2:
+int i,j,k,l;
+for(i=0; i<5; i++)
+---
+Node 3:
+for(j=0; j<5; j++)
+---
+Node 4:
+for(k=0; k<5; k++)
+---
+Node 5:
+for(l=0; l<5; l++)
+---
+Node 6:
+if(keys[i][j][k][l] == x)
+---
+Node 7:
+return answer[i][j][k][l] + keys[i][j][k][l];
+---
+Node 8:
+}
+</codigos>

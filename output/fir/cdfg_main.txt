@@ -1,0 +1,67 @@
+
+To create the Control and Data Flow Graph (CDFG) for the provided main function, we analyze each statement and represent it as a node. The graph includes nodes for variable declarations, function calls, and the return statement. Each node captures definitions (def), constant uses (C-use), and predicate uses (P-use).
+
+Here's the detailed breakdown:
+
+1. **Node 1**:
+   - **Line**: `long output[OUTSIZE];`
+   - **Shape**: Box (declaration).
+   - **Label**: "1"
+   - **Details**:
+     - Def: `output` array.
+     - C-Use: None.
+     - P-Use: None.
+
+2. **Node 2**:
+   - **Line**: Function call to `fir_filter_int`.
+   - **Shape**: Circle (statement).
+   - **Label**: "2"
+   - **Details**:
+     - Def: None.
+     - C-Use: `in_data`, `output`, 700, `fir_int`, 35, 285.
+     - P-Use: None.
+
+3. **Node 3**:
+   - **Line**: `return 0;`
+   - **Shape**: Circle (statement), with exit as doublecircle.
+   - **Label**: "3"
+   - **Details**:
+     - Def: None.
+     - C-Use: Constant 0.
+     - P-Use: None.
+
+The graph flows sequentially from Node 1 to Node 2, then to Node 3 (exit).
+
+```dot
+digraph main {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: output\nC-Use: none"];
+    2 [label="2", xlabel="C-Use: in_data, output,700,fir_int,35,285"];
+    3 [label="3", xlabel="C-Use: 0"];
+
+    1 -> 2;
+    2 -> 3;
+    3 [shape=doublecircle];
+}
+```
+
+**Mapping Code to Nodes**:
+
+1. **Node 1**: Corresponds to the declaration of the output array.
+   ```c
+   long output[OUTSIZE];
+   ```
+
+2. **Node 2**: Represents the function call to `fir_filter_int`.
+   ```c
+   fir_filter_int(in_data, output, 700, fir_int, 35, 285);
+   ```
+
+3. **Node 3**: Represents the return statement.
+   ```c
+   return 0;
+   ```
+
+This graph captures the control flow and data usage for each basic block in the main function.

@@ -1,0 +1,60 @@
+Okay, I need to create a hybrid Control and Data Flow Graph (CDFG) in Graphviz DOT format for the provided main function. The function calls another function `fdct`, which is quite complex with loops and conditionals. Let me start by understanding the code structure.
+
+First, looking at the main function:
+
+1. It declares an int variable i but doesn't use it.
+2. Calls `fdct(block, 8);`
+3. Has a conditional compilation block that prints elements of the block array if IO is defined.
+4. Returns `block[0]`.
+
+The `fdct` function is where most of the logic happens. It processes an 8x8 block, likely for image compression like JPEG. The function has two main parts: processing rows and then columns.
+
+In `fdct`, there are:
+- Loops over rows (i from 0 to 7) with some conditional jumps.
+- Then loops over columns (j from 0 to 7), again with conditionals.
+
+Each loop iteration processes elements of the block array, which is a 2D array. The function uses variables like i, j, temp, and others for calculations.
+
+To construct the CDFG:
+- I'll need to identify each basic block.
+- Track variable definitions (def) and uses (c-use/p-use).
+- Represent control flow with nodes and edges, including loops and conditionals.
+
+Starting with the main function:
+
+Node 1: Declares i but doesn't use it. Then calls `fdct`.
+- Def: i
+- C-Use: none since it's unused.
+- P-Use: none for conditions.
+
+Then after `fdct`, there's a printf statement inside an #ifdef IO block, which is optional.
+
+After that, returns block[0].
+
+Now, focusing on the `fdct` function:
+
+The function has loops and conditionals. Let's break it down step by step.
+
+First loop (i from 0 to 7):
+
+Inside this loop:
+- There are two if conditions checking if i is 0 or 7.
+- Then another loop for j from 0 to 7 with similar checks on j.
+- Inside the inner loop, more conditionals and array accesses.
+
+Each of these loops and conditionals will be separate nodes in the CDFG. I'll need to represent each basic block as a node, showing data flow (variable uses) and control flow (edges with conditions).
+
+For example:
+
+- Node for i=0 check: if (i == 0), which is a decision point.
+- If true, execute some code; else, skip.
+
+Each time variables are used or defined, I'll note them in the node's xlabel.
+
+I also need to handle loops correctly by creating nodes that represent the loop condition and connect back to the start if false.
+
+Given the complexity, each loop iteration will have multiple basic blocks. Each of these blocks will be a separate node with their respective def and use information.
+
+Finally, after processing all loops, `fdct` returns, which connects back to main's return statement.
+
+I'll proceed by numbering each node sequentially as I identify them, ensuring that control flow is correctly represented with edges labeled by conditions or data movements.

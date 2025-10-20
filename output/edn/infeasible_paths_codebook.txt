@@ -1,0 +1,20 @@
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+1. **Caminho Inviável [codebook]**
+   - **Trechos de Código**:
+     - Linha 9: `e[0] = codebook(d, 1, 17, e[0], d, a, c, 1)`
+     - Linha 3: `i = 0`
+     - Linha 6: `if (i < 17)`
+   - **Descrição**: Nó 2 → Nó 3 → Nó 4 → Nó 5
+   - **Motivo**: A condição `(i < 17)` é verificada após a inicialização de `i = 0`. Como `i` inicia em 0 e o loop incrementa `i`, a condição será verdadeira em todas as iterações, tornando o caminho para Nó 6 inválido.
+
+2. **Caminho Inviável [codebook]**
+   - **Trechos de Código**:
+     - Linha 3: `i = 0`
+     - Linha 6: `if (i < 17)`
+   - **Descrição**: Nó 3 → Nó 4 → Nó 6
+   - **Motivo**: A condição `(i < 17)` é sempre verdadeira logo após a inicialização de `i = 0`, tornando o caminho para Nó 5 inválido.
+
+```

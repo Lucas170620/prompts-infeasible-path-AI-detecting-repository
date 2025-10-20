@@ -1,0 +1,42 @@
+Okay, I need to generate a hybrid Control and Data Flow Graph (CDFG) in Graphviz DOT format for the function `mmul` from the provided code. Let me start by understanding what `mmul` does.
+
+Looking at the code, `mmul` is a matrix multiplication function for 3x3 matrices. It takes four integers as parameters: row_a, col_a, row_b, col_b. The function returns an integer.
+
+First, I should identify all the basic blocks in `mmul`. A basic block is a sequence of instructions with no jumps or jumps out except at the end. In this case, the function has several loops and condition checks, so I'll need to break it down into these blocks.
+
+The function starts by initializing variables like row_c, col_c. Then there's an if statement checking conditions for rows and columns, returning 999 if they are invalid. After that, there are nested loops for matrix multiplication.
+
+I'll go step by step:
+
+1. The first part is the initial setup:
+   - Assigning row_c = row_a
+   - col_c = col_b
+   - Check if any dimension is less than 1 or if col_a != row_b.
+
+2. If any condition fails, return 999.
+
+3. Then there's a loop over i from 0 to row_c:
+   - Inside this loop, another loop for j from 0 to col_c.
+   - For each (i,j), initialize w to 0.0 and loop k from 0 to row_b to compute the matrix product.
+
+So, the function has nested loops with some condition checks.
+
+Now, I need to map out all the nodes in the CDFG. Each node will represent a basic block. I'll assign each line of code or group of lines into these blocks.
+
+Let me outline the structure:
+
+- Start with initializing variables.
+- Then the if statement for invalid conditions.
+- If valid, proceed to loops.
+
+Each loop iteration is a separate block, and condition checks inside the loops are decision nodes.
+
+I also need to note down all variable definitions (def) and uses (c-use/p-use). For example:
+- Variables like i, j, k are defined in loops and used in indexing.
+- w is defined and used within each loop iteration.
+
+Now, I'll map each code segment to a node with their defs and uses. Then connect them based on control flow and data dependencies.
+
+I should ensure that the graph starts from the first line of `mmul`, goes through each basic block, and ends at the return statement.
+
+Finally, construct the DOT file with nodes representing these blocks, edges showing control flow, and labels indicating conditions or data flows.

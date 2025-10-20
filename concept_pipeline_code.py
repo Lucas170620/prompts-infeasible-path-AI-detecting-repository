@@ -9,6 +9,9 @@ from typing import List, Any
 from ia_prompt_integration import IAIntegration
 
 ia_integration = IAIntegration()
+OUTPUT_BASE = 'output'
+# será atualizado em main para output/<code_name>
+OUTPUT_DIR = OUTPUT_BASE
 
 def load_markdown_file(caminho_arquivo: str) -> str:
     print(f"Iniciando: load_markdown_file -> {caminho_arquivo}")
@@ -67,25 +70,17 @@ def process_code(path: str) -> str:
     print(f"Finalizado: process_code -> {path}")
     return text
 
-def prompt_code_cleaning(code: str) -> str:
-    caminho_prompt = "sexta/clean_code.md"
-    print("Iniciando: prompt_code_cleaning")
-    conteudo_markdown = load_markdown_file(caminho_prompt)
-    prompt = conteudo_markdown + "\n[code]\n" + code
-    reasoning, resposta = ia_integration.fetch_response(prompt)
-    
-    with open('code_clean.txt', 'w', encoding='utf-8') as f:
-        f.write(resposta)
-    with open('reasoning_code_clean.txt', 'w', encoding='utf-8') as f:
-        f.write(reasoning if reasoning else "No reasoning provided")
-    print("Finalizado: prompt_code_cleaning")
-    return resposta
 
 def prompt_fetch_all_functions(code: str) -> list:
-    caminho_prompt = "sexta/fetch_all_functions.md"
+    caminho_prompt = "fetch_all_functions.md"
     print("Iniciando: prompt_fetch_all_functions")
     conteudo_markdown = load_markdown_file(caminho_prompt)
-    prompt = conteudo_markdown + "\n[code]\n" + code
+
+    # clearer separation for LLM: wrap code block and prompt body with '---' separators
+    prompt = "[code]\n" + code + "\n---\n" + conteudo_markdown
+    path_save = os.path.join(OUTPUT_DIR, 'functions_list.txt')
+    path_reasoning = os.path.join(OUTPUT_DIR, 'reasoning_fetch_all_functions.txt')
+    path_prompt = os.path.join(OUTPUT_DIR, 'prompt_fetch_all_functions.txt')
     reasoning, response = ia_integration.fetch_response(prompt)
     try:
         functions = [func.strip() for func in response.split('\n') if func.strip()]
@@ -93,34 +88,32 @@ def prompt_fetch_all_functions(code: str) -> list:
         print(f"Erro ao parsear lista de funções: {e}")
         print("Finalizado (com erro): prompt_fetch_all_functions")
         raise
-    with open('functions_list.txt', 'w', encoding='utf-8') as f:
+    with open(path_prompt, 'w', encoding='utf-8') as f:
+        f.write(prompt)
+    with open(path_save, 'w', encoding='utf-8') as f:
         for func in functions:
             f.write(func + '\n')
-    with open('reasoning_fetch_all_functions.txt', 'w', encoding='utf-8') as f:
+    with open(path_reasoning, 'w', encoding='utf-8') as f:
         f.write(reasoning if reasoning else "No reasoning provided")
     print("Finalizado: prompt_fetch_all_functions -> {} funções encontradas".format(len(functions)))
     return functions
-    caminho_prompt = "sexta/fetch_input_code.md"
-    print("Iniciando: prompt_generate_entrypoint")
-    conteudo_markdown = load_markdown_file(caminho_prompt)
-    prompt = conteudo_markdown + "\n[code]\n" + code
-    out = ia_integration.fetch_response(prompt)
-    with open('entrypoint.txt', 'w', encoding='utf-8') as f:
-        f.write(out)
-    print("Finalizado: prompt_generate_entrypoint")
-    return out
-
+    
 def prompt_generate_cdfg(function: str, code: str) -> str:
-    caminho_prompt = "sexta/generate_cdfg.md"
+    caminho_prompt = "generate_cdfg.md"
+    path_save = os.path.join(OUTPUT_DIR, 'cdfg_' + function + '.txt')
+    path_reasoning = os.path.join(OUTPUT_DIR, 'reasoning_cdfg_' + function + '.txt')
+    path_prompt = os.path.join(OUTPUT_DIR, 'prompt_cdfg_' + function + '.txt')
     print(f"Iniciando: prompt_generate_cdfg -> {function}")
     conteudo_markdown = load_markdown_file(caminho_prompt)
-    prompt = conteudo_markdown.replace("{substitua aqui o nome da funcao}", function) + "\n[code]\n" + code
+    # clearer separation for LLM: wrap code block and prompt body with '---' separators
+    prompt = "[code]\n" + code + "\n---\n" + conteudo_markdown.replace("{substitua aqui o nome da funcao}", function)
     resoning, response = ia_integration.fetch_response(prompt)
     try:
-        with open(f'cdfg_{function}.txt', 'w', encoding='utf-8') as f:
+        with open(path_save, 'w', encoding='utf-8') as f:
             f.write(response)
-        
-        with open(f'reasoning_cdfg_{function}.txt', 'w', encoding='utf-8') as f:
+        with open(path_prompt, 'w', encoding='utf-8') as f:
+            f.write(prompt)
+        with open(path_reasoning, 'w', encoding='utf-8') as f:
             f.write(resoning if resoning else "No reasoning provided")
     except Exception as e:
         print(f"Erro ao salvar cdfg_{function}.txt: {e}")
@@ -175,7 +168,7 @@ def extrair_todos_os_digraphs(conteudo: str) -> list:
 
 def save_cdfg_output(code_name: str, func_name: str, conteudo: str) -> None:
     print(f"Iniciando: save_cdfg_output -> {code_name} / {func_name}")
-    out_dir = os.path.join('quinta', code_name)
+    out_dir = os.path.join(OUTPUT_BASE, code_name)
     os.makedirs(out_dir, exist_ok=True)
 
     lista = extrair_todos_os_digraphs(conteudo)
@@ -198,96 +191,106 @@ def save_cdfg_output(code_name: str, func_name: str, conteudo: str) -> None:
             logging.getLogger(__name__).exception("Failed to write dot file %s: %s", caminho, e)
     print(f"Finalizado: save_cdfg_output -> {code_name} / {func_name}")
 
-def prompt_detecting_all_infeasible_paths(cdfg: list, code_cleaned: str) -> str:
-    """
-    caminho_prompt = "sexta/detecting_all_infeasible_paths.md"
+def prompt_detecting_all_infeasible_paths(result_per_function: dict, code_cleaned: str) -> str:
+    caminho_prompt = "detecting_all_infeasible_paths.md"
     print("Iniciando: prompt_detecting_all_infeasible_paths")
     conteudo_markdown = load_markdown_file(caminho_prompt)
-    prompt = conteudo_markdown + "\n[code]\n" + code_cleaned + "\n[entrypoint]\n" + entrypoint + "\n[cdfg]\n" + '\n'.join([c for c in cdfg if c])
-    out = ia_integration.fetch_response(prompt)
-    with open('infeasible_paths_output.txt', 'w', encoding='utf-8') as f:
-        f.write(out)
+    functions = list(result_per_function.keys())
+    # clearer separation for LLM: wrap each major section with '---' separators
+    prompt = "[code]\n" + code_cleaned + "\n---\n"
+    for func in functions:
+        cdfg_content = result_per_function[func]['cdfg'] if result_per_function[func]['cdfg'] else ""
+        infeasible_content = result_per_function[func]['infeasible_paths'] if result_per_function[func]['infeasible_paths'] else ""
+        prompt += "\n---\n[cdfg " + func + "]\n" + cdfg_content + "\n---\n"
+        prompt += "\n---\n[analise infeasible_paths " + func + "]\n" + infeasible_content + "\n---\n"
+    
+    prompt += "\n---\n" + conteudo_markdown + "\n---\n"
+    reasoning, resposta = ia_integration.fetch_response(prompt)
+    path_save = os.path.join(OUTPUT_DIR, 'infeasible_paths_all_functions.txt')
+    path_reasoning = os.path.join(OUTPUT_DIR, 'reasoning_infeasible_paths_all_functions.txt')
+    path_prompt_final = os.path.join(OUTPUT_DIR, 'final_prompt_infeasible_paths_all_functions.txt')
+    try:
+        with open(path_save, 'w', encoding='utf-8') as f:
+            f.write(resposta)
+        with open(path_reasoning, 'w', encoding='utf-8') as f:
+            f.write(reasoning if reasoning else "No reasoning provided")
+        with open(path_prompt_final, 'w', encoding='utf-8') as f:
+            f.write(prompt)
+    except Exception as e:
+        print(f"Erro ao salvar infeasible_paths_all_functions.txt: {e}")
     print("Finalizado: prompt_detecting_all_infeasible_paths")
+    return resposta
+
+def prompt_detecting_infeasible_paths_in_function(cdfg: str, function: str, code_cleaned: str) -> str:
+    caminho_prompt = "detecting_all_infeasible_paths_in_function.md"
+    print(f"Iniciando: prompt_detecting_infeasible_paths_in_function -> {function}")
+    conteudo_markdown = load_markdown_file(caminho_prompt)
+    # clearer separation for LLM: delimit code and cdfg sections with '---'
+    prompt =  "[code]\n" + code_cleaned + "\n---\n[cdfg]\n" + cdfg + "\n---\n" + conteudo_markdown.replace("INSIRA AQUI A FUNÇÃO", function)
+    reasoning, out = ia_integration.fetch_response(prompt)
+
+
+    path_save = os.path.join(OUTPUT_DIR, 'infeasible_paths_' + function + '.txt')
+    path_reasoning = os.path.join(OUTPUT_DIR, 'reasoning_infeasible_paths_' + function + '.txt')
+    path_prompt = os.path.join(OUTPUT_DIR, 'prompt_infeasible_paths_' + function + '.txt')
+    try:
+        with open(path_prompt, 'w', encoding='utf-8') as f:
+            f.write(prompt)
+        with open(path_save, 'w', encoding='utf-8') as f:
+            f.write(out)
+        with open(path_reasoning, 'w', encoding='utf-8') as f:
+            f.write(reasoning if reasoning else "No reasoning provided")
+    except Exception as e:
+        print(f"Erro ao salvar infeasible_paths_{function}.txt: {e}")
+    print(f"Finalizado: prompt_detecting_infeasible_paths_in_function -> {function}")
     return out if out else "No infeasible paths detected"
-    """
-    return
 
-def main(code: str):
-    import argparse
+def process_code_file(code: str):
 
-    print("Iniciando: main")
+    print(f"Iniciando: process_code_file -> {code}")
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-    parser = argparse.ArgumentParser(description="Executa pipeline (parallel ou serial)")
-    parser.add_argument('--mode', '-m', choices=['parallel', 'serial'], default='parallel',
-                        help='Modo de execução: "parallel" (padrão) usa ThreadPool; "serial" executa em série')
-    args = parser.parse_args()
-
     path = os.path.join('codes', code)
-    processed = process_code(path)
-    cleaned = prompt_code_cleaning(processed)
     code_name = os.path.splitext(os.path.basename(path))[0]
+    # configurar diretório de saída para este código: output/<code_name>
+    global OUTPUT_DIR
+    OUTPUT_DIR = os.path.join(OUTPUT_BASE, code_name)
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    code = process_code(path)
+    try:
+        with open(os.path.join(OUTPUT_DIR, 'original_code.txt'), 'w', encoding='utf-8') as f:
+            f.write(code)
+    except Exception as e:
+        logger.exception("Failed to save original_code.txt: %s", e)
 
-    mode = args.mode
-    logger.info("Execution mode: %s", mode)
+    result_per_function : dict = {}
 
-    cdfgs: List[Any] = []
+    # dicionario para cada funcao -> cdfg e infeasible paths
 
-    if mode == 'parallel':
-        # comportamento anterior: paraleliza a busca de funções, entrypoint e geração de CDFGs
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future_functions = executor.submit(prompt_fetch_all_functions, cleaned)
+    try:
+        functions = prompt_fetch_all_functions(code)
+    except Exception as e:
+        logger.exception("Failed to fetch functions (serial): %s", e)
+        functions = []
 
-            try:
-                functions = future_functions.result()
-            except Exception as e:
-                logger.exception("Failed to fetch functions: %s", e)
-                functions = []
-
-            if functions is None:
-                functions = []
-
-            cdfg_futures: List[concurrent.futures.Future] = []
-            for func in functions:
-                cdfg_futures.append(executor.submit(prompt_generate_cdfg, func, cleaned))
-
-            waitables = list(cdfg_futures)
-            if waitables:
-                concurrent.futures.wait(waitables, return_when=concurrent.futures.ALL_COMPLETED)
-
-            for f in cdfg_futures:
-                try:
-                    cdfgs.append(f.result())
-                except Exception as e:
-                    logger.exception("CDFG generation failed for a function: %s", e)
-                    cdfgs.append(None)
-
-            
-
-    else:  # serial
-        # executar tudo de forma sequencial (sem threads)
+    if functions is None:
+        functions = []
+    print(f"Functions found: {functions}")
+    for func in functions:
+        print(f"Processing function: {func}")
         try:
-            functions = prompt_fetch_all_functions(cleaned)
+            cdfg = prompt_generate_cdfg(func, code)
+            infeasible_paths = prompt_detecting_infeasible_paths_in_function(cdfg, func, code)
+            result_per_function[func] = {'cdfg': cdfg, 'infeasible_paths': infeasible_paths}
         except Exception as e:
-            logger.exception("Failed to fetch functions (serial): %s", e)
-            functions = []
-
-        if functions is None:
-            functions = []
-
-        for func in functions:
-            try:
-                result = prompt_generate_cdfg(func, cleaned)
-                cdfgs.append(result)
-            except Exception as e:
-                logger.exception("CDFG generation failed for function %s (serial): %s", func, e)
-                cdfgs.append(None)
-
+            logger.exception("CDFG generation failed for function %s (serial): %s", func, e)
+            result_per_function[func] = {'cdfg': None, 'infeasible_paths': None}
+    print(result_per_function)
 
     # salvar saídas dos CDFGs (ambos os modos)
     try:
-        for func_name, cdfg_content in zip(functions, cdfgs):
+        for func_name, cdfg_content in zip(functions, [result_per_function[f]['cdfg'] for f in functions]):
             if cdfg_content:
                 save_cdfg_output(code_name, func_name, cdfg_content)
             else:
@@ -296,12 +299,37 @@ def main(code: str):
         logger.exception("Failed while saving CDFG outputs: %s", e)
 
     try:
-        infeasible_paths = prompt_detecting_all_infeasible_paths(cdfgs, cleaned)
+        infeasible_paths = prompt_detecting_all_infeasible_paths(result_per_function, code)
     except Exception as e:
         logger.exception("Infeasible path detection failed: %s", e)
         infeasible_paths = None
 
-    print("Finalizado: main")
-        
+    print(f"Finalizado: process_code_file -> {code}")
+
+def main():
+    """Varre o diretório 'codes' e executa o processamento para cada arquivo regular encontrado."""
+    print("Iniciando: main - scanning 'codes' directory")
+    codes_dir = 'codes'
+    if not os.path.isdir(codes_dir):
+        print(f"Diretório não encontrado: {codes_dir}")
+        return
+
+    entries = sorted(os.listdir(codes_dir))
+    files = [e for e in entries if os.path.isfile(os.path.join(codes_dir, e))]
+
+    if not files:
+        print("Nenhum arquivo encontrado em 'codes/'.")
+        return
+
+    for fname in files:
+        print(f"==== Iniciando processamento do arquivo: {fname} ====")
+        try:
+            process_code_file(fname)
+        except Exception as e:
+            logging.getLogger(__name__).exception("Erro ao processar %s: %s", fname, e)
+        print(f"==== Finalizado processamento do arquivo: {fname} ====")
+
+    print("Finalizado: main - todos os códigos processados")
+
 if __name__ == "__main__":
-    main("fibcall.c")
+    main()

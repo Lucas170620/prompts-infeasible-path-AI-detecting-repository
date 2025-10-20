@@ -1,0 +1,58 @@
+
+To solve this problem, we need to generate a Control Flow and Data Flow Graph (CDFG) for the `main` function of a given C program. The CDFG will help visualize both the control flow (sequence of instructions execution) and data flow (movement of data between variables) within the function.
+
+### Approach
+1. **Understand the Function**: The provided `main` function is straightforward:
+   - Declares an integer variable `a`.
+   - Assigns the value 30 to `a`.
+   - Calls the function `fib(a)` with `a` as an argument.
+   - Returns the value of `a`.
+
+2. **Identify Basic Blocks**: Break down the function into basic blocks, which are sequences of instructions that can be executed in order without any jumps or branches. For this function, each statement is a basic block.
+
+3. **Control Flow Analysis**: Determine the sequence of execution between these basic blocks. Since there are no conditional statements, the control flow is linear.
+
+4. **Data Flow Analysis**: Track how data (specifically the variable `a`) flows through the function:
+   - Assignment: `a = 30` defines `a`.
+   - Function call: `fib(a)` uses `a`.
+   - Return statement: `return a` uses `a`.
+
+5. **Graph Representation**: Represent each basic block as a node in the graph, with edges showing control flow. Use labels to indicate data flow (defs and uses) within each node.
+
+### Solution Code
+```dot
+digraph main {
+    rankdir=TB;
+    
+    0 [shape=diamond];
+    1 [label="a = 30", shape=box];
+    2 [label="fib(a)", shape=box];
+    3 [label="return a", shape=box];
+    exit [shape=doublecircle];
+    
+    0 -> 1;
+    1 -> 2;
+    2 -> 3;
+    3 -> exit;
+}
+
+// Mapping of code to nodes:
+// Node 1: "a = 30;"
+// Node 2: "fib(a);"
+// Node 3: "return a;"
+```
+
+### Explanation
+- **Nodes**:
+  - `0`: Entry point (diamond shape).
+  - `1`: Assignment `a = 30` (box shape, defines `a`).
+  - `2`: Function call `fib(a)` (box shape, uses `a`).
+  - `3`: Return statement `return a` (box shape, uses `a`).
+  - `exit`: Exit point (doublecircle shape).
+
+- **Edges**:
+  - Connects the entry node to the assignment.
+  - Sequentially connects each basic block to the next.
+  - Finally, connects the return statement to the exit.
+
+This CDFG provides a clear visualization of how control flows from one instruction to another and how data (variable `a`) is used throughout the function.

@@ -1,0 +1,6 @@
+
+# Caminhos Inviáveis Identificados
+
+Nenhum caminho inviável foi identificado.
+
+**Motivo**: A função lms_fabs possui dois caminhos claros e mutuamente exclusivos, ambos dependendo da condição de entrada `n >= 0`. Cada caminho é executável dependendo do valor de `n`, sem nenhuma contradição ou falta de inicialização.

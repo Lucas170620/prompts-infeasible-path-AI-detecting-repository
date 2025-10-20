@@ -1,3 +1,0 @@
-Analise o código de entrada fornecido e identifique claramente o ponto inicial de execução, como a função principal (ex: main), o método de entrada, ou a primeira linha executável. Indique a localização específica (ex: número da linha, nome da função) e explique o fluxo que avanca apartir dele.
-
-Se o código não tiver um ponto de entrada explícito, informe isso e sugira onde a execução poderia começar

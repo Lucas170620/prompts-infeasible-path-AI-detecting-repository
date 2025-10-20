@@ -1,0 +1,29 @@
+digraph latsynth {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Entrada: a, b, N, d"];
+    2 [label="2", xlabel="Processar entrada"];
+    3 [label="3", xlabel="Iniciar loop"];
+    4 [label="4", xlabel="P-Use: i < N"];
+    5 [label="5", xlabel="Def: i"];
+    6 [label="6", xlabel="C-Use: a[i], b[i]"];
+    7 [label="7", xlabel="Def: d"];
+    8 [label="8", xlabel="P-Use: condição"];
+    9 [label="9", xlabel="Def: resultado"];
+    10 [label="10", xlabel="Fim do loop"];
+    11 [label="11", xlabel="Saida: d"];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> 4 [label="True\n(i < N)"];
+    3 -> 10 [label="False"];
+    4 -> 5;
+    5 -> 6;
+    6 -> 7;
+    7 -> 8;
+    8 -> 9 [label="True"];
+    8 -> 10 [label="False"];
+    9 -> 10;
+    10 -> 11;
+}

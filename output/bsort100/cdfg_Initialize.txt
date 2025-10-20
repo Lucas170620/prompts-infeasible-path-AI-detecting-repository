@@ -1,0 +1,18 @@
+
+The Control Flow Graph (CDFG) for the given code is constructed by identifying each node's operations and their interconnections through control flow. Here's a detailed breakdown:
+
+### Nodes:
+1. **Node 1**: Assigns `factor` based on `WORSTCASE`.
+2. **Node 2**: Assigns `fact` using `factor`.
+3. **Node 3**: Initializes `Index` to 1.
+4. **Node 4**: Checks if `Index <= NUMELEMS`. If true, proceeds; otherwise exits.
+5. **Node 5**: Assigns `Array[Index]` using `fact`.
+
+### Edges:
+- **1 → 2**: Control flow from assigning `factor` to assigning `fact`.
+- **2 → 3**: Control flow initializes `Index`.
+- **3 → 4**: Enters the loop condition check.
+- **4 (true) → 5**: If condition is true, proceeds to assign array element.
+- **5 → 4**: After assignment, control loops back to recheck the condition with incremented `Index`.
+
+This structure captures both the control flow and data dependencies, showing how each operation leads to the next or exits based on conditions.

@@ -1,0 +1,328 @@
+[code]
+/* $Id: crc.c,v 1.2 2005/04/04 11:34:58 csg Exp $ */
+
+/*************************************************************************/
+/*                                                                       */
+/*   SNU-RT Benchmark Suite for Worst Case Timing Analysis               */
+/*   =====================================================               */
+/*                              Collected and Modified by S.-S. Lim      */
+/*                                           sslim@archi.snu.ac.kr       */
+/*                                         Real-Time Research Group      */
+/*                                        Seoul National University      */
+/*                                                                       */
+/*                                                                       */
+/*        < Features > - restrictions for our experimental environment   */
+/*                                                                       */
+/*          1. Completely structured.                                    */
+/*               - There are no unconditional jumps.                     */
+/*               - There are no exit from loop bodies.                   */
+/*                 (There are no 'break' or 'return' in loop bodies)     */
+/*          2. No 'switch' statements.                                   */
+/*          3. No 'do..while' statements.                                */
+/*          4. Expressions are restricted.                               */
+/*               - There are no multiple expressions joined by 'or',     */
+/*                'and' operations.                                      */
+/*          5. No library calls.                                         */
+/*               - All the functions needed are implemented in the       */
+/*                 source file.                                          */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+/*                                                                       */
+/*  FILE: crc.c                                                          */
+/*  SOURCE : Numerical Recipes in C - The Second Edition                 */
+/*                                                                       */
+/*  DESCRIPTION :                                                        */
+/*                                                                       */
+/*     A demonstration for CRC (Cyclic Redundancy Check) operation.      */
+/*     The CRC is manipulated as two functions, icrc1 and icrc.          */
+/*     icrc1 is for one character and icrc uses icrc1 for a string.      */
+/*     The input string is stored in array lin[].                        */
+/*     icrc is called two times, one for X-Modem string CRC and the      */
+/*     other for X-Modem packet CRC.                                     */
+/*                                                                       */
+/*  REMARK :                                                             */
+/*                                                                       */
+/*  EXECUTION TIME :                                                     */
+/*                                                                       */
+/*                                                                       */
+/*************************************************************************/
+
+
+typedef unsigned char uchar;
+#define LOBYTE(x) ((uchar)((x) & 0xFF))
+#define HIBYTE(x) ((uchar)((x) >> 8))
+
+unsigned char lin[256] = "asdffeagewaHAFEFaeDsFEawFdsFaefaeerdjgp";
+
+unsigned short icrc1(unsigned short crc, unsigned char onech)
+{
+	int i;
+	unsigned short ans=(crc^onech << 8);
+
+	for (i=0;i<8;i++) {
+		if (ans & 0x8000)
+			ans = (ans <<= 1) ^ 4129;
+		else
+			ans <<= 1;
+	}
+	return ans;
+}
+
+unsigned short icrc(unsigned short crc, unsigned long len,
+		    short jinit, int jrev)
+{
+  unsigned short icrc1(unsigned short crc, unsigned char onech);
+  static unsigned short icrctb[256],init=0;
+  static uchar rchr[256];
+  unsigned short tmp1, tmp2, j,cword=crc;
+  static uchar it[16]={0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
+
+  if (!init) {
+    init=1;
+    for (j=0;j<=255;j++) {
+      icrctb[j]=icrc1(j << 8,(uchar)0);
+      rchr[j]=(uchar)(it[j & 0xF] << 4 | it[j >> 4]);
+    }
+  }
+  if (jinit >= 0) cword=((uchar) jinit) | (((uchar) jinit) << 8);
+  else if (jrev < 0)
+    cword=rchr[HIBYTE(cword)] | rchr[LOBYTE(cword)] << 8;
+#ifdef DEBUG
+  printf("len = %d\n", len);
+#endif
+  for (j=1;j<=len;j++) {
+    if (jrev < 0) {
+      tmp1 = rchr[lin[j]]^ HIBYTE(cword);
+    }
+    else {
+      tmp1 = lin[j]^ HIBYTE(cword);
+    }
+    cword = icrctb[tmp1] ^ LOBYTE(cword) << 8;
+  }
+  if (jrev >= 0) {
+    tmp2 = cword;
+  }
+  else {
+    tmp2 = rchr[HIBYTE(cword)] | rchr[LOBYTE(cword)] << 8;
+  }
+  return (tmp2 );
+}
+
+
+int main(void)
+{
+
+  unsigned short i1,i2;
+  unsigned long n;
+
+  n=40;
+  lin[n+1]=0;
+  i1=icrc(0,n,(short)0,1);
+  lin[n+1]=HIBYTE(i1);
+  lin[n+2]=LOBYTE(i1);
+  i2=icrc(i1,n+2,(short)0,1);
+  return 0;
+}
+
+---
+
+---
+[cdfg icrc1]
+
+---
+
+---
+[analise infeasible_paths icrc1]
+
+---
+
+---
+[cdfg icrc]
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph icrc {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: icrctb, init, rchr\nC-Use: j, it"];
+    2 [label="2", xlabel="P-Use: !init"];
+    3 [label="3", xlabel="Def: icrctb[j], rchr[j]"];
+    4 [label="4", xlabel="P-Use: jinit >=0"];
+    5 [label="5", xlabel="Def: cword"];
+    6 [label="6", xlabel="P-Use: jrev <0"];
+    7 [label="7", xlabel="Def: cword"];
+    8 [label="8", xlabel="P-Use: len, jrev"];
+    9 [label="9", xlabel="P-Use: lin[j], HIBYTE(cword)"];
+    10 [label="10", xlabel="Def: tmp1"];
+    11 [label="11", xlabel="Def: cword"];
+    12 [label="12", xlabel="P-Use: jrev >=0, HIBYTE(cword), rchr[HIBYTE(cword)], rchr[LOBYTE(cword)]"];
+    13 [label="13", xlabel="Def: tmp2"];
+    14 [label="14", shape=doublecircle, xlabel="Return: tmp2"];
+
+    1 -> 2;
+    2 -> 3 [label="True\n(!init)"];
+    2 -> 5 [label="False"];
+    3 -> 4;
+    4 -> 5 [label="True\n(jinit >=0)"];
+    4 -> 6 [label="False"];
+    5 -> 7;
+    6 -> 7 [label="True\n(jrev <0)"];
+    7 -> 8;
+    8 -> 9 [label="j <= len"];
+    9 -> 10;
+    10 -> 11;
+    11 -> 8 [label="(loop continue)"];
+    11 -> 12 [label="j > len"];
+    12 -> 13;
+    13 -> 14;
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós (em tags):**
+
+<codigos - icrc>
+Node 1:
+static unsigned short icrctb[256],init=0;
+static uchar rchr[256];
+unsigned short tmp1, tmp2, j,cword=crc;
+static uchar it[16]={0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
+if (!init) {
+    init=1;
+    for (j=0;j<=255;j++) {
+        icrctb[j]=icrc1(j << 8,(uchar)0);
+        rchr[j]=(uchar)(it[j & 0xF] << 4 | it[j >> 4]);
+    }
+}
+---
+Node 2:
+if (!init)
+---
+Node 3:
+{
+    init=1;
+    for (j=0;j<=255;j++) {
+        icrctb[j]=icrc1(j << 8,(uchar)0);
+        rchr[j]=(uchar)(it[j & 0xF] << 4 | it[j >> 4]);
+    }
+}
+---
+Node 4:
+if (jinit >=0)
+cword=((uchar) jinit) | (((uchar) jinit) << 8)
+else if (jrev < 0)
+cword=rchr[HIBYTE(cword)] | rchr[LOBYTE(cword)] << 8;
+if (jrev <0)
+    tmp1 = rchr[lin[j]]^ HIBYTE(cword);
+else
+    tmp1 = lin[j]^ HIBYTE(cword);
+cword = icrctb[tmp1] ^ LOBYTE(cword) << 8;
+if (jrev >=0) {
+    tmp2 = cword;
+}
+else {
+    tmp2 = rchr[HIBYTE(cword)] | rchr[LOBYTE(cword)] << 8;
+}
+return (tmp2 );
+</codigos>
+---
+
+---
+[analise infeasible_paths icrc]
+
+To solve this problem, we need to identify infeasible paths within a given function based on logical contradictions or data dependencies. Specifically, we focus on whether all possible combinations of input parameters lead to valid execution without any undefined behaviors.
+
+### Approach
+The approach involves analyzing the control flow and variable initialization within the function. We look for scenarios where variables might be uninitialized or used in ways that violate their intended use. This analysis helps us identify paths that cannot be executed correctly due to logical inconsistencies or data issues.
+
+### Solution Code
+
+```python
+def find_infeasible_paths():
+    # The code provided is in C, but we'll analyze it conceptually.
+    # We are looking for paths where cword remains uninitialized.
+    
+    # Scenario:
+    # When both jinit < 0 and jrev >= 0, cword is not initialized,
+    # leading to undefined behavior. This path is infeasible because
+    # it causes a runtime error due to an uninitialized variable.
+
+    return "Path where jinit < 0 and jrev >= 0 leads to uninitialized cword."
+
+# To use this analysis, you would integrate it into your static code analysis tool or perform manual checks.
+```
+
+### Explanation
+1. **Problem Analysis**: The function `icrc` initializes a local variable `cword` based on the parameters `jinit` and `jrev`. If neither condition (`jinit >= 0` nor `jrev < 0`) is met, `cword` remains uninitialized.
+
+2. **Infeasible Path Identification**: When both `jinit` is negative and `jrev` is non-negative, `cword` is not assigned any value. Using an uninitialized variable in subsequent code leads to undefined behavior, making this path infeasible.
+
+3. **Solution Approach**: The solution involves recognizing that certain combinations of input parameters can lead to variables being left uninitialized. This requires checking all possible parameter combinations and ensuring all paths within the function correctly initialize necessary variables.
+
+By identifying such scenarios, we ensure the function behaves correctly for all valid inputs and avoids runtime errors due to undefined variable usage.
+---
+
+---
+[cdfg main]
+
+---
+
+---
+[analise infeasible_paths main]
+
+---
+
+---
+**Análise de Caminhos Inviáveis em Código - Especialista em Testes Estruturais**
+
+**Instruções de Entrada:**  
+Forneça:  
+1. O código-fonte a ser analisado  
+2. Para cada função no código, inclua:  
+   - O **CDFG (Control Data Flow Graph)** correspondente, representando todos os nós (operações/blocos básicos) e arestas (fluxos de controle)  
+   - Uma **análise preliminar** indicando possíveis *infeasible paths* identificados  
+
+---
+
+**Processo de Análise (Executado Automaticamente):**  
+
+**1. Mapeamento CDFG-Função**  
+Para cada função no código:  
+- Identificar nós críticos (ex: branches com condições dependentes de dados)  
+- Mapear arestas do CDFG para trechos de código correspondentes  
+
+**2. Detecção de Infeasible Paths**  
+Analisar cada caminho do CDFG considerando:  
+- **Dependências de Dados:** Caminhos onde variáveis têm estados conflitantes  
+- **Constraints Lógicas:** Condições mutualmente exclusivas (ex: `(x > 0 && x < 0)`)  
+- **Invariantes de Loop:** Caminhos que violam condições de saída de loops  
+- **Dead Code:** Blocos inalcançáveis identificados no CDFG  
+
+**3. Classificação de Inviabilidade**  
+Categorizar cada caminho inviável como:  
+- **Estaticamente Inviável:** Inviável em todas as execuções (ex: lógica contraditória)  
+- **Dinamicamente Inviável:** Inviável sob condições específicas de entrada  
+
+**4. Relatório Consolidado**  
+Gerar para cada função:  
+- Lista de caminhos inviáveis com localização no código  
+- Justificativa técnica baseada no CDFG  
+- Impacto na cobertura de testes estruturais  
+- Recomendações para refinamento do CDFG/código  
+
+---
+
+**Exemplo de Saída Esperada:**  
+```  
+Função: calculate_grade  
+- Caminho Inviável #1: Nós [A3→B5→C7]  
+  Motivo: Condição "score > 100 && score < 50" é logicamente impossível  
+  Efeito: Dead code detectado no bloco C7  
+- Caminho Inviável #2: Nós [A3→D9]  
+  Motivo: Variável 'initialized' deve ser false em A3 mas true em D9  
+```  
+
+**Nota Técnica:** Esta análise assume que o CDFG fornecido reflete fielmente o fluxo de controle e dados. Inviabilidades detectadas podem indicar oportunidades de otimização ou necessidade de revisão do modelo.
+---

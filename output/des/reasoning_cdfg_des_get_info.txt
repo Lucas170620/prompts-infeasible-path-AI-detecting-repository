@@ -1,0 +1,54 @@
+Okay, so I have to generate a Control and Data Flow Graph (CDFG) for the function des_get_info using Graphviz DOT. The function is written in C, and it's part of some crypto library, probably handling 3DES encryption.
+
+First, I'll start by understanding what des_get_info does. Looking at the code, it seems to be a function that returns information about the 3DES algorithm. It also performs self-testing when it's first called.
+
+Let me break down the function step by step:
+
+1. The function starts by checking if `did_selftest` is false. If not, it runs the self-test.
+2. Inside the self-test call, if any test fails, `selftest()` returns an error string, which is then printed and set in `selftest_failed`. This would cause the function to return NULL.
+3. After the self-test, if everything is okay, the function checks if the algorithm (`algo`) is CIPHER_ALGO_3DES.
+4. If it's 3DES, it sets various parameters like key length (192 bits), block size (8 bytes), and context size based on struct _tripledes_ctx.
+5. It then assigns pointers to setkey, encrypt, and decrypt functions from do_tripledes_setkey, do_tripledes_encrypt, and do_tripledes_decrypt respectively.
+6. Finally, it returns the string "3DES".
+
+Now, I need to model this as a CDFG. Each basic block will be a node, and edges represent control flow with conditions where necessary.
+
+I'll start by identifying each basic block:
+
+- Line 1: Check if `did_selftest` is false.
+- Lines 2-5: Run self-test; check for errors.
+- Lines 6-9: Set keylen, blocksize, contextsize.
+- Lines 10-13: Assign pointers to functions.
+- Line 14: Return "3DES".
+
+I need to represent each of these as nodes and connect them based on control flow. There are conditionals here, so I'll have decision points.
+
+Let me outline the nodes:
+
+1. Node 1: Check `did_selftest`.
+2. Node 2: Run self-test.
+   - If error (s != NULL), print and set flag, return NULL.
+3. Node 3: Check if `algo` is CIPHER_ALGO_3DES.
+4. Node 4: Set key parameters.
+5. Node 5: Assign function pointers.
+6. Node 6: Return "3DES".
+
+Now, the control flow:
+
+- From node 1 to node 2 if `did_selftest` is false.
+- If self-test fails (s != NULL), go to return NULL. But since this is a function call that returns early, I need to model that as a branch after node 2.
+- After passing self-test, proceed to check algo.
+- Then set parameters and assign functions.
+- Finally, return "3DES".
+
+I'll also note data flow: variables like `did_selftest`, `algo`, and the return value are used or defined in each block.
+
+Each node will have labels indicating definitions (def) and uses (use). For example:
+
+- Node 1 uses `did_selftest`.
+- Node 2 defines `s`, `did_selftest`, `selftest_failed`, and outputs an error.
+- Nodes after that use variables like `algo` and set various parameters.
+
+I need to ensure each node correctly reflects the data flow and control flow, including any conditional branches. Also, I should represent loops if present, but in this case, there are no loops except for the self-test check.
+
+Finally, the last node (return "3DES") will be a doublecircle since it's the end of the function.

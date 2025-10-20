@@ -1,0 +1,10 @@
+
+```markdown
+# Caminhos Inviáveis Identificados
+
+Nenhum caminho inviável foi identificado.
+
+```
+
+**Explicação:**  
+Após analisar o código e seu CDFG, não foram encontrados caminhos inviáveis. Todas as condições e dependências de dados são consistentes e podem ser executadas dependendo das entradas fornecidas. O algoritmo implementa corretamente a otimização do Bubble Sort, quebra loops internos conforme necessário e mantém invariantes lógicos em toda a execução.

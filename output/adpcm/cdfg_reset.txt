@@ -1,0 +1,59 @@
+
+To model the `reset` function as a Control Flow Graph (CFG) and Data Flow Graph (DFG), we'll represent each line of code as a node and connect them sequentially. Since there are no conditionals or jumps between the lines, the graph will be straightforward.
+
+Here is the step-by-step explanation:
+
+1. **Node 1**: `memset(&xout1, 0, sizeof(int));`  
+   - **C-Use**: Assigns value to `xout1`.
+
+2. **Node 2**: `memset(&xout2, 0, sizeof(int));`  
+   - **C-Use**: Assigns value to `xout2`.
+
+3. **Node 3**: Loop initializing `dlti` array.  
+   - Iterates and sets each element of `dlti` to zero.
+
+4. **Node 4**: Loop initializing `bli` array.  
+   - Iterates and sets each element of `bli` to zero.
+
+5. **Nodes 5-12**: Assignments setting variables like `ih`, `nbh`, etc., to zero. Each is a separate node.
+
+Each node will be connected in a linear sequence from Node 1 to Node 12, with no branches.
+
+```code
+// CDFG for the reset function
+
+digraph Reset_CFG {
+    node [shape=rectangle];
+    
+    // Nodes representing each statement
+    1 [label="memset(&xout1, 0, sizeof(int))"];
+    2 [label="memset(&xout2, 0, sizeof(int))"];
+    3 [label="for (i=0; i<6; dlti[i]=0; ++i)"];
+    4 [label="for (i=0; i<6; bli[i]=0; ++i)"];
+    5 [label="ih = 0"];
+    6 [label="nbh = 0"];
+    7 [label="f = 0"];
+    8 [label="wd = 0"];
+    9 [label="wd2 = 0"];
+    10[label="wd3 = 0"];
+    11[label="apl1 = 0"];
+    12[label="apl2 = 0"];
+
+    // Edges representing control flow
+    1 -> 2;
+    2 -> 3;
+    3 -> 4;
+    4 -> 5;
+    5 -> 6;
+    6 -> 7;
+    7 -> 8;
+    8 -> 9;
+    9 -> 10;
+    10-> 11;
+    11-> 12;
+}
+
+// Data flow within each node is implicit (assignments to variables)
+```
+
+This graph shows the sequential execution of the `reset` function without any branches, accurately capturing both control and data flows.

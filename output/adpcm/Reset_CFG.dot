@@ -1,0 +1,30 @@
+digraph Reset_CFG {
+    node [shape=rectangle];
+    
+    // Nodes representing each statement
+    1 [label="memset(&xout1, 0, sizeof(int))"];
+    2 [label="memset(&xout2, 0, sizeof(int))"];
+    3 [label="for (i=0; i<6; dlti[i]=0; ++i)"];
+    4 [label="for (i=0; i<6; bli[i]=0; ++i)"];
+    5 [label="ih = 0"];
+    6 [label="nbh = 0"];
+    7 [label="f = 0"];
+    8 [label="wd = 0"];
+    9 [label="wd2 = 0"];
+    10[label="wd3 = 0"];
+    11[label="apl1 = 0"];
+    12[label="apl2 = 0"];
+
+    // Edges representing control flow
+    1 -> 2;
+    2 -> 3;
+    3 -> 4;
+    4 -> 5;
+    5 -> 6;
+    6 -> 7;
+    7 -> 8;
+    8 -> 9;
+    9 -> 10;
+    10-> 11;
+    11-> 12;
+}

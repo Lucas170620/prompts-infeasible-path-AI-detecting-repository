@@ -1,7 +1,0 @@
-digraph CFG_RandomInteger {
-    node [shape=box];
-    start [label="Inicio", shape=ellipse];
-    n1 [label="Seed = ((Seed * 133) + 81) % 8095"];
-    end [label="return Seed;", shape=ellipse];
-    start -> n1 -> end;
-}

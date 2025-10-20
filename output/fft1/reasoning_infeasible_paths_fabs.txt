@@ -1,0 +1,96 @@
+Alright, let's tackle this problem step by step. I'm supposed to analyze the provided code and its CDFG to identify infeasible paths. The code is a function called `fabs` which computes the absolute value of a double. Let me start by understanding the code and then map it to the given CDFG.
+
+First, looking at the `fabs` function:
+
+```c
+static double fabs(double n)
+{
+  double f;
+
+  if (n >= 0) 
+    f = n;
+  else 
+    f = -n;
+  return f;
+}
+```
+
+This is straightforward. It checks if `n` is non-negative; if so, it assigns `n` to `f`, otherwise, it takes the negation of `n`. Then it returns `f`.
+
+Now, looking at the CDFG provided in the question:
+
+```dot
+digraph fabs {
+    rankdir=TB;
+    node [shape=circle];
+    
+    1 [label="1", xlabel="Def: f\nC-Use: n"];
+    2 [label="2", xlabel="P-Use: n"];
+    3 [label="3", xlabel="Def: f = n\nC-Use: n"];
+    4 [label="4", xlabel="Def: f = -n\nC-Use: n"];
+    5 [label="5", shape=doublecircle, xlabel="Return f\nC-Use: f"];
+
+    1 -> 2;
+    2 -> 3 [label="True\n(n >= 0)"];
+    2 -> 4 [label="False"];
+    3 -> 5;
+    4 -> 5;
+}
+```
+
+From the CDFG, I can see that there are five nodes:
+
+1. Node 1: Definition of `f` and use of `n`.
+2. Node 2: Use of `n` in an if condition.
+3. Node 3: Definition of `f = n`; uses `n`.
+4. Node 4: Definition of `f = -n`; uses `n`.
+5. Node 5: Return statement, returns `f`.
+
+The edges represent the control flow:
+
+- From node 2, it branches to node 3 if true (when `n >=0`) and to node 4 if false.
+
+Now, the task is to identify infeasible paths in this CDFG.
+
+Let me map each node to the code lines. 
+
+Node 1 corresponds to line where `f` is declared.
+Node 2 corresponds to the condition `if (n >=0)`.
+Nodes 3 and 4 are the assignments inside the if-else blocks.
+Node 5 is the return statement.
+
+Now, let's list all possible paths:
+
+1. True branch: Node 2 → Node 3 → Node 5
+   - Code lines: Line with `if (n >=0)`, then assigning `f = n`, then returning `f`.
+
+2. False branch: Node 2 → Node4 → Node5
+   - Assigning `f = -n` and then returning.
+
+Since the function is straightforward, let me check for any infeasible paths.
+
+An infeasible path would be a control flow that can never execute due to logical contradictions or impossible conditions.
+
+Looking at the condition node (node2), it's checking if `n >=0`. Depending on this, either node3 or node4 executes. Both are mutually exclusive because the if-else structure ensures only one branch is taken.
+
+Now, let me check each possible path:
+
+1. Path through Node 2 → Node3 → Node5:
+   - This happens when `n >=0`.
+   - The assignment `f = n` is valid.
+   - Then return `f`, which is correct.
+
+2. Path through Node2 → Node4 → Node5:
+   - When `n <0`.
+   - Assigns `f = -n`, making it positive.
+   - Return `f`.
+
+Both paths are logically consistent and there's no contradiction in either path because each condition ensures the appropriate assignment.
+
+Now, considering data dependencies: All variables (`n` and `f`) are properly initialized. There's no case where a variable is used before being defined, except for `f`, which is always assigned in both branches before returning.
+
+Another point to check: Are there any impossible conditions? For example, can `n` be both >=0 and <0 at the same time? No, because it's mutually exclusive. So each branch correctly handles its own case.
+
+Is there a scenario where neither branch could execute? That would happen if `n` is somehow invalid, but in C, any double value is valid, so that can't happen.
+
+Therefore, both paths are feasible under different conditions. There are no infeasible paths because the control flow correctly partitions based on the condition and both branches lead to valid executions.

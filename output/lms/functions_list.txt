@@ -1,0 +1,8 @@
+lms_rand
+lms_log
+lms_fabs
+lms_sqrt
+lms_sin
+gaussian
+main
+lms

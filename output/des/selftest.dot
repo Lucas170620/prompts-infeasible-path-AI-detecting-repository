@@ -1,0 +1,29 @@
+digraph selftest {
+    rankdir=TB;
+    node [shape=circle];
+
+    1 [label="1", xlabel="Def: i\nC-Use: testdata"];
+    2 [label="2", xlabel="Def: result; Use: des3, plain, cipher"];
+    3 [label="3", xlabel="P-Use: memcmp"];
+    4 [label="4", xlabel="Def: error; Use: encryption failed"];
+    5 [label="5"];
+    6 [label="6", xlabel="Def: result; Use: des3, cipher, plain"];
+    7 [label="7", xlabel="Def: error; Use: decryption failed"];
+    8 [label="8"];
+    9 [label="9"];
+    10[label="10", xlabel="P-Use: is_weak_key"];
+    11[label="11"];
+    12[label="12", shape=doublecircle];
+
+    1 -> 2;
+    2 -> 3 [label="True\n(i < sizeof(testdata)/sizeof(*testdata))"];
+    3 -> 4 [label="False\n(memcmp failed)"];
+    3 -> 5 [label="True"];
+    5 -> 6;
+    6 -> 7 [label="False\n(memcmp failed)"];
+    7 -> 8 [label="decryption failure"];
+    8 -> 9 [label="loop continue"];
+    9 -> 10 [label="check weak key"];
+    10->11[label="!is_weak_key detected"];
+    11->12;
+}

@@ -1,0 +1,69 @@
+Okay, so I need to analyze the provided code and its CDFG to identify infeasible paths. Let's go step by step.
+
+First, I'll look at the function `ludcmp`. It starts with checking if n is greater than 99 or eps is less than or equal to zero. If either condition is true, it returns 999. Then there are loops for LU decomposition, some matrix operations, and solving for x.
+
+Looking at the CDFG provided, I see several nodes labeled from 1 to 19. Each node represents a part of the code. For example, Node 2 seems to be the first check in `ludcmp`, where it checks if n > 99 or eps <=0.
+
+Passo 1: Mapping Code to CDFG Nodes
+I'll go through each node and see what code they correspond to.
+
+Node 1 is labeled with "C-Use: n, eps" which I think corresponds to the function parameters. So in the code, this would be when `ludcmp` is called with n=5 and eps=1e-6 in main().
+
+Node 2 has "P-Use: n >99, eps <=0". This must be the initial if statement at the start of `ludcmp`: if (n>99 || eps <=0.0) return 999; So this is line where it checks for invalid inputs.
+
+If Node 2 returns true, then it goes to Node3 which is "return 999". That's straightforward.
+
+If Node2 is false, then we go into the main logic of LU decomposition, represented by Nodes4 onwards. 
+
+Looking further, Node6 has a condition on a[i][i] <= eps. This corresponds to the inner if statement inside the for loop in `ludcmp` after checking each diagonal element. So line where it checks if (fabs(a[i][i]) <= eps) return 1.
+
+Now, I need to look at all possible paths and see which ones are infeasible.
+
+Passo2: Identifying Potential Paths
+Starting from Node1, the initial condition is checked in Node2. If n is 5 and eps is 1e-6, then Node2's condition (n>99 || eps<=0) is false, so we go into Node4 which represents the for loop starting i=0.
+
+Then, inside this loop, at each iteration i, it checks a[i][i] in Node6. If that's <=eps, returns 1 (Node7). Else, proceeds with the inner loops.
+
+Assuming all diagonal elements are okay, we proceed through several matrix operations until reaching Node13, which is another condition on i>=0. This continues until Node19, which seems to be an exit node, but in this case, `ludcmp` returns 0 at the end.
+
+So possible paths would involve going through the main logic of LU decomposition, handling each iteration's conditions and loops.
+
+Passo3: Classifying Inviability
+I need to see if any paths are impossible based on data dependencies or logical contradictions.
+
+Looking at Node6: If a[i][i] is less than or equal to eps, it returns 1. Otherwise, continues. But in our case, since n=5 and eps=1e-6, let's assume that the matrix is well-conditioned, so a[i][i] will be larger than eps. So paths that go through Node7 (return 1) would only happen if any diagonal element is zero or very small, which isn't the case here.
+
+Passo4: Analysis by Criteria
+For each path, check data consistency and logical conditions.
+
+Node2: n=5<99, eps>0. So this condition is false; path to Node3 (return 999) is impossible because it's only taken if n>99 or eps<=0. Therefore, the path from Node1->Node2->Node3 is infeasible since our inputs don't meet these conditions.
+
+Wait, no—actually, in this case, since n=5 and eps=1e-6 are valid, we don't take that path. So the return 999 is not executed, making that path infeasible under normal execution.
+
+Similarly, paths that would require a[i][i] <=eps might be possible only if the matrix has singularities. But without such inputs, these conditions won't hold, so those paths are infeasible.
+
+Passo5: Consolidation
+So any path that depends on n>99 or eps<=0 or any diagonal element being small would be infeasible for valid inputs.
+
+Looking back at Node2, when n=5 and eps=1e-6, the condition is false. Therefore, paths going to Node3 are infeasible because they can't happen with these input values.
+
+Another possible path is through all loops without any early returns. But I should check if any other conditions could be contradictory.
+
+For example, after LU decomposition, it calculates x. If during the back substitution any step would require division by zero (if a[i][i] was <=eps), but in our case, we don't hit that because Node6's condition is false.
+
+So in this code execution:
+
+- Path 1: Node1 -> Node2 (n=5, eps=1e-6) → condition fails → go to Node4.
+- Then proceeds through the loops without hitting any returns except at the end returning 0.
+
+Any path that would return 999 or 1 is infeasible because inputs don't meet those conditions.
+
+So for example:
+
+Path: Node1 → Node2 → Node3 (return 999) is impossible since n=5 and eps=1e-6 are valid. So this is an infeasible path due to static reasons—it can never be taken.
+
+Similarly, any path that would reach Node7 (return 1) requires a diagonal element being too small, which isn't the case here.
+
+Another possible infeasible path could involve conditions inside loops leading to impossible scenarios. For example, if in some iteration i, j goes out of bounds due to a miscalculation, but looking at the code, indices are properly handled.
+
+So I think the main infeasible paths are those that return early (Node3 and Node7) because their conditions aren't met with valid inputs.

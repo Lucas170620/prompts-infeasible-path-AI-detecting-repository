@@ -1,0 +1,62 @@
+
+**Parte 1 - Código Graphviz:**
+
+```dot
+digraph jpegdct {
+    rankdir=TB;
+    node [shape=circle];
+
+    1 [label="1", xlabel="Entrada da função"];
+    2 [label="2", xlabel="Início da transformação DCT"];
+    3 [label="3", xlabel="Loop externo sobre linhas"];
+    4 [label="4", xlabel="Processar bloco de 8x8"];
+    5 [label="5", xlabel="Aplicar DCT nos pixels"];
+    6 [label="6", xlabel="Quantização dos coeficientes"];
+    7 [label="7", xlabel="Verificação de blocos especiais"];
+    8 [label="8", xlabel="Fim do loop interno"];
+    9 [label="9", xlabel="Retorno da função"];
+
+    1 -> 2;
+    2 -> 3;
+    3 -> 4 [label="Entrar no bloco"];
+    4 -> 5;
+    5 -> 6;
+    6 -> 7 [label="Blocos especiais"];
+    7 -> 8;
+    8 -> 9 [label="Fim de todos blocos"];
+}
+```
+
+**Parte 2 - Mapeamento Código-Nós (em tags):**
+
+<codigos - jpegdct>
+Node 1:
+void jpegdct(short a[], short b[], ...) {
+---
+Node 2:
+// Início da transformação DCT
+short c = 0x3;
+long int d = 0xAAAA;
+int e[1] = {0xEEEE};
+---
+Node 3:
+for (int i = 0; i < numRows; i++) {
+---
+Node 4:
+processBlock(a[blockIndex], b[blockIndex]);
+---
+Node 5:
+performDCT(pixelData);
+---
+Node 6:
+quantize(dctCoefficients);
+---
+Node 7:
+if (isSpecialCase) handleSpecial();
+---
+Node 8:
+} // Fim do loop interno
+---
+Node 9:
+return;
+</codigos>

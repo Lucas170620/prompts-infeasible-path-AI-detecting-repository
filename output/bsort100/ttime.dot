@@ -1,0 +1,12 @@
+digraph ttime {
+    rankdir=TB;
+    
+    1 [label="1", xlabel="Def: buffer, utime"];
+    2 [label="2", xlabel="C-Use: buffer.tms_utime\nDef: utime"];
+    3 [label="3", xlabel="P-Use: utime"];
+    exit [shape=doublecircle];
+    
+    1 -> 2;
+    2 -> 3;
+    3 -> exit;
+}
