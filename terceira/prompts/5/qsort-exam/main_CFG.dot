@@ -1,6 +1,0 @@
-digraph main_CFG {
-    node [shape=box, style=rounded, fontname="Helvetica"];
-    N1 [label="main: call sort(20)"];
-    N2 [label="return", shape=doublecircle];
-    N1 -> N2;
-}

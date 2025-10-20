@@ -1,7 +1,0 @@
-digraph main_DFG {
-    node [shape=ellipse];
-    // Nao ha dependencias de dados explicitas entre as instrucoes, pois as funcoes operam em variaveis globais.
-    N1 [label="InitSeed"];
-    N2 [label="Test"];
-    // Chamadas de funcao sem passagem explicita de parametros (uso de globais).
-}

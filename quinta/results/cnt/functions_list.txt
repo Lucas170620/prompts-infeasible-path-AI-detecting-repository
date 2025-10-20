@@ -1,6 +1,0 @@
-main
-Test
-Initialize
-InitSeed
-Sum
-RandomInteger

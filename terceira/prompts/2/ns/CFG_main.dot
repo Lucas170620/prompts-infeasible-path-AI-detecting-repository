@@ -1,8 +1,0 @@
-digraph CFG_main {
-  node [shape=box];
-  entry [label="Entry", shape=ellipse];
-  exit [label="Exit", shape=ellipse];
-  BB0 [label="foo(400)"];
-  entry -> BB0;
-  BB0 -> exit;
-}
