@@ -1,8 +1,0 @@
-digraph main_CFG {
-    node [shape=box, style=rounded];
-    M1 [label="int a;"];
-    M2 [label="a = 30;"];
-    M3 [label="fib(a);"];
-    M4 [label="return a;"];
-    M1 -> M2 -> M3 -> M4;
-}

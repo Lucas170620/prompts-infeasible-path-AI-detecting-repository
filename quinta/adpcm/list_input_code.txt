@@ -1,7 +1,0 @@
-O ponto inicial de execução do código fornecido é a função `main()`, localizada próximo ao final do arquivo, após todas as outras definições de funções e variáveis globais. 
-
-**Localização específica:** A função `main` inicia na linha onde se encontra `int main()` (aproximadamente na linha 263, considerando a numeração implícita do código fornecido). Ela está condicionalmente compilada dentro de um bloco `#ifndef Seoul_Mate` e `#endif`, mas como `Seoul_Mate` não está definido no código, a função `main` está incluída e é o ponto de entrada.
-
-**Explicação com base nas convenções da linguagem C:** Em C, a execução de um programa sempre começa pela função `main()`, a menos que haja uma configuração específica de ambiente ou bootloader que modifique isso. Neste código, a função `main` está presente e é onde a lógica principal é iniciada, incluindo chamadas para `reset()`, `encode()` e `decode()`, seguindo a convenção padrão da linguagem.
-
-Se `Seoul_Mate` estivesse definido, o código não teria um ponto de entrada explícito, mas como não está, `main` é o ponto de entrada válido.

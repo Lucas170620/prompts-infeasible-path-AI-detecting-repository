@@ -1,6 +1,0 @@
-digraph InitSeed_CFG {
-    node [shape=box];
-    N1 [label="Seed = 0"];
-    N2 [label="return 0;"];
-    N1 -> N2;
-}
