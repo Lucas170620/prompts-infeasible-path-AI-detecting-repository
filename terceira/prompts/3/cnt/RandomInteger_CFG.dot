@@ -1,6 +1,0 @@
-digraph RandomInteger_CFG {
-    node [shape=box];
-    N1 [label="Seed = ((Seed * 133) + 81) % 8095"];
-    N2 [label="return Seed"];
-    N1 -> N2;
-}

@@ -1,7 +1,0 @@
-digraph my_cos_CFG {
-    node [shape=box, style=rounded, fontname="Helvetica"];
-    N1 [label="1: return (my_sin(PI / 2 - rad));"];
-    N2 [label="2: Fim", shape=doublecircle];
-
-    N1 -> N2;
-}
