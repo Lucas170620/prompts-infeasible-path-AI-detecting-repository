@@ -106,7 +106,7 @@ def prompt_generate_cdfg(function: str, code: str) -> str:
     print(f"Iniciando: prompt_generate_cdfg -> {function}")
     conteudo_markdown = load_markdown_file(caminho_prompt)
     # clearer separation for LLM: wrap code block and prompt body with '---' separators
-    prompt = "[code]\n" + code + "\n---\n" + conteudo_markdown.replace("{substitua aqui o nome da funcao}", function)
+    prompt = "[code]\n" + code + "\n---\n" + conteudo_markdown.replace("{replace with function name here}", function)
     resoning, response = ia_integration.fetch_response(prompt)
     try:
         with open(path_save, 'w', encoding='utf-8') as f:
@@ -226,7 +226,7 @@ def prompt_detecting_infeasible_paths_in_function(cdfg: str, function: str, code
     print(f"Iniciando: prompt_detecting_infeasible_paths_in_function -> {function}")
     conteudo_markdown = load_markdown_file(caminho_prompt)
     # clearer separation for LLM: delimit code and cdfg sections with '---'
-    prompt =  "[code]\n" + code_cleaned + "\n---\n[cdfg]\n" + cdfg + "\n---\n" + conteudo_markdown.replace("INSIRA AQUI A FUNÇÃO", function)
+    prompt =  "[code]\n" + code_cleaned + "\n---\n" + conteudo_markdown.replace("<INSERT FUNCTION HERE>", function).replace("<INSERT CDFG HERE>", cdfg)
     reasoning, out = ia_integration.fetch_response(prompt)
 
 

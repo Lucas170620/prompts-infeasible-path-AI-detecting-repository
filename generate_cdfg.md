@@ -1,57 +1,49 @@
-Você é um especialista em análise estática de código e teste estrutural. Sua tarefa é analisar código fornecido e gerar um **CDFG (Control and Data Flow Graph)** preciso em formato Graphviz DOT para uma função {substitua aqui o nome da funcao}.
+You are an expert in static code analysis and structural testing. Your task is to analyze the provided code and generate an accurate **CDFG (Control and Data Flow Graph)** in Graphviz DOT format for a specific function {replace with function name here}.
 
-### Especificações Técnicas:
+### Technical Specifications:
 
-**1. Linguagem Graphviz DOT:**
-- Use digrafos direcionados: `digraph NomeFuncao { ... }`
-- Personalize nós com: `NóID [label="Texto" shape="forma" xlabel="info dados"]`
-- Formas principais: box (processamento), diamond (decisão), doublecircle (fim)
-- Rotule arestas com condições: `A -> B [label="condição"]`
-- Use `rankdir=TB` para layout vertical
+**1. Graphviz DOT Language:**
+- Use directed digraphs: `digraph FunctionName { ... }`
+- Customize nodes with: `NodeID [label="Text" shape="shape" xlabel="data info"]`
+- Main shapes: box (processing), diamond (decision), doublecircle (end)
+- Label edges with conditions: `A -> B [label="condition"]`
+- Use `rankdir=TB` for vertical layout
 
-**2. Construção do CDFG Híbrido:**
-Integre estas informações em cada nó:
-- **Fluxo de Controle:** sequência de execução básica
-- **Fluxo de Dados:** def (definições) e use (usos) de variáveis
-- **Tipos de Uso:** C-Use (computacional) e P-Use (predicativo)
+**2. Hybrid CDFG Construction:**
+Integrate this information in each node:
+- **Control Flow:** basic execution sequence
+- **Data Flow:** def (definitions) and use (usages) of variables
+- **Usage Types:** C-Use (computational) and P-Use (predicative)
 
-**3. Estrutura de Representação:**
-- Nós de processo: operações sequenciais
-- Nós de decisão: condições if/while/for
-- Arestas verdadeiro/falso para bifurcações
-- Loops: nó de condição com retorno ao corpo
-- Use circulo para representar os nós
-- Um circulo duplo para representar o nó final.
+**3. Representation Structure:**
+- Process nodes: sequential operations
+- Decision nodes: if/while/for conditions
+- True/false edges for branches
+- Loops: condition node with return to body
+- Use circle to represent nodes
+- Use double circle to represent the end node
 
-### Processamento Obrigatório:
+### Mandatory Processing:
 
-**Para a função especificada:**
-1. Identifique todos os blocos básicos
-2. Mapeie definições (def) e usos (c-use/p-use) de variáveis
-3. Construa o grafo integrando controle e dados
-4. Numere nós sequencialmente
-5. Gere lista de correspondência código-nós
+**For the specified function:**
+1. Identify all basic blocks
+2. Map definitions (def) and usages (c-use/p-use) of variables
+3. Construct the graph integrating control and data
+4. Number nodes sequentially
+5. Generate code-to-node correspondence list
 
-### Saída Exigida:
+### Required Output:
 
-**Parte 1 - Código Graphviz:**
+**Graphviz Code:**
 ```dot
-digraph NomeFuncao {
-    // Configurações e nós
+digraph FunctionName {
+    // Settings and nodes
 }
 ```
 
-**Parte 2 - Mapeamento Código-Nós (em tags):**
-<codigos - NomeFuncao>
-Node [ID]:
-[Trecho código relevante]
----
-[Próximo node...]
-</codigos>
+### Reference Example:
 
-### Exemplo de Referência:
-
-**Código:**
+**Code:**
 ```java
 public class Order {
     public void applyDiscount(Customer customer, Product product) {
@@ -60,20 +52,20 @@ public class Order {
         boolean isOnClearance = product.isOnClearance();
         
         if (isPremium && isEligibleForDiscount) {
-            System.out.println("Desconto Premium aplicado.");
+            System.out.println("Premium Discount applied.");
         }
 
         if (isOnClearance) {
-            System.out.println("Item em liquidação.");
+            System.out.println("Clearance item.");
             if (isPremium && isEligibleForDiscount) {
-                System.out.println("Super Desconto para Premium em Liquidação!");
+                System.out.println("Super Discount for Premium on Clearance!");
             }
         }
     }
 }
 ```
 
-**Saída Esperada:**
+**Expected Output:**
 ```dot
 digraph order {
     rankdir=TB;
@@ -102,18 +94,4 @@ digraph order {
 }
 ```
 
-<codigos - exemplo>
-Node 1:
-int y = x * 2;
----
-Node 2:
-if (y > 10)
----
-Node 3:
-System.out.println("Maior")
----
-Node 4:
-return
-</codigos>
-
-**Agora, gere o CDFG completo para o código e função fornecidos. Mantenha precisão técnica e complete ambas as partes da saída.**
+**Now, generate the complete CDFG for the provided code and function. Maintain technical precision and complete both parts of the output.**

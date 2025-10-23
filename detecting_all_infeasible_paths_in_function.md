@@ -1,30 +1,30 @@
- Você é um especialista em engenharia de software com expertise em teste estrutural, CDFG e Graphviz. Sua tarefa é analisar um código e seu CDFG para identificar caminhos inviáveis (*infeasible paths*). Siga **rigorosamente** os passos abaixo.
+You are a software engineering expert with specialization in structural testing, CDFG, and Graphviz. Your task is to analyze a code and its CDFG to identify infeasible paths. Follow the steps below **rigorously**.
 
 ---
 
-#### **1. Contexto Teórico (Resumo)**  
-- **CDFG**: Combina CFG (fluxo de controle) e DFG (fluxo de dados).  
-- **Caminhos Inviáveis**: Sequências de nós/arestas inexequíveis devido a:  
-  - Contradições lógicas (ex: `x > 10` e `x < 5` no mesmo caminho).  
-  - Dependências de dados (ex: variável não inicializada).  
-  - Conflitos em condições sequenciais ou invariantes de programa.  
+#### **1. Theoretical Context (Summary)**
+- **CDFG**: Combines CFG (control flow) and DFG (data flow).
+- **Infeasible Paths**: Sequences of nodes/edges that cannot be executed due to:
+  - Logical contradictions (e.g., `x > 10` and `x < 5` in the same path).
+  - Data dependencies (e.g., uninitialized variable).
+  - Conflicts in sequential conditions or program invariants.
 
 ---
 
-#### **2. Exemplo de Análise**  
-**Função de Exemplo:**  
+#### **2. Analysis Example**
+**Example Function:**
 ```python
 def example(x):
-    if x > 10:     # Nó A
-        y = 5      # Nó B
+    if x > 10:     # Node A
+        y = 5      # Node B
     else:
-        y = 0      # Nó C
-    if y < 0:      # Nó D
-        return -1  # Nó E
-    return y       # Nó F
+        y = 0      # Node C
+    if y < 0:      # Node D
+        return -1  # Node E
+    return y       # Node F
 ```
 
-**CDFG (Graphviz DOT):**  
+**CDFG (Graphviz DOT):**
 ```dot
 digraph Example {
   A [label="if x > 10"]
@@ -41,80 +41,80 @@ digraph Example {
 }
 ```
 
-**Análise:**  
-1. **Passo 1:** Rastrear caminhos no CDFG (ex: A→B→D→E).  
-2. **Passo 2:** Verificar contradições:  
-   - Caminho `A→B→D→E`:  
-     - Em `B`, `y = 5`.  
-     - Em `D`, a condição `y < 0` é **falsa** porque `y = 5`.  
-     - Conclusão: O caminho para `E` é inviável.  
-3. **Saída Formatada:**  
+**Analysis:**
+1. **Step 1:** Trace paths in the CDFG (e.g., A→B→D→E).
+2. **Step 2:** Check for contradictions:
+   - Path `A→B→D→E`:
+     - At `B`, `y = 5`.
+     - At `D`, the condition `y < 0` is **false** because `y = 5`.
+     - Conclusion: The path to `E` is infeasible.
+3. **Formatted Output:**
    ```markdown
-   1. **Caminho Inviável [example]**  
-      - **Trechos de Código**:  
-        - Linha 2: `if x > 10`  
-        - Linha 3: `y = 5`  
-        - Linha 6: `if y < 0`  
-        - Linha 7: `return -1`  
-      - **Descrição**: Nó A → Nó B → Nó D → Nó E  
-      - **Motivo**: Contradição lógica: `y = 5` torna a condição `y < 0` falsa.  
+   1. **Infeasible Path [example]**
+      - **Code Segments**:
+        - Line 2: `if x > 10`
+        - Line 3: `y = 5`
+        - Line 6: `if y < 0`
+        - Line 7: `return -1`
+      - **Description**: Node A → Node B → Node D → Node E
+      - **Reason**: Logical contradiction: `y = 5` makes the condition `y < 0` false.
    ```
 
 ---
 
-#### **3. Tarefa Principal**  
-Analise o código e CDFG fornecidos abaixo:
+#### **3. Main Task**
+Analyze the provided code and CDFG below:
 
-**Função:**  
-```<INSIRA AQUI A FUNÇÃO>```
+**Function:**
+```<INSERT FUNCTION HERE>```
 
-**CDFG (Graphviz DOT):**  
-```<INSIRA AQUI O CDFG>```
-
----
-
-Execute **sequencialmente** estes passos:
-
-**Passo 1: Mapeamento Código-CDFG**  
-- Relacione cada nó/aresta do CDFG com trechos do código.  
-- Exemplo: "Nó A corresponde à linha 5: `if x > 0`".
-
-**Passo 2: Identificação de Caminhos Potenciais**  
-- Liste todos os caminhos possíveis no CDFG (ex: A→B→D, A→C→D).  
-- Use a estrutura do CDFG para evitar omissões.
-
-**Passo 3. Classificação de Inviabilidade**  
-Categorizar cada caminho inviável como:  
-- **Estaticamente Inviável:** Inviável em todas as execuções (ex: lógica contraditória)  
-- **Dinamicamente Inviável:** Inviável sob condições específicas de entrada  
-
-**Passo 4: Análise de Viabilidade por Critério**  
-Para cada caminho:  
-1. **Dados**: Variáveis estão inicializadas? Valores são consistentes?  
-2. **Lógica**: Condições subsequentes se contradizem?  
-3. **Contexto**: Há invariantes (ex: `x ≥ 0`) que bloqueiam o caminho?  
-4. **Loop**: Condições de entrada/saída de loops são satisfeitas?
-
-**Passo 5: Consolidação**  
-- Filtre caminhos que violam **pelo menos um critério** como inviáveis.  
-- Descreva cada um com:  
-  - Trechos de código relevantes.  
-  - Sequência de nós.  
-  - Motivo detalhado (ex: "`x = 5` no nó B contradiz `x != 5` no nó D").
+**CDFG (Graphviz DOT):**
+```<INSERT CDFG HERE>```
 
 ---
 
-#### **5. Formato de Saída Exigido**  
-- Se houver caminhos inviáveis:  
+Execute these steps **sequentially**:
+
+**Step 1: Code-CDFG Mapping**
+- Relate each node/edge in the CDFG to code segments.
+- Example: "Node A corresponds to line 5: `if x > 0`".
+
+**Step 2: Identification of Potential Paths**
+- List all possible paths in the CDFG (e.g., A→B→D, A→C→D).
+- Use the CDFG structure to avoid omissions.
+
+**Step 3: Infeasibility Classification**
+Categorize each infeasible path as:
+- **Statically Infeasible:** Infeasible in all executions (e.g., contradictory logic)
+- **Dynamically Infeasible:** Infeasible under specific input conditions
+
+**Step 4: Feasibility Analysis by Criterion**
+For each path:
+1. **Data**: Are variables initialized? Are values consistent?
+2. **Logic**: Do subsequent conditions contradict each other?
+3. **Context**: Are there invariants (e.g., `x ≥ 0`) that block the path?
+4. **Loop**: Are loop entry/exit conditions satisfied?
+
+**Step 5: Consolidation**
+- Filter paths that violate **at least one criterion** as infeasible.
+- Describe each one with:
+  - Relevant code segments.
+  - Node sequence.
+  - Detailed reason (e.g., "`x = 5` at node B contradicts `x != 5` at node D").
+
+---
+
+#### **5. Required Output Format**
+- If infeasible paths exist:
   ```markdown
-  # Caminhos Inviáveis Identificados
+  # Infeasible Paths Identified
 
-  [Número]. **Caminho Inviável [Nome da Função]**  
-    - **Trechos de Código**:  
-      - Linha [X]: `[código]`  
-      - Linha [Y]: `[código]`  
-    - **Descrição**: [Sequência de nós, ex: A → B → C]  
-    - **Motivo**: [Explicação técnica com base nos critérios]  
-  ```  
-- Caso contrário:  
-  `"Nenhum caminho inviável foi identificado."`
+  [Number]. **Infeasible Path [Function Name]**
+    - **Code Segments**:
+      - Line [X]: `[code]`
+      - Line [Y]: `[code]`
+    - **Description**: [Node sequence, e.g., A → B → C]
+    - **Reason**: [Technical explanation based on criteria]
+  ```
+- Otherwise:
+  `"No infeasible paths were identified."`

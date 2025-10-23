@@ -1,17 +1,18 @@
-Analise o código abaixo e extraia **apenas os nomes** de todas as funções ou métodos definidos pelo usuário (ignore funções built-in ou de bibliotecas).  
-
-**Regras de formatação:**  
-- Liste um nome por linha, sem números, bullets ou caracteres extras.  
-- Use exatamente o nome como declarado no código (preserve maiúsculas/minúsculas).  
-- Ignore parâmetros, corpo da função e comentários.  
-- Traga funções TODAS funções , inclusive funções main
-**Código de entrada:**  
+**Input code:**
 ```
-{insira_o_código_aqui}
+{insert_code_here}
 ```
 
-**Saída esperada (exemplo):**  
-minhaFuncao  
-calcularTotal  
-obterDados  
+Analyze the code and extract **only the names** of all user-defined functions or methods (ignore built-in or library functions).
+
+**Formatting rules:**
+- List one name per line, without numbers, bullets, or extra characters.
+- Use the exact name as declared in the code (preserve uppercase/lowercase).
+- Ignore parameters, function body, and comments.
+- Include ALL functions, including main functions.
+
+**Expected output (example):**
+minhaFuncao
+calcularTotal
+obterDados
 ...
