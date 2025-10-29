@@ -1,6 +1,0 @@
-
-```markdown
-# Caminhos Inviáveis Identificados
-
-Nenhum caminho inviável foi identificado.
-```

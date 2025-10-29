@@ -1,9 +1,0 @@
-Okay, I need to analyze the given code and extract only the names of all functions or methods defined by the user. I should ignore built-in or library functions.
-
-Looking at the code, I start from the top. There's a function called num_to_lcd that takes an unsigned char a as a parameter. That's one function.
-
-Then further down, there's a main function declared with int main(void). So that's another function to include.
-
-I should list each name on a separate line, exactly as they are in the code. So I'll write 'num_to_lcd' and 'main'.
-
-Wait, what about variables? Like n or i? No, those are not functions. Only functions defined by the user count here. So just num_to_lcd and main.

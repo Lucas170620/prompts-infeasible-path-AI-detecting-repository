@@ -1,6 +1,0 @@
-main
-InitSeed
-Test
-Initialize
-RandomInteger
-Multiply

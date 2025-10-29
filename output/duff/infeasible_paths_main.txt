@@ -1,4 +1,0 @@
-
-```markdown
-Nenhum caminho inviável foi identificado.
-```

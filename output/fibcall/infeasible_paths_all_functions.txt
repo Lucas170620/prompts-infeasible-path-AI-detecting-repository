@@ -1,4 +1,0 @@
-
-**Resposta Final:**
-
-Nenhum caminho inviável foi identificado nos códigos fornecidos para a função `fib` e `main`. O fluxo de controle é lógico e consistente, sem contradições ou condições impossíveis.

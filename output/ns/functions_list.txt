@@ -1,3 +1,0 @@
-printDate
-calculateTotalDays
-main

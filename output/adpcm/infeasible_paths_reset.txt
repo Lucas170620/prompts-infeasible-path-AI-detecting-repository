@@ -1,8 +1,0 @@
-
-```markdown
-# Caminhos Inviáveis Identificados
-
-Nenhum caminho inviável foi identificado.
-
-O CDFG da função `reset` não possui branches ou condicionais que possam levar a caminhos inviáveis. Todo o fluxo de controle é linear e as variáveis são inicializadas adequadamente sem contradições lógicas.
-```

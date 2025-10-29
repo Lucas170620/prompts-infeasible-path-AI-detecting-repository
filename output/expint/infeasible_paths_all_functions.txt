@@ -1,2 +1,0 @@
-
-$\boxed{\text{When } n > 101 \text{ and } x \leq 1, \text{ the path involving node 17 is infeasible.}}$

@@ -1,8 +1,0 @@
-vec_mpy1
-mac
-fir
-fir_no_red_ld
-latsynth
-iir1
-codebook
-jpegdct

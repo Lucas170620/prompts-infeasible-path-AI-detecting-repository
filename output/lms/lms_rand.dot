@@ -1,8 +1,0 @@
-digraph lms_rand {
-    rankdir=TB;
-    
-    1 [label="Update next", shape=circle];
-    2 [label="Return value", shape=doublecircle, xlabel="Use: next"];
-    
-    1 -> 2;
-}

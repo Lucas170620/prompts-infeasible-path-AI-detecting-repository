@@ -1,8 +1,0 @@
-
-```markdown
-Nenhum caminho inviável foi identificado.
-```
-
-**Explicação:**
-
-A função `do_tripledes_encrypt` é extremamente simples, composta apenas por um único comando de chamada a outra função e não possui nenhuma estrutura condicional ou iterativa. Como consequência, o fluxo de controle é linear e invariável, eliminando a possibilidade de caminhos inviáveis.
