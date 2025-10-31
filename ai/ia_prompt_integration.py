@@ -88,7 +88,7 @@ class IAIntegration:
         if response.status_code == 200:
             self.response = response.json()
             extract_reasoning = self.response['choices'][0]['message'].get('reasoning_content')
-            resposta = "self.response['choices'][0]['message'].get('content')"
+            resposta = self.response['choices'][0]['message'].get('content')
             logger.debug("Extracted reasoning: %s", extract_reasoning)
             logger.debug("Full response content: %s", resposta)
             return extract_reasoning, resposta
